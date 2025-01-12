@@ -1,0 +1,17 @@
+spring:
+  application:
+      name: backend
+  datasource:
+    username: nce
+    password: nce
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/ncedb
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
