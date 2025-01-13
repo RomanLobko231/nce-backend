@@ -5,7 +5,7 @@ spring:
     username: nce
     password: nce
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/ncedb
+    url: jdbc:postgresql://localhost:5435/ncedb
   jpa:
     hibernate:
       ddl-auto: validate

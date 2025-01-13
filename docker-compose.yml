@@ -5,9 +5,10 @@ services:
     environment:
       POSTGRES_USER: nce
       POSTGRES_PASSWORD: nce
+      POSTGRES_DB: ncedb
       PGDATA: var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
       - postgres:/var/lib/postgresql/data
 
