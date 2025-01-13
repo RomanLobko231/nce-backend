@@ -16,4 +16,5 @@ class BackendApplicationTests {
 		ApplicationModules modules = ApplicationModules.of(BackendApplication.class);
 		modules.verify();
 	}
+
 }

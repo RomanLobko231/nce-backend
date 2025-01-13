@@ -1,10 +1,8 @@
 package com.nce.backend.cars.domain.valueObjects;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Builder;
 
-
-@Getter
+@Builder
 public record OwnerInfo(String name, String phoneNumber, String email) {
 
 }

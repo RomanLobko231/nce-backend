@@ -1,7 +1,7 @@
 services:
   postgres:
     container_name: ps_sql
-    image: postgres
+    image: postgres:15
     environment:
       POSTGRES_USER: nce
       POSTGRES_PASSWORD: nce

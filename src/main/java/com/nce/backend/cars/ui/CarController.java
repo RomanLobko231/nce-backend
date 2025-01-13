@@ -1,6 +1,7 @@
 package com.nce.backend.cars.ui;
 
-import com.nce.backend.cars.ui.request.AddCarRequest;
+import com.nce.backend.cars.application.CarApplicationService;
+import com.nce.backend.cars.ui.requests.AddCarRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CarController {
 
+    private final CarApplicationService carService;
+
     ResponseEntity<Void> addNewCar(@RequestBody AddCarRequest addCarRequest){
+        carService.addNewCar(addCarRequest);
 
         return ResponseEntity.ok().build();
     }

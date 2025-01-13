@@ -1,13 +1,11 @@
 package com.nce.backend.cars.domain.entities;
 
 import com.nce.backend.cars.domain.valueObjects.GearboxType;
+import com.nce.backend.cars.domain.valueObjects.OperatingMode;
 import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
 import com.nce.backend.cars.domain.valueObjects.Status;
 import jakarta.persistence.ElementCollection;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -15,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@RequiredArgsConstructor
+
 @Getter
 @Setter
 @Builder
@@ -31,7 +29,7 @@ public class Car {
 
     private String model;
 
-    private LocalTime firstTimeRegisteredInNorway;
+    private LocalDate firstTimeRegisteredInNorway;
 
     private String engineType;
 
@@ -47,18 +45,18 @@ public class Car {
 
     private GearboxType gearboxType;
 
+    private OperatingMode operatingMode;
+
     private Integer weight;
 
     private LocalDate nextEUControl;
 
-    //@Embeddable
     private OwnerInfo ownerInfo;
 
     private Status status;
 
     private String additionalInformation;
 
-    //@ElementCollection
-    private List<String> imagesPaths = new ArrayList<>();
+    private List<String> imagePaths = new ArrayList<>();
 
 }

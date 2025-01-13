@@ -11,7 +11,11 @@ spring:
       ddl-auto: validate
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      default-schema: ncedb
   flyway:
     enabled: true
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
+    baseline-on-migrate: true
+    baseline-version: 0
