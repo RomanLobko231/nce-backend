@@ -42,7 +42,7 @@ public class CarRepositoryImpl implements CarRepository {
     }
 
     @Override
-    public void delete(Car car) {
-        carJpaRepository.delete(mapper.toJpaEntity(car));
+    public void deleteById(UUID id) {
+        carJpaRepository.deleteById(id);
     }
 }

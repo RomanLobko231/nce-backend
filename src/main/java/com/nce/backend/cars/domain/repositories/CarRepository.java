@@ -10,5 +10,6 @@ public interface CarRepository {
     Optional<Car> findById(UUID id);
     List<Car> findAll();
     Car save(Car car);
-    void delete(Car car);
+    void deleteById(UUID id);
+
 }
