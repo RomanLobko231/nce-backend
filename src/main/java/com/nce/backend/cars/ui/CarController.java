@@ -22,7 +22,7 @@ public class CarController {
 
     @PostMapping
     ResponseEntity<Void> addNewCar(@RequestBody @Valid AddCarRequest addCarRequest) {
-        carService.addNewCar(addCarRequest);
+        carService.addNewCarRequest(addCarRequest);
 
         return ResponseEntity.ok().build();
     }

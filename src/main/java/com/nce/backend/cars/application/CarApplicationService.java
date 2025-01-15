@@ -1,12 +1,16 @@
 package com.nce.backend.cars.application;
 
 import com.nce.backend.cars.domain.entities.Car;
+import com.nce.backend.cars.domain.events.NewCarSavedEvent;
 import com.nce.backend.cars.domain.services.CarDomainService;
+import com.nce.backend.cars.domain.services.ExternalApiService;
+import com.nce.backend.cars.domain.valueObjects.ApiCarData;
 import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
-import com.nce.backend.cars.infrastructure.jpa.CarRepositoryImpl;
+import com.nce.backend.cars.domain.valueObjects.Status;
 import com.nce.backend.cars.ui.requests.AddCarRequest;
-import com.nce.backend.cars.ui.responses.CarResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,9 +22,10 @@ import java.util.UUID;
 public class CarApplicationService {
 
     private final CarDomainService carDomainService;
+    private final ExternalApiService externalApiService;
 
-    public Car addNewCar(AddCarRequest addCarRequest) {
-        return carDomainService.saveCar(
+    public Car addNewCarRequest(AddCarRequest addCarRequest) {
+        return carDomainService.saveNewCarRequest(
                 Car.builder()
                         .registrationNumber(addCarRequest.carRegistrationNumber())
                         .ownerInfo(
@@ -30,6 +35,7 @@ public class CarApplicationService {
                                         .email(addCarRequest.email())
                                         .build()
                         )
+                        .status(Status.IN_REVIEW)
                         .build());
     }
 
@@ -47,5 +53,12 @@ public class CarApplicationService {
                 .orElseThrow(
                         () -> new NoSuchElementException("Car with id %s was not found".formatted(id))
                 );
+    }
+
+    @EventListener
+    @Async
+    public void onEvent(NewCarSavedEvent event){
+        ApiCarData apiData = externalApiService.fetchCarData(event.registrationNumber());
+        carDomainService.save(Car.builder().build());
     }
 }

@@ -28,7 +28,7 @@ public class CarApplicationServiceTest {
                 "john.doe@example.com"
         );
 
-        Car savedCar = carApplicationService.addNewCar(addCarRequest);
+        Car savedCar = carApplicationService.addNewCarRequest(addCarRequest);
 
         assertNotNull(savedCar);
         assertEquals("ABC123", savedCar.getRegistrationNumber());

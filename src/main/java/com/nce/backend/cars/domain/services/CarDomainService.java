@@ -1,8 +1,10 @@
 package com.nce.backend.cars.domain.services;
 
 import com.nce.backend.cars.domain.entities.Car;
+import com.nce.backend.cars.domain.events.NewCarSavedEvent;
 import com.nce.backend.cars.domain.repositories.CarRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +17,9 @@ public class CarDomainService {
 
     private final CarRepository carRepository;
 
-    public Car saveCar(Car car) {
+    private final ApplicationEventPublisher eventPublisher;
+
+    public Car save(Car car) {
         return carRepository.save(car);
     }
 
@@ -29,5 +33,14 @@ public class CarDomainService {
 
     public Optional<Car> findById(UUID id) {
         return carRepository.findById(id);
+    }
+
+    public Car saveNewCarRequest(Car car) {
+        Car savedCar = carRepository.save(car);
+        eventPublisher.publishEvent(
+                new NewCarSavedEvent(savedCar.getId(), savedCar.getRegistrationNumber())
+        );
+
+        return savedCar;
     }
 }
