@@ -45,4 +45,9 @@ public class CarRepositoryImpl implements CarRepository {
     public void deleteById(UUID id) {
         carJpaRepository.deleteById(id);
     }
+
+    @Override
+    public boolean existsByRegNumber(String registrationNumber) {
+        return carJpaRepository.existsByRegistrationNumber(registrationNumber);
+    }
 }

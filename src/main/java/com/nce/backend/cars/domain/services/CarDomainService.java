@@ -3,10 +3,13 @@ package com.nce.backend.cars.domain.services;
 import com.nce.backend.cars.domain.entities.Car;
 import com.nce.backend.cars.domain.events.NewCarSavedEvent;
 import com.nce.backend.cars.domain.repositories.CarRepository;
+import com.nce.backend.cars.exceptions.CarAlreadyExistsException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import java.beans.Transient;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,7 +38,14 @@ public class CarDomainService {
         return carRepository.findById(id);
     }
 
+    @Transactional
     public Car saveNewCarRequest(Car car) {
+        if (carRepository.existsByRegNumber(car.getRegistrationNumber())) {
+            throw new CarAlreadyExistsException(
+                    "Car with the registration number '%s' already exists".formatted(car.getRegistrationNumber())
+            );
+        }
+
         Car savedCar = carRepository.save(car);
         eventPublisher.publishEvent(
                 new NewCarSavedEvent(savedCar.getId(), savedCar.getRegistrationNumber())

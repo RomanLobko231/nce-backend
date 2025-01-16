@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -55,8 +56,8 @@ public class CarApplicationService {
                 );
     }
 
-    @EventListener
     @Async
+    @TransactionalEventListener
     public void onEvent(NewCarSavedEvent event){
         ApiCarData apiData = externalApiService.fetchCarData(event.registrationNumber());
         carDomainService.save(Car.builder().build());
