@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 //'Vegvesen' is the name for the Norwegian road inspection agency.
 @Service
@@ -22,15 +23,22 @@ public class VegvesenApiService implements ExternalApiService {
     @Override
     public ApiCarData fetchCarData(String registrationNumber) {
 
-        return webClient.get()
+        Mono<JsonNode> apiResponse = webClient.get()
                 .uri(
                         uriBuilder -> uriBuilder
-                        .queryParam("kjennemerke", registrationNumber)
-                        .build()
+                                .queryParam("kjennemerke", registrationNumber)
+                                .build()
                 )
-                .header("SVV-Authorization", authorizationToken)
+                .header("SVV-Authorization", authToken)
                 .retrieve()
                 .bodyToMono(JsonNode.class);
+
+        apiResponse.subscribe(carData -> {
+
+                }
+        );
+
+        return null;
     }
 }
 

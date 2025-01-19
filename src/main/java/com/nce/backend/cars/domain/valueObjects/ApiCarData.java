@@ -1,8 +1,10 @@
 package com.nce.backend.cars.domain.valueObjects;
 
+import lombok.Builder;
+
 import java.time.LocalDate;
 
-
+@Builder
 public record ApiCarData(
          String make,
 

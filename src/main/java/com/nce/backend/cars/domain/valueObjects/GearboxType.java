@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum GearboxType {
 
-    MANUAL("Manuel"),
+    MANUAL("Manuell"),
 
     AUTOMATIC("Automat"),
 

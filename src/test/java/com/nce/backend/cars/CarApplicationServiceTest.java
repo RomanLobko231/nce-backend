@@ -19,7 +19,7 @@ public class CarApplicationServiceTest {
 
     @Test
     @Transactional
-    public void testAddNewCar_savesCarSuccessfully() {
+    void testAddNewCar_savesCarSuccessfully() {
 
         AddCarRequest addCarRequest = new AddCarRequest(
                 "John Doe",
