@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nce.backend.cars.domain.valueObjects.ApiCarData;
+import com.nce.backend.cars.domain.valueObjects.GearboxType;
+import com.nce.backend.cars.domain.valueObjects.OperatingMode;
 import com.nce.backend.cars.infrastructure.externalApi.VegvesenApiJsonMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,24 +31,16 @@ public class ExternalApiTest {
         JsonNode node = objectMapper.readTree(json);
 
 
-        System.out.println(
-                node
-                        .get("kjoretoydataListe")
-                        .get(0)
-                        .get("godkjenning")
-                        .get("tekniskGodkjenning")
-                        .get("tekniskeData")
-                        .get("generelt")
-                        .get("merke")
-                        .get(0)
-                        .get("merke")
-                        .asText());
-
-//        ApiCarData apiData = mapper.mapFromJson(node);
-//        assertEquals(apiData.bodywork(), "N/A");
-//        assertEquals(apiData.color(), "Sølv");
-//        assertEquals(apiData.engineVolume(), 2494);
-//        assertEquals(apiData.firstTimeRegisteredInNorway(), LocalDate.parse("2005-06-02"));
+        ApiCarData apiData = mapper.mapFromJson(node);
+        assertEquals(apiData.bodywork(), "N/A");
+        assertEquals(apiData.color(), "Sølv");
+        assertEquals(apiData.engineVolume(), 2494);
+        assertEquals(apiData.firstTimeRegisteredInNorway(), LocalDate.parse("2005-06-02"));
+        assertEquals(apiData.nextEUControl(), LocalDate.parse("2024-07-22"));
+        assertEquals(apiData.engineType(), "Diesel");
+        assertEquals(apiData.gearboxType(), GearboxType.MANUAL);
+        assertEquals(apiData.numberOfDoors(), 0);
+        assertEquals(apiData.operatingMode(), OperatingMode.REAR_WHEEL);
 
     }
 }

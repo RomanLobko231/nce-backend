@@ -1,5 +1,6 @@
 package com.nce.backend.cars.infrastructure.externalApi;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.nce.backend.cars.domain.valueObjects.ApiCarData;
 import com.nce.backend.cars.domain.valueObjects.GearboxType;
@@ -12,48 +13,108 @@ import java.time.LocalDate;
 @Service
 public class VegvesenApiJsonMapper {
 
+    private final String TEXT_DEFAULT_VALUE = "N/A";
+    private final int INT_DEFAULT_VALUE = 0;
+
     public ApiCarData mapFromJson(JsonNode jsonNode) {
+
+        JsonNode technicalDetailsNode = jsonNode
+                .path("kjoretoydataListe")
+                .path(0)
+                .at("/godkjenning/tekniskGodkjenning/tekniskeData");
+
+
         return ApiCarData.builder()
                 .make(
-                        jsonNode
-                                .get("kjoretoydataListe")
-                                .get(0)
-                                .get("godkjenning")
-                                .get("tekniskGodkjenning")
-                                .get("tekniskeData")
-                                .get("generelt")
-                                .get("merke")
-                                .get(0)
-                                .get("merke")
-                                .asText()
+                        technicalDetailsNode
+                                .at("/generelt/merke")
+                                .path(0)
+                                .path("merke")
+                                .asText(TEXT_DEFAULT_VALUE)
                 )
-                .model(jsonNode.get("handelsbetegnelse").asText())
-                .color(jsonNode.get("farge").asText())
-                .weight(jsonNode.get("egenvekt").asInt())
-                .numberOfSeats(jsonNode.get("sitteplasserTotalt").asInt())
-                .numberOfDoors(jsonNode.get("antallDorer").get(0).asInt())
-                .engineVolume(jsonNode.get("slagvolum").asInt())
-                .engineType(jsonNode.get("drivstoffKode").get("kodeBeskrivelse").asText())
-                .bodywork(jsonNode.path("karosseritype").path("kodeNavn").asText("N/A"))
+                .model(
+                        technicalDetailsNode
+                                .at("/generelt/handelsbetegnelse")
+                                .path(0)
+                                .asText(TEXT_DEFAULT_VALUE)
+                )
+                .color(
+                        technicalDetailsNode
+                                .at("/karosseriOgLasteplan/rFarge")
+                                .path(0)
+                                .path("kodeNavn")
+                                .asText(TEXT_DEFAULT_VALUE)
+                )
+                .weight(
+                        technicalDetailsNode
+                                .at("/vekter/egenvekt")
+                                .asInt(INT_DEFAULT_VALUE)
+                )
+                .numberOfSeats(
+                        technicalDetailsNode
+                                .at("/persontall/sitteplasserTotalt")
+                                .asInt(INT_DEFAULT_VALUE)
+                )
+                .numberOfDoors(
+                        technicalDetailsNode
+                                .at("/karosseriOgLasteplan/antallDorer")
+                                .path(0)
+                                .asInt(INT_DEFAULT_VALUE)
+                )
+                .engineVolume(
+                        technicalDetailsNode
+                                .at("/motorOgDrivverk/motor")
+                                .path(0)
+                                .path("slagvolum")
+                                .asInt(INT_DEFAULT_VALUE)
+                )
+                .engineType(
+                        technicalDetailsNode
+                                .at("/motorOgDrivverk/motor")
+                                .path(0)
+                                .path("drivstoff")
+                                .path(0)
+                                .at("/drivstoffKode/kodeBeskrivelse")
+                                .asText(TEXT_DEFAULT_VALUE)
+                )
+                .bodywork(
+                        technicalDetailsNode
+                                .at("/karosseriOgLasteplan/karosseritype/kodeNavn")
+                                .asText(TEXT_DEFAULT_VALUE)
+                )
                 .firstTimeRegisteredInNorway(
-                        LocalDate.parse(jsonNode.get("forstegangRegistrertDato").asText())
+                        LocalDate.parse(
+                                jsonNode
+                                        .path("kjoretoydataListe")
+                                        .path(0)
+                                        .at("/forstegangsregistrering/registrertForstegangNorgeDato")
+                                        .asText("1111-11-11")
+                        )
                 )
                 .nextEUControl(
-                        LocalDate.parse(jsonNode.get("kontrollfrist").asText())
+                        LocalDate.parse(
+                                jsonNode
+                                        .path("kjoretoydataListe")
+                                        .path(0)
+                                        .at("/periodiskKjoretoyKontroll/kontrollfrist")
+                                        .asText("1111-11-11")
+                        )
                 )
                 .gearboxType(
                         GearboxType.fromString(
-                                jsonNode.get("girkassetype").get("kodeNavn").asText()
+                                technicalDetailsNode
+                                        .at("/motorOgDrivverk/girkassetype/kodeNavn")
+                                        .asText(TEXT_DEFAULT_VALUE)
                         )
 
                 )
-                .operatingMode(defineOperatingMode(jsonNode))
+                .operatingMode(defineOperatingMode(technicalDetailsNode))
                 .build();
     }
 
     OperatingMode defineOperatingMode(JsonNode jsonNode) {
-        JsonNode frontAxle = jsonNode.path("akselGruppe").path(0).path("aksel").path(0).path("drivAksel");
-        JsonNode backAxle = jsonNode.path("akselGruppe").path(1).path("aksel").path(0).path("drivAksel");
+        JsonNode frontAxle = jsonNode.at("/akslinger/akselGruppe").path(0).at("/akselListe/aksel").path(0).path("drivAksel");
+        JsonNode backAxle = jsonNode.at("/akslinger/akselGruppe").path(1).at("/akselListe/aksel").path(0).path("drivAksel");
 
         if (frontAxle.isMissingNode() || backAxle.isMissingNode()) return OperatingMode.OTHER;
 
