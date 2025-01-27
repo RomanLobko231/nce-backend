@@ -16,8 +16,8 @@ public class VegvesenApiJsonMapper {
     private final String TEXT_DEFAULT_VALUE = "N/A";
     private final int INT_DEFAULT_VALUE = 0;
 
-    public ApiCarData mapFromJson(JsonNode jsonNode) {
 
+    public ApiCarData mapFromJson(JsonNode jsonNode) {
         JsonNode technicalDetailsNode = jsonNode
                 .path("kjoretoydataListe")
                 .path(0)
@@ -112,7 +112,7 @@ public class VegvesenApiJsonMapper {
                 .build();
     }
 
-    OperatingMode defineOperatingMode(JsonNode jsonNode) {
+    private OperatingMode defineOperatingMode(JsonNode jsonNode) {
         JsonNode frontAxle = jsonNode.at("/akslinger/akselGruppe").path(0).at("/akselListe/aksel").path(0).path("drivAksel");
         JsonNode backAxle = jsonNode.at("/akslinger/akselGruppe").path(1).at("/akselListe/aksel").path(0).path("drivAksel");
 

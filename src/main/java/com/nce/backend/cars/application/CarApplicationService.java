@@ -58,8 +58,28 @@ public class CarApplicationService {
 
     @Async
     @TransactionalEventListener
-    public void onEvent(NewCarSavedEvent event){
+    public void onEvent(NewCarSavedEvent event) {
         ApiCarData apiData = externalApiService.fetchCarData(event.registrationNumber());
-        carDomainService.save(Car.builder().build());
+        Car carToUpdate = carDomainService
+                .findById(event.id())
+                .orElseThrow(
+                        () -> new NoSuchElementException("Car with id %s was not found".formatted(event.id()))
+                );
+
+        carToUpdate.setMake(apiData.make());
+        carToUpdate.setModel(apiData.model());
+        carToUpdate.setColor(apiData.color());
+        carToUpdate.setEngineType(apiData.engineType());
+        carToUpdate.setEngineVolume(apiData.engineVolume());
+        carToUpdate.setFirstTimeRegisteredInNorway(apiData.firstTimeRegisteredInNorway());
+        carToUpdate.setNextEUControl(apiData.nextEUControl());
+        carToUpdate.setGearboxType(apiData.gearboxType());
+        carToUpdate.setNumberOfDoors(apiData.numberOfDoors());
+        carToUpdate.setNumberOfSeats(apiData.numberOfSeats());
+        carToUpdate.setBodywork(apiData.bodywork());
+        carToUpdate.setOperatingMode(apiData.operatingMode());
+        carToUpdate.setWeight(apiData.weight());
+
+        carDomainService.save(carToUpdate);
     }
 }

@@ -15,14 +15,16 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class VegvesenApiService implements ExternalApiService {
 
+
     private final WebClient webClient;
+
+    private final VegvesenApiJsonMapper jsonMapper;
 
     @Value("${authorization.token}")
     private String authToken;
 
     @Override
     public ApiCarData fetchCarData(String registrationNumber) {
-
         Mono<JsonNode> apiResponse = webClient.get()
                 .uri(
                         uriBuilder -> uriBuilder
@@ -33,12 +35,9 @@ public class VegvesenApiService implements ExternalApiService {
                 .retrieve()
                 .bodyToMono(JsonNode.class);
 
-        apiResponse.subscribe(carData -> {
-
-                }
-        );
-
-        return null;
+        return apiResponse
+                .map(jsonMapper::mapFromJson)
+                .block();
     }
 }
 
