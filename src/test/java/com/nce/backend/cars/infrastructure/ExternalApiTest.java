@@ -35,8 +35,6 @@ public class ExternalApiTest {
         assertEquals(apiData.bodywork(), "N/A");
         assertEquals(apiData.color(), "Sølv");
         assertEquals(apiData.engineVolume(), 2494);
-        assertEquals(apiData.firstTimeRegisteredInNorway(), LocalDate.parse("2005-06-02"));
-        assertEquals(apiData.nextEUControl(), LocalDate.parse("2024-07-22"));
         assertEquals(apiData.engineType(), "Diesel");
         assertEquals(apiData.gearboxType(), GearboxType.MANUAL);
         assertEquals(apiData.numberOfDoors(), 0);
@@ -45,6 +43,8 @@ public class ExternalApiTest {
         assertEquals(apiData.operatingMode(), OperatingMode.REAR_WHEEL);
         assertEquals(apiData.make(), "TOYOTA");
         assertEquals(apiData.model(), "DYNA");
+        assertEquals(apiData.nextEUControl(), LocalDate.parse("2024-07-22"));
+        assertEquals(apiData.firstTimeRegisteredInNorway(), LocalDate.parse("2005-06-02"));
 
     }
 

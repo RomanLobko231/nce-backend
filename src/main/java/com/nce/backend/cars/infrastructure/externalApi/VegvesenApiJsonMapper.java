@@ -15,34 +15,28 @@ public class VegvesenApiJsonMapper {
 
     private final String TEXT_DEFAULT_VALUE = "N/A";
     private final int INT_DEFAULT_VALUE = 0;
+    private final String DATE_DEFAULT_VALUE = "1111-11-11";
 
 
     public ApiCarData mapFromJson(JsonNode jsonNode) {
-        JsonNode technicalDetailsNode = jsonNode
-                .path("kjoretoydataListe")
-                .path(0)
-                .at("/godkjenning/tekniskGodkjenning/tekniskeData");
+
+        JsonNode technicalDetailsNode = jsonNode.at("/kjoretoydataListe/0/godkjenning/tekniskGodkjenning/tekniskeData");
 
 
         return ApiCarData.builder()
                 .make(
                         technicalDetailsNode
-                                .at("/generelt/merke")
-                                .path(0)
-                                .path("merke")
+                                .at("/generelt/merke/0/merke")
                                 .asText(TEXT_DEFAULT_VALUE)
                 )
                 .model(
                         technicalDetailsNode
-                                .at("/generelt/handelsbetegnelse")
-                                .path(0)
+                                .at("/generelt/handelsbetegnelse/0")
                                 .asText(TEXT_DEFAULT_VALUE)
                 )
                 .color(
                         technicalDetailsNode
-                                .at("/karosseriOgLasteplan/rFarge")
-                                .path(0)
-                                .path("kodeNavn")
+                                .at("/karosseriOgLasteplan/rFarge/0/kodeNavn")
                                 .asText(TEXT_DEFAULT_VALUE)
                 )
                 .weight(
@@ -57,24 +51,17 @@ public class VegvesenApiJsonMapper {
                 )
                 .numberOfDoors(
                         technicalDetailsNode
-                                .at("/karosseriOgLasteplan/antallDorer")
-                                .path(0)
+                                .at("/karosseriOgLasteplan/antallDorer/0")
                                 .asInt(INT_DEFAULT_VALUE)
                 )
                 .engineVolume(
                         technicalDetailsNode
-                                .at("/motorOgDrivverk/motor")
-                                .path(0)
-                                .path("slagvolum")
+                                .at("/motorOgDrivverk/motor/0/slagvolum")
                                 .asInt(INT_DEFAULT_VALUE)
                 )
                 .engineType(
                         technicalDetailsNode
-                                .at("/motorOgDrivverk/motor")
-                                .path(0)
-                                .path("drivstoff")
-                                .path(0)
-                                .at("/drivstoffKode/kodeBeskrivelse")
+                                .at("/motorOgDrivverk/motor/0/drivstoff/0/drivstoffKode/kodeBeskrivelse")
                                 .asText(TEXT_DEFAULT_VALUE)
                 )
                 .bodywork(
@@ -85,19 +72,15 @@ public class VegvesenApiJsonMapper {
                 .firstTimeRegisteredInNorway(
                         LocalDate.parse(
                                 jsonNode
-                                        .path("kjoretoydataListe")
-                                        .path(0)
-                                        .at("/forstegangsregistrering/registrertForstegangNorgeDato")
-                                        .asText("1111-11-11")
+                                        .at("/kjoretoydataListe/0/forstegangsregistrering/registrertForstegangNorgeDato")
+                                        .asText(DATE_DEFAULT_VALUE)
                         )
                 )
                 .nextEUControl(
                         LocalDate.parse(
                                 jsonNode
-                                        .path("kjoretoydataListe")
-                                        .path(0)
-                                        .at("/periodiskKjoretoyKontroll/kontrollfrist")
-                                        .asText("1111-11-11")
+                                        .at("/kjoretoydataListe/0/periodiskKjoretoyKontroll/kontrollfrist")
+                                        .asText(DATE_DEFAULT_VALUE)
                         )
                 )
                 .gearboxType(
