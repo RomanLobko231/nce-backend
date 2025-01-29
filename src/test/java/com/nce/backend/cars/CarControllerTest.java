@@ -59,7 +59,7 @@ public class CarControllerTest {
     public void testGetAllCars() throws Exception {
         List<CarResponse> carResponses = List.of(CarResponse.builder().build());
 
-        when(carService.getAllCars()).thenReturn(Collections.emptyList());
+        when(carService.getAllCars()).thenReturn(List.of(Car.builder().build()));
         when(carResponseMapper.toCarResponse(any())).thenReturn(carResponses.get(0));
 
         mockMvc.perform(get("/api/v1/cars"))

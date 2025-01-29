@@ -2,10 +2,10 @@ spring:
   application:
       name: backend
   datasource:
-    username: nce
-    password: nce
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5435/ncedb
+    url: ${DATABASE_URL}
   jpa:
     hibernate:
       ddl-auto: validate

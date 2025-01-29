@@ -11,6 +11,6 @@ import java.util.UUID;
 public interface CarJpaRepository extends JpaRepository<CarJpaEntity, UUID> {
 
     //@Query("SELECT CASE COUNT(c) > 0 THEN TRUE ELSE FALSE END FROM CarJpaEntity c WHERE c.registration_number = :registrationNumber")
-    @Query(value = "SELECT EXISTS(SELECT 1 FROM cars WHERE registration_number = :registrationNumber)", nativeQuery = true)
+    @Query(value = "SELECT EXISTS(SELECT 1 FROM car WHERE registration_number = :registrationNumber)", nativeQuery = true)
     boolean existsByRegistrationNumber(@Param("registrationNumber") String registrationNumber);
 }
