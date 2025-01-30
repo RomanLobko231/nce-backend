@@ -5,18 +5,18 @@ spring:
     username: ${PGUSER}
     password: ${PGPASSWORD}
     driver-class-name: org.postgresql.Driver
-    url: ${DATABASE_URL}
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDBNAME}
   jpa:
     hibernate:
       ddl-auto: validate
     database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
-      default-schema: ncedb
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: true
-    user: ${spring.datasource.username}
-    password: ${spring.datasource.password}
+    user: ${PGUSER}
+    password: ${PGPASSWORD}
     baseline-on-migrate: true
     baseline-version: 0
 
