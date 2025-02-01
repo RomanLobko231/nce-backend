@@ -1,5 +1,6 @@
 package com.nce.backend.cars.ui.requests;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
@@ -19,6 +20,10 @@ public record AddCarRequest(
         String carRegistrationNumber,
 
         @Nullable
-        String email
+        String email,
+
+        @NotNull(message = "KMs cannot be null")
+        @Min(value = 0, message = "Kilometers value cannot be less than 0")
+        Integer kilometers
 ) {
 }

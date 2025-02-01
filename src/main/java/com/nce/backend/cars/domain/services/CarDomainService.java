@@ -22,6 +22,7 @@ public class CarDomainService {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    @Transactional
     public Car save(Car car) {
         return carRepository.save(car);
     }
@@ -30,12 +31,17 @@ public class CarDomainService {
         return carRepository.findAll();
     }
 
+    @Transactional
     public void deleteById(UUID id) {
         carRepository.deleteById(id);
     }
 
     public Optional<Car> findById(UUID id) {
         return carRepository.findById(id);
+    }
+
+    public boolean existsById(UUID id) {
+        return carRepository.existsById(id);
     }
 
     @Transactional

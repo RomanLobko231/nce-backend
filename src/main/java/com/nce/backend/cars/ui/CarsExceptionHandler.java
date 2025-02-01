@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.NoSuchElementException;
+
 @ControllerAdvice
 @ResponseBody
 public class CarsExceptionHandler {
@@ -23,6 +25,26 @@ public class CarsExceptionHandler {
         return new ErrorResponse(
                 HttpStatus.CONFLICT.value(),
                 e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleCarDoesNotExistException(NoSuchElementException e) {
+        logger.info(e.getMessage());
+        return new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleGeneralException(Exception e) {
+        logger.error("Unexpected error occurred: {}", e.getMessage(), e);
+        return new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "An unexpected error occurred. Please try again later."
         );
     }
 }

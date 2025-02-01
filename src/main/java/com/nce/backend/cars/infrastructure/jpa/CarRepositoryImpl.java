@@ -50,4 +50,9 @@ public class CarRepositoryImpl implements CarRepository {
     public boolean existsByRegNumber(String registrationNumber) {
         return carJpaRepository.existsByRegistrationNumber(registrationNumber);
     }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return carJpaRepository.existsById(id);
+    }
 }

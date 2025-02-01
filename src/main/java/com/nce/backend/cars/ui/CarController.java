@@ -15,6 +15,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/cars")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class CarController {
 
     private final CarApplicationService carService;

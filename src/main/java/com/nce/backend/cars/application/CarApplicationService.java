@@ -36,6 +36,7 @@ public class CarApplicationService {
                                         .email(addCarRequest.email())
                                         .build()
                         )
+                        .kilometers(addCarRequest.kilometers())
                         .status(Status.IN_REVIEW)
                         .build());
     }
@@ -45,6 +46,7 @@ public class CarApplicationService {
     }
 
     public void deleteById(UUID id) {
+        if (!carDomainService.existsById(id)) throw new NoSuchElementException("Car with id %s was not found".formatted(id));
         carDomainService.deleteById(id);
     }
 
@@ -58,7 +60,7 @@ public class CarApplicationService {
 
     @Async
     @TransactionalEventListener
-    public void onEvent(NewCarSavedEvent event) {
+    public void saveApiDataOn(NewCarSavedEvent event) {
         ApiCarData apiData = externalApiService.fetchCarData(event.registrationNumber());
         Car carToUpdate = carDomainService
                 .findById(event.id())

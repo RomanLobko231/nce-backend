@@ -12,5 +12,6 @@ public interface CarRepository {
     Car save(Car car);
     void deleteById(UUID id);
     boolean existsByRegNumber(String registrationNumber);
+    boolean existsById(UUID id);
 
 }
