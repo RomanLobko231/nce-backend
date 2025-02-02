@@ -25,7 +25,8 @@ public class CarApplicationServiceTest {
                 "John Doe",
                 "123456789",
                 "ABC123",
-                "john.doe@example.com"
+                "john.doe@example.com",
+                10
         );
 
         Car savedCar = carApplicationService.addNewCarRequest(addCarRequest);
@@ -35,5 +36,6 @@ public class CarApplicationServiceTest {
         assertEquals("John Doe", savedCar.getOwnerInfo().name());
         assertEquals("123456789", savedCar.getOwnerInfo().phoneNumber());
         assertEquals("john.doe@example.com", savedCar.getOwnerInfo().email());
+        assertEquals(10, savedCar.getKilometers());
     }
 }

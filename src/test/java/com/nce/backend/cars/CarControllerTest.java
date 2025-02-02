@@ -44,7 +44,8 @@ public class CarControllerTest {
                 "John Doe",
                 "123456789",
                 "ABC123",
-                "john.doe@example.com"
+                "john.doe@example.com",
+                10
         );
 
         mockMvc.perform(post("/api/v1/cars")
