@@ -1,5 +1,6 @@
 package com.nce.backend.cars.domain.valueObjects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 
 @Getter
@@ -10,7 +11,6 @@ public enum GearboxType {
     AUTOMATIC("Automat"),
 
     OTHER("Annet");
-
 
     private final String value;
 

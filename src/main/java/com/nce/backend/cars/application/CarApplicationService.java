@@ -7,9 +7,10 @@ import com.nce.backend.cars.domain.services.ExternalApiService;
 import com.nce.backend.cars.domain.valueObjects.ApiCarData;
 import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
 import com.nce.backend.cars.domain.valueObjects.Status;
-import com.nce.backend.cars.ui.requests.AddCarRequest;
+import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
+import com.nce.backend.cars.ui.requests.AddCarCustomerRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -25,20 +26,12 @@ public class CarApplicationService {
     private final CarDomainService carDomainService;
     private final ExternalApiService externalApiService;
 
-    public Car addNewCarRequest(AddCarRequest addCarRequest) {
-        return carDomainService.saveNewCarRequest(
-                Car.builder()
-                        .registrationNumber(addCarRequest.carRegistrationNumber())
-                        .ownerInfo(
-                                OwnerInfo.builder()
-                                        .name(addCarRequest.ownerName())
-                                        .phoneNumber(addCarRequest.phoneNumber())
-                                        .email(addCarRequest.email())
-                                        .build()
-                        )
-                        .kilometers(addCarRequest.kilometers())
-                        .status(Status.IN_REVIEW)
-                        .build());
+    public Car addCarAsCustomer(Car carToAdd) {
+        return carDomainService.saveNewCarRequest(carToAdd);
+    }
+
+    public Car addCarAsAdmin(Car carToAdd) {
+        return carDomainService.save(carToAdd);
     }
 
     public List<Car> getAllCars() {
@@ -56,6 +49,11 @@ public class CarApplicationService {
                 .orElseThrow(
                         () -> new NoSuchElementException("Car with id %s was not found".formatted(id))
                 );
+    }
+
+    public void updateCar(Car car) {
+        if (!carDomainService.existsById(car.getId())) throw new NoSuchElementException("Car with id %s was not found".formatted(car.getId()));
+        carDomainService.save(car);
     }
 
     @Async
@@ -84,4 +82,6 @@ public class CarApplicationService {
 
         carDomainService.save(carToUpdate);
     }
+
+
 }

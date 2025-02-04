@@ -9,7 +9,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -63,7 +62,7 @@ public class CarJpaEntity {
     private LocalDate nextEUControl;
 
     @Embedded
-    private OwnerInfoJpa ownerInfo;
+    private OwnerInfoJpaEntity ownerInfo;
 
     @NotNull(message = "Status can't be null")
     @Enumerated(EnumType.STRING)

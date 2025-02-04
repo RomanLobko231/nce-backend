@@ -1,5 +1,6 @@
 package com.nce.backend.cars.domain.valueObjects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 
 @Getter
@@ -17,6 +18,15 @@ public enum OperatingMode {
 
     OperatingMode(String value) {
         this.value = value;
+    }
+
+    public static OperatingMode fromString(String apiValue) {
+        for (OperatingMode type : values()) {
+            if (type.value.equalsIgnoreCase(apiValue)) {
+                return type;
+            }
+        }
+        return OTHER;
     }
 
 }

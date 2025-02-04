@@ -1,19 +1,17 @@
-package com.nce.backend.cars.ui.responses;
+package com.nce.backend.cars.ui.requests;
 
-import com.nce.backend.cars.domain.valueObjects.GearboxType;
-import com.nce.backend.cars.domain.valueObjects.OperatingMode;
 import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
-import com.nce.backend.cars.domain.valueObjects.Status;
-import lombok.Builder;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.PositiveOrZero;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-@Builder
-public record CarResponse(
+public record AddCarAdminRequest(
 
-        UUID id,
 
         String registrationNumber,
 

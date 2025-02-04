@@ -2,7 +2,6 @@ package com.nce.backend.cars.ui.responses;
 
 import com.nce.backend.cars.domain.entities.Car;
 import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
-import com.nce.backend.cars.infrastructure.jpa.OwnerInfoJpa;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,13 +19,13 @@ public class CarResponseMapper {
                 .registrationNumber(car.getRegistrationNumber())
                 .color(car.getColor())
                 .weight(car.getWeight())
-                .gearboxType(car.getGearboxType())
-                .operatingMode(car.getOperatingMode())
+                .gearboxType(car.getGearboxType().getValue())
+                .operatingMode(car.getOperatingMode().getValue())
                 .firstTimeRegisteredInNorway(car.getFirstTimeRegisteredInNorway())
                 .nextEUControl(car.getNextEUControl())
                 .numberOfSeats(car.getNumberOfSeats())
                 .numberOfDoors(car.getNumberOfDoors())
-                .status(car.getStatus())
+                .status(car.getStatus().getValue())
                 .ownerInfo(
                         new OwnerInfo(
                                 car.getOwnerInfo().name(),

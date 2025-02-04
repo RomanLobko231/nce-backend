@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
 
-public record AddCarRequest(
+public record AddCarCustomerRequest(
 
         @NotBlank(message = "Name should not be blank")
         @NotNull(message = "Name cannot be null")

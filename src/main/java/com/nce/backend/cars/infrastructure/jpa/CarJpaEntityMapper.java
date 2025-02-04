@@ -27,7 +27,7 @@ public class CarJpaEntityMapper {
                 .numberOfDoors(car.getNumberOfDoors())
                 .status(car.getStatus())
                 .ownerInfo(
-                        new OwnerInfoJpa(
+                        new OwnerInfoJpaEntity(
                                 car.getOwnerInfo().name(),
                                 car.getOwnerInfo().phoneNumber(),
                                 car.getOwnerInfo().email()

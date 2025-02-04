@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class OwnerInfoJpa {
+public class OwnerInfoJpaEntity {
 
     @NotNull(message = "Name can't be null")
     String name;

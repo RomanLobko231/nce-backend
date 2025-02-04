@@ -1,7 +1,11 @@
 package com.nce.backend.cars.ui;
 
 import com.nce.backend.cars.application.CarApplicationService;
-import com.nce.backend.cars.ui.requests.AddCarRequest;
+import com.nce.backend.cars.domain.entities.Car;
+import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
+import com.nce.backend.cars.ui.requests.AddCarCustomerRequest;
+import com.nce.backend.cars.ui.requests.CarRequestMapper;
+import com.nce.backend.cars.ui.requests.UpdateCarRequest;
 import com.nce.backend.cars.ui.responses.CarResponse;
 import com.nce.backend.cars.ui.responses.CarResponseMapper;
 import jakarta.validation.Valid;
@@ -20,10 +24,18 @@ public class CarController {
 
     private final CarApplicationService carService;
     private final CarResponseMapper carResponseMapper;
+    private final CarRequestMapper carRequestMapper;
 
-    @PostMapping
-    ResponseEntity<Void> addNewCar(@RequestBody @Valid AddCarRequest addCarRequest) {
-        carService.addNewCarRequest(addCarRequest);
+    @PostMapping("/customer")
+    ResponseEntity<Void> addNewCarAsCustomer(@RequestBody @Valid AddCarCustomerRequest request) {
+        carService.addCarAsCustomer(carRequestMapper.toCarFromCustomerRequest(request));
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/admin")
+    ResponseEntity<Void> addNewCarAsAdmin(@RequestBody @Valid AddCarAdminRequest request) {
+        carService.addCarAsAdmin(carRequestMapper.toCarFromAdminRequest(request));
 
         return ResponseEntity.ok().build();
     }
@@ -44,6 +56,13 @@ public class CarController {
         CarResponse fetchedCar = carResponseMapper.toCarResponse(carService.findById(id));
 
         return ResponseEntity.ok(fetchedCar);
+    }
+
+    @PutMapping()
+    ResponseEntity<Void> updateCar(@RequestBody @Valid UpdateCarRequest updateCarRequest) {
+        Car carToUpdate = carRequestMapper.toCarFromUpdateRequest(updateCarRequest);
+        carService.updateCar(carToUpdate);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping(path = "/{id}")
