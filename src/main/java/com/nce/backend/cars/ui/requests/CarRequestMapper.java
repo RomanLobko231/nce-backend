@@ -79,7 +79,7 @@ public class CarRequestMapper {
                         OwnerInfo.builder()
                                 .name(request.ownerName())
                                 .phoneNumber(request.phoneNumber())
-                                .email(request.email())
+                                .email((request.email() != null) ? request.email() : "N/A")
                                 .build()
                 )
                 .kilometers(request.kilometers())

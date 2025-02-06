@@ -5,10 +5,7 @@ import com.nce.backend.cars.domain.valueObjects.OperatingMode;
 
 import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
 import com.nce.backend.cars.domain.valueObjects.Status;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -27,19 +24,23 @@ public record UpdateCarRequest(
         @PositiveOrZero(message = "Kilometers cannot be less then 0")
         Integer kilometers,
 
+        @NotBlank(message = "Make cannot be null or blank")
         String make,
 
+        @NotBlank(message = "Model cannot be null or blank")
         String model,
 
         @PastOrPresent(message = "Car cannot be registered in the future")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         LocalDate firstTimeRegisteredInNorway,
 
+        @NotBlank(message = "Engine type cannot be null or blank")
         String engineType,
 
         @PositiveOrZero(message = "Engine volume cannot be less then 0")
         Integer engineVolume,
 
+        @NotBlank(message = "Bodywork cannot be null or blank")
         String bodywork,
 
         @PositiveOrZero(message = "Seats cannot be less then 0")
@@ -48,10 +49,13 @@ public record UpdateCarRequest(
         @PositiveOrZero(message = "Doors cannot be less then 0")
         Integer numberOfDoors,
 
+        @NotBlank(message = "Color cannot be null or blank")
         String color,
 
+        @NotBlank(message = "Gearbox type cannot be null or blank")
         String gearboxType,
 
+        @NotBlank(message = "Operating mode cannot be null or blank")
         String operatingMode,
 
         @PositiveOrZero(message = "Weight cannot be less then 0")
@@ -63,6 +67,7 @@ public record UpdateCarRequest(
         @NotNull
         OwnerInfo ownerInfo,
 
+        @NotBlank(message = "Status cannot be null or blank")
         String status,
 
         String additionalInformation,
