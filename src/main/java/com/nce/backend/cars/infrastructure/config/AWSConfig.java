@@ -12,7 +12,6 @@ import software.amazon.awssdk.services.s3.S3Client;
 @Configuration
 public class AWSConfig {
 
-    private final String BUCKET_NAME = "test-bucket";
     private final Region REGION = Region.EU_NORTH_1;
 
     @Value("${AWS_ACCESS_KEY_ID}")
@@ -20,7 +19,7 @@ public class AWSConfig {
 
     @Value("${AWS_SECRET_ACCESS_KEY}")
     private String secretAccessKey;
-    
+
     @Bean
     S3Client s3Client() {
         AwsCredentials credentials = AwsBasicCredentials.create(accessKeyId, secretAccessKey);

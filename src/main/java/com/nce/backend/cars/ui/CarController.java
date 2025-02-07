@@ -43,6 +43,7 @@ public class CarController {
 
     @PostMapping("/images")
     ResponseEntity<Void> addImagesForCar(@RequestParam("images") List<MultipartFile> images, @RequestParam("carId") UUID id) {
+
         carService.addImagesForCar(images, id);
         return ResponseEntity.ok().build();
     }
