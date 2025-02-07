@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +38,12 @@ public class CarController {
     ResponseEntity<Void> addNewCarAsAdmin(@RequestBody @Valid AddCarAdminRequest request) {
         carService.addCarAsAdmin(carRequestMapper.toCarFromAdminRequest(request));
 
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/images")
+    ResponseEntity<Void> addImagesForCar(@RequestParam("images") List<MultipartFile> images, @RequestParam("carId") UUID id) {
+        carService.addImagesForCar(images, id);
         return ResponseEntity.ok().build();
     }
 

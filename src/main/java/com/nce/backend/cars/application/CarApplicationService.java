@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionalEventListener;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -54,6 +55,10 @@ public class CarApplicationService {
     public void updateCar(Car car) {
         if (!carDomainService.existsById(car.getId())) throw new NoSuchElementException("Car with id %s was not found".formatted(car.getId()));
         carDomainService.save(car);
+    }
+
+    public void addImagesForCar(List<MultipartFile> images, UUID carId) {
+            //TODO: implement image adding functionality
     }
 
     @Async
