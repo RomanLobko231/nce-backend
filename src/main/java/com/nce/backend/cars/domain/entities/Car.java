@@ -59,4 +59,8 @@ public class Car {
 
     private List<String> imagePaths = new ArrayList<>();
 
+    public void addNewImagePaths(List<String> newImagePaths) {
+        imagePaths.addAll(newImagePaths);
+    }
+
 }
