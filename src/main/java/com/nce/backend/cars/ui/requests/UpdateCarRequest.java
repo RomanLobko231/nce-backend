@@ -22,6 +22,7 @@ public record UpdateCarRequest(
         String registrationNumber,
 
         @PositiveOrZero(message = "Kilometers cannot be less then 0")
+        @NotNull
         Integer kilometers,
 
         @NotBlank(message = "Make cannot be null or blank")
@@ -38,15 +39,18 @@ public record UpdateCarRequest(
         String engineType,
 
         @PositiveOrZero(message = "Engine volume cannot be less then 0")
+        @NotNull
         Integer engineVolume,
 
         @NotBlank(message = "Bodywork cannot be null or blank")
         String bodywork,
 
         @PositiveOrZero(message = "Seats cannot be less then 0")
+        @NotNull
         Integer numberOfSeats,
 
         @PositiveOrZero(message = "Doors cannot be less then 0")
+        @NotNull
         Integer numberOfDoors,
 
         @NotBlank(message = "Color cannot be null or blank")
@@ -59,6 +63,7 @@ public record UpdateCarRequest(
         String operatingMode,
 
         @PositiveOrZero(message = "Weight cannot be less then 0")
+        @NotNull
         Integer weight,
 
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
