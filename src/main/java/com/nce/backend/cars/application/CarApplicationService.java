@@ -30,14 +30,61 @@ public class CarApplicationService {
 
     private final CarDomainService carDomainService;
     private final ExternalApiService externalApiService;
-    private final ImageStorageService imageStorageService;
+    private final ImageStorageService<MultipartFile> imageStorageService;
 
     public Car addCarAsCustomer(Car carToAdd) {
         return carDomainService.saveNewCarRequest(carToAdd);
     }
 
-    public Car addCarAsAdmin(Car carToAdd) {
+    public Car addCarAsAdmin(Car carToAdd, List<MultipartFile> images) {
+        if (images != null && !images.isEmpty()) {
+            List<String> imageUrls = imageStorageService.uploadImages(images);
+            carToAdd.addNewImagePaths(imageUrls);
+        }
+
         return carDomainService.save(carToAdd);
+    }
+
+    public Car updateCar(Car car, List<MultipartFile> imagesToUpload) {
+        Car existingCar = carDomainService
+                .findById(car.getId())
+                .orElseThrow(
+                        () -> new NoSuchElementException("Car with id %s was not found".formatted(car.getId()))
+                );
+
+        List<String> existingImagePaths = existingCar.getImagePaths();
+        List<String> updatedImagePaths = car.getImagePaths();
+
+        List<String> imagesToDelete = existingImagePaths
+                .stream()
+                .filter(image -> !updatedImagePaths.contains(image))
+                .toList();
+
+        if (!imagesToDelete.isEmpty()) {
+            imageStorageService.deleteImages(imagesToDelete);
+        }
+
+        if (imagesToUpload != null && !imagesToUpload.isEmpty()) {
+            List<String> imageUrls = imageStorageService.uploadImages(imagesToUpload);
+            car.addNewImagePaths(imageUrls);
+        }
+
+        return carDomainService.save(car);
+    }
+
+    public void addImagesForCarById(UUID carId, List<MultipartFile> images) {
+        if (images == null) return;
+
+        Car car = carDomainService
+                .findById(carId)
+                .orElseThrow(
+                        () -> new NoSuchElementException("Car with id %s was not found".formatted(carId))
+                );
+
+        List<String> imageUrls = imageStorageService.uploadImages(images);
+        car.addNewImagePaths(imageUrls);
+
+        carDomainService.save(car);
     }
 
     public List<Car> getAllCars() {
@@ -45,7 +92,8 @@ public class CarApplicationService {
     }
 
     public void deleteById(UUID id) {
-        if (!carDomainService.existsById(id)) throw new NoSuchElementException("Car with id %s was not found".formatted(id));
+        if (!carDomainService.existsById(id))
+            throw new NoSuchElementException("Car with id %s was not found".formatted(id));
         carDomainService.deleteById(id);
     }
 
@@ -55,37 +103,6 @@ public class CarApplicationService {
                 .orElseThrow(
                         () -> new NoSuchElementException("Car with id %s was not found".formatted(id))
                 );
-    }
-
-    public void updateCar(Car car) {
-        if (!carDomainService.existsById(car.getId())) throw new NoSuchElementException("Car with id %s was not found".formatted(car.getId()));
-        carDomainService.save(car);
-    }
-
-    public void addImagesForCar(List<MultipartFile> images, UUID carId) {
-        if (!carDomainService.existsById(carId)) throw new NoSuchElementException("Car with id %s was not found".formatted(carId));
-
-        List<String> imageUrls = images.stream()
-                .map(image -> {
-                    try {
-                        return imageStorageService.uploadImage(
-                                image.getOriginalFilename(),
-                                image.getInputStream(),
-                                image.getContentType());
-                    } catch (IOException e) {
-                        throw new ImageProcessingException("Image '%s' could not be processed".formatted(image.getOriginalFilename()));
-                    }
-                })
-                .toList();
-
-        Car car = carDomainService
-                .findById(carId)
-                .orElseThrow(
-                        () -> new NoSuchElementException("Car with id '%s' was not found".formatted(carId))
-                );
-
-        car.setImagePaths(imageUrls);
-        carDomainService.save(car);
     }
 
     @Async
