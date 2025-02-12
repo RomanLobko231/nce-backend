@@ -15,9 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.ObjectInputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -66,7 +69,7 @@ public class CarControllerTest {
 
     @Test
     public void testAddCarAsAdmin() throws Exception {
-        AddCarAdminRequest request = new AddCarAdminRequest(
+        AddCarAdminRequest carData = new AddCarAdminRequest(
                 "ABC123",
                 10,
                 "Make",
@@ -80,7 +83,7 @@ public class CarControllerTest {
                 "Black",
                 "Manuell",
                 "Framhjulstrekk",
-                1000,
+                10,
                 LocalDate.now().plusMonths(6),
                 OwnerInfo.builder()
                         .email("email")
@@ -92,17 +95,41 @@ public class CarControllerTest {
                 Collections.emptyList()
         );
 
-        mockMvc.perform(post("/api/v1/cars/admin")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().findAndRegisterModules().writeValueAsString(request)))
+        MockMultipartFile carDataPart = new MockMultipartFile(
+                "carData",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                new ObjectMapper().findAndRegisterModules().writeValueAsString(carData).getBytes(StandardCharsets.UTF_8)
+        );
+
+        MockMultipartFile image1 = new MockMultipartFile(
+                "images",
+                "image1.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "dummy-image-content1".getBytes()
+        );
+
+        MockMultipartFile image2 = new MockMultipartFile(
+                "images",
+                "image2.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "dummy-image-content2".getBytes()
+        );
+
+        mockMvc.perform(multipart("/api/v1/cars/admin")
+                        .file(carDataPart)
+                        .file(image1)
+                        .file(image2)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(carService).addCarAsAdmin(carRequestMapper.toCarFromAdminRequest(request));
+        verify(carService).addCarAsAdmin(carRequestMapper.toCarFromAdminRequest(carData), List.of(image1, image2));
     }
 
     @Test
     public void testUpdateCar() throws Exception {
-        UpdateCarRequest request = new UpdateCarRequest(
+        UpdateCarRequest carData = new UpdateCarRequest(
                 UUID.randomUUID(),
                 "ABC123",
                 10,
@@ -129,12 +156,41 @@ public class CarControllerTest {
                 Collections.emptyList()
         );
 
-        mockMvc.perform(put("/api/v1/cars")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().findAndRegisterModules().writeValueAsString(request)))
+        MockMultipartFile carDataPart = new MockMultipartFile(
+                "carData",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                new ObjectMapper().findAndRegisterModules().writeValueAsString(carData).getBytes(StandardCharsets.UTF_8)
+        );
+
+        MockMultipartFile image1 = new MockMultipartFile(
+                "images",
+                "image1.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "dummy-image-content1".getBytes()
+        );
+
+        MockMultipartFile image2 = new MockMultipartFile(
+                "images",
+                "image2.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "dummy-image-content2".getBytes()
+        );
+
+        mockMvc.perform(multipart("/api/v1/cars")
+                        .file(carDataPart)
+                        .file(image1)
+                        .file(image2)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        })
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(carService).updateCar(carRequestMapper.toCarFromUpdateRequest(request));
+
+        verify(carService).updateCar(carRequestMapper.toCarFromUpdateRequest(carData), List.of(image1, image2));
     }
 
     @Test
