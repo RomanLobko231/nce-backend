@@ -75,7 +75,7 @@ public class CarApplicationServiceTest {
                 Collections.emptyList()
         );
         Car mappedCar = carRequestMapper.toCarFromAdminRequest(request);
-        Car savedCar = carApplicationService.addCarAsAdmin(mappedCar);
+        Car savedCar = carApplicationService.addCarAsAdmin(mappedCar, null);
 
         assertNotNull(savedCar);
         assertNotNull(savedCar.getId());
