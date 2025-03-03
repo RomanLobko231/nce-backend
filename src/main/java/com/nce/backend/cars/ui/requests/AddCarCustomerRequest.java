@@ -17,7 +17,7 @@ public record AddCarCustomerRequest(
 
         @NotBlank(message = "Registration number should not be blank")
         @NotNull(message = "Registration number cannot be null")
-        String carRegistrationNumber,
+        String registrationNumber,
 
         @Nullable
         String email,

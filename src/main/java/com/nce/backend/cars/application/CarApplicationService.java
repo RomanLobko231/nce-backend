@@ -32,13 +32,18 @@ public class CarApplicationService {
     private final ExternalApiService externalApiService;
     private final ImageStorageService<MultipartFile> imageStorageService;
 
-    public Car addCarAsCustomer(Car carToAdd) {
+    public Car addCarAsCustomer(Car carToAdd, List<MultipartFile> imagesToUpload) {
+        if (imagesToUpload != null && !imagesToUpload.isEmpty()) {
+            List<String> imageUrls = imageStorageService.uploadImages(imagesToUpload);
+            carToAdd.setImagePaths(imageUrls);
+        }
+
         return carDomainService.saveNewCarRequest(carToAdd);
     }
 
-    public Car addCarAsAdmin(Car carToAdd, List<MultipartFile> images) {
-        if (images != null && !images.isEmpty()) {
-            List<String> imageUrls = imageStorageService.uploadImages(images);
+    public Car addCarAsAdmin(Car carToAdd, List<MultipartFile> imagesToUpload) {
+        if (imagesToUpload != null && !imagesToUpload.isEmpty()) {
+            List<String> imageUrls = imageStorageService.uploadImages(imagesToUpload);
             carToAdd.addNewImagePaths(imageUrls);
         }
 
@@ -72,8 +77,8 @@ public class CarApplicationService {
         return carDomainService.save(car);
     }
 
-    public void addImagesForCarById(UUID carId, List<MultipartFile> images) {
-        if (images == null) return;
+    public void addImagesForCarById(UUID carId, List<MultipartFile> imagesToUpload) {
+        if (imagesToUpload == null || imagesToUpload.isEmpty()) return;
 
         Car car = carDomainService
                 .findById(carId)
@@ -81,7 +86,7 @@ public class CarApplicationService {
                         () -> new NoSuchElementException("Car with id %s was not found".formatted(carId))
                 );
 
-        List<String> imageUrls = imageStorageService.uploadImages(images);
+        List<String> imageUrls = imageStorageService.uploadImages(imagesToUpload);
         car.addNewImagePaths(imageUrls);
 
         carDomainService.save(car);
