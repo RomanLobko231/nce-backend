@@ -57,6 +57,7 @@ public class Car {
 
     private String additionalInformation;
 
+    @Builder.Default
     private List<String> imagePaths = new ArrayList<>();
 
     public void addNewImagePaths(List<String> newImagePaths) {
