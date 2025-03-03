@@ -11,6 +11,7 @@ import com.nce.backend.cars.ui.requests.UpdateCarRequest;
 import com.nce.backend.cars.ui.responses.CarResponse;
 import com.nce.backend.cars.ui.responses.CarResponseMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -59,12 +61,51 @@ public class CarControllerTest {
                 10
         );
 
-        mockMvc.perform(post("/api/v1/cars/customer")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(request)))
+        MockMultipartFile carDataPart = new MockMultipartFile(
+                "carData",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                new ObjectMapper().findAndRegisterModules().writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
+        );
+
+        MockMultipartFile image1 = new MockMultipartFile(
+                "images",
+                "image1.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "dummy-image-content1".getBytes()
+        );
+
+        MockMultipartFile image2 = new MockMultipartFile(
+                "images",
+                "image2.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "dummy-image-content2".getBytes()
+        );
+
+        Car mockCar = Car
+                .builder()
+                .ownerInfo(OwnerInfo
+                        .builder()
+                        .name(request.ownerName())
+                        .phoneNumber(request.phoneNumber())
+                        .email(request.email())
+                        .build())
+                .registrationNumber(request.registrationNumber())
+                .kilometers(request.kilometers())
+                .build();
+
+        when(carRequestMapper.toCarFromCustomerRequest(any(AddCarCustomerRequest.class))).thenReturn(mockCar);
+        when(carService.addCarAsCustomer(any(Car.class), anyList())).thenReturn(mockCar);
+
+        mockMvc.perform(multipart("/api/v1/cars/customer")
+                        .file(carDataPart)
+                        .file(image1)
+                        .file(image2)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(carService).addCarAsCustomer(carRequestMapper.toCarFromCustomerRequest(request));
+        verify(carService).addCarAsCustomer(mockCar, List.of(image1, image2));
     }
 
     @Test
@@ -90,7 +131,7 @@ public class CarControllerTest {
                         .phoneNumber("123454567")
                         .name("Owner")
                         .build(),
-                "In Review",
+                "Vurdering",
                 null,
                 Collections.emptyList()
         );
@@ -115,6 +156,10 @@ public class CarControllerTest {
                 MediaType.IMAGE_PNG_VALUE,
                 "dummy-image-content2".getBytes()
         );
+        Car mockCar = Car.builder().build();
+
+        when(carRequestMapper.toCarFromAdminRequest(any(AddCarAdminRequest.class))).thenReturn(mockCar);
+        when(carService.addCarAsAdmin(any(Car.class), anyList())).thenReturn(mockCar);
 
         mockMvc.perform(multipart("/api/v1/cars/admin")
                         .file(carDataPart)
@@ -124,7 +169,7 @@ public class CarControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(carService).addCarAsAdmin(carRequestMapper.toCarFromAdminRequest(carData), List.of(image1, image2));
+        verify(carService).addCarAsAdmin(mockCar, List.of(image1, image2));
     }
 
     @Test
@@ -151,7 +196,7 @@ public class CarControllerTest {
                         .phoneNumber("123454567")
                         .name("Owner")
                         .build(),
-                "In Review",
+                "Vurdering",
                 null,
                 Collections.emptyList()
         );

@@ -26,7 +26,6 @@ public record AddCarAdminRequest(
         @NotBlank(message = "Model cannot be null or blank")
         String model,
 
-        @PastOrPresent(message = "Car cannot be registered in the future")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         LocalDate firstTimeRegisteredInNorway,
 

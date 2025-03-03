@@ -74,7 +74,7 @@ public class CarRequestMapper {
     
     public Car toCarFromCustomerRequest(AddCarCustomerRequest request) {
         return Car.builder()
-                .registrationNumber(request.carRegistrationNumber())
+                .registrationNumber(request.registrationNumber())
                 .ownerInfo(
                         OwnerInfo.builder()
                                 .name(request.ownerName())
