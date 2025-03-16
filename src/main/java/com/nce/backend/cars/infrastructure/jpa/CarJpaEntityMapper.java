@@ -1,7 +1,6 @@
 package com.nce.backend.cars.infrastructure.jpa;
 
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,13 +25,7 @@ public class CarJpaEntityMapper {
                 .numberOfSeats(car.getNumberOfSeats())
                 .numberOfDoors(car.getNumberOfDoors())
                 .status(car.getStatus())
-                .ownerInfo(
-                        new OwnerInfoJpaEntity(
-                                car.getOwnerInfo().name(),
-                                car.getOwnerInfo().phoneNumber(),
-                                car.getOwnerInfo().email()
-                        )
-                )
+                .ownerId(car.getOwnerID())
                 .additionalInformation(car.getAdditionalInformation())
                 .imagePaths(car.getImagePaths())
                 .build();
@@ -57,13 +50,7 @@ public class CarJpaEntityMapper {
                 .numberOfSeats(carJpaEntity.getNumberOfSeats())
                 .numberOfDoors(carJpaEntity.getNumberOfDoors())
                 .status(carJpaEntity.getStatus())
-                .ownerInfo(
-                        new OwnerInfo(
-                                carJpaEntity.getOwnerInfo().name,
-                                carJpaEntity.getOwnerInfo().phoneNumber,
-                                carJpaEntity.getOwnerInfo().email
-                        )
-                )
+                .ownerID(carJpaEntity.getOwnerId())
                 .additionalInformation(carJpaEntity.getAdditionalInformation())
                 .imagePaths(carJpaEntity.getImagePaths())
                 .build();

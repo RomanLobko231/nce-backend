@@ -61,8 +61,7 @@ public class CarJpaEntity {
     @Column(name = "next_eu_control")
     private LocalDate nextEUControl;
 
-    @Embedded
-    private OwnerInfoJpaEntity ownerInfo;
+    private UUID ownerId;
 
     @NotNull(message = "Status can't be null")
     @Enumerated(EnumType.STRING)
@@ -76,5 +75,6 @@ public class CarJpaEntity {
             joinColumns = @JoinColumn(name = "car_id")
     )
     @Column(name = "image_path")
+    @Builder.Default
     private List<String> imagePaths = new ArrayList<>();
 }
