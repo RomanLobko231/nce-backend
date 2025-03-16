@@ -1,7 +1,7 @@
-package com.nce.backend.cars.infrastructure.aws;
+package com.nce.backend.file_storage.infrastructure.aws;
 
-import com.nce.backend.cars.domain.services.ImageStorageService;
-import com.nce.backend.cars.exceptions.ImageProcessingException;
+import com.nce.backend.file_storage.domain.FileStorageService;
+import com.nce.backend.file_storage.exceptions.FileProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,34 +11,33 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class S3ImageStorageService implements ImageStorageService<MultipartFile> {
+public class S3FIleStorageService implements FileStorageService<MultipartFile> {
 
     private final S3Client s3Client;
 
     private final String BUCKET_NAME = "maro-nalo";
 
     @Override
-    public String uploadImage(MultipartFile image) {
-        String uniqueFileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+    public String uploadFile(MultipartFile file) {
+        String uniqueFileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(BUCKET_NAME)
                 .key(uniqueFileName)
-                .contentType(image.getContentType())
+                .contentType(file.getContentType())
                 .build();
 
         try {
             s3Client.putObject(
                     putObjectRequest,
-                    RequestBody.fromInputStream(image.getInputStream(), image.getInputStream().available()));
+                    RequestBody.fromInputStream(file.getInputStream(), file.getInputStream().available()));
         } catch (IOException e) {
-            throw new ImageProcessingException(
-                    "Image '%s' could not be processed".formatted(image.getOriginalFilename())
+            throw new FileProcessingException(
+                    "File '%s' could not be processed".formatted(file.getOriginalFilename())
             );
         }
 
@@ -46,32 +45,31 @@ public class S3ImageStorageService implements ImageStorageService<MultipartFile>
     }
 
     @Override
-    public List<String> uploadImages(List<MultipartFile> images) {
-        return images
+    public List<String> uploadFiles(List<MultipartFile> files) {
+        return files
                 .stream()
-                .map(this::uploadImage)
+                .map(this::uploadFile)
                 .toList();
     }
 
     @Override
-    public void deleteImage(String url) {
-        String fileName = extractFileNameFromUrl(url);
+    public void deleteFile(String fileUrl) {
+        String fileToDelete = extractFileNameFromUrl(fileUrl);
         s3Client.deleteObject(
                 DeleteObjectRequest
                         .builder()
                         .bucket(BUCKET_NAME)
-                        .key(fileName)
+                        .key(fileToDelete)
                         .build()
         );
     }
 
     @Override
-    public void deleteImages(List<String> imageUrls) {
-        imageUrls.forEach(this::deleteImage);
+    public void deleteFiles(List<String> fileUrls) {
+        fileUrls.forEach(this::deleteFile);
     }
 
     private String extractFileNameFromUrl(String url) {
         return url.substring(url.lastIndexOf("/") + 1);
     }
-
 }

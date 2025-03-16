@@ -1,4 +1,4 @@
-package com.nce.backend.cars.infrastructure.config;
+package com.nce.backend.file_storage.infrastructure.aws;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
