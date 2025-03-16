@@ -1,15 +1,9 @@
 package com.nce.backend.cars.ui.requests;
 
-import com.nce.backend.cars.domain.valueObjects.GearboxType;
-import com.nce.backend.cars.domain.valueObjects.OperatingMode;
-
-import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
-import com.nce.backend.cars.domain.valueObjects.Status;
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,7 +64,7 @@ public record UpdateCarRequest(
         LocalDate nextEUControl,
 
         @NotNull
-        OwnerInfo ownerInfo,
+        UUID ownerId,
 
         @NotBlank(message = "Status cannot be null or blank")
         String status,

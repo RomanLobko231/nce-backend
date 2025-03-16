@@ -1,7 +1,6 @@
 package com.nce.backend.cars.ui.responses;
 
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,13 +25,7 @@ public class CarResponseMapper {
                 .numberOfSeats(car.getNumberOfSeats())
                 .numberOfDoors(car.getNumberOfDoors())
                 .status(car.getStatus().getValue())
-                .ownerInfo(
-                        new OwnerInfo(
-                                car.getOwnerInfo().name(),
-                                car.getOwnerInfo().phoneNumber(),
-                                car.getOwnerInfo().email()
-                        )
-                )
+                .ownerId(car.getOwnerID())
                 .additionalInformation(car.getAdditionalInformation())
                 .imagePaths(car.getImagePaths())
                 .build();
