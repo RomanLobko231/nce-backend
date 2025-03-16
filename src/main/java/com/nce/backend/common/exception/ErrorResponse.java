@@ -1,4 +1,4 @@
-package com.nce.backend.cars.ui.responses;
+package com.nce.backend.common.exception;
 
 import java.time.LocalDateTime;
 

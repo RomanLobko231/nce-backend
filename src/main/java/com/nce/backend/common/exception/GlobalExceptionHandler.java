@@ -1,9 +1,6 @@
 package com.nce.backend.common.exception;
 
-import com.nce.backend.cars.ui.CarController;
-import com.nce.backend.cars.ui.responses.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +40,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleMAxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+    public ErrorResponse handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
         log.info(e.getMessage());
         return new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
