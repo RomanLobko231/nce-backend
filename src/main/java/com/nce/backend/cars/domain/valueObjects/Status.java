@@ -7,13 +7,13 @@ import lombok.Getter;
 @Getter
 public enum Status {
 
-    IN_REVIEW("In Review"),
+    IN_REVIEW("Vurdering"),
 
-    ON_AUCTION("On Auction"),
+    ON_AUCTION("Auksjon"),
 
-    SOLD("Sold"),
+    SOLD("Solgt"),
 
-    OTHER("Other");
+    OTHER("Annet");
 
     private final String value;
 

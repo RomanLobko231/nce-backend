@@ -1,7 +1,6 @@
 package com.nce.backend.cars.application;
 
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
 import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
 import com.nce.backend.cars.ui.requests.AddCarCustomerRequest;
 import com.nce.backend.cars.ui.requests.CarRequestMapper;
@@ -12,11 +11,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
 public class CarApplicationServiceTest {
+
 
     @Autowired
     private CarApplicationService carApplicationService;
@@ -28,22 +30,19 @@ public class CarApplicationServiceTest {
     @Transactional
     void testAddCarAsCustomer_savesCarSuccessfully() {
         AddCarCustomerRequest request = new AddCarCustomerRequest(
-                "John Doe",
-                "123456789",
+               UUID.randomUUID(),
                 "ABC123",
-                "john.doe@example.com",
                 10
         );
 
         Car mappedCar = carRequestMapper.toCarFromCustomerRequest(request);
-        Car savedCar = carApplicationService.addCarAsCustomer(mappedCar);
+        Car savedCar = carApplicationService.addCarAsCustomer(mappedCar, Collections.emptyList());
 
         assertNotNull(savedCar);
         assertEquals("ABC123", savedCar.getRegistrationNumber());
-        assertEquals("John Doe", savedCar.getOwnerInfo().name());
-        assertEquals("123456789", savedCar.getOwnerInfo().phoneNumber());
-        assertEquals("john.doe@example.com", savedCar.getOwnerInfo().email());
+        assertNotNull(savedCar.getOwnerID());
         assertEquals(10, savedCar.getKilometers());
+        assertEquals(Collections.emptyList(), savedCar.getImagePaths());
     }
 
     @Test
@@ -65,17 +64,13 @@ public class CarApplicationServiceTest {
                 "Framhjulstrekk",
                 1000,
                 LocalDate.now().plusMonths(6),
-                OwnerInfo.builder()
-                        .email("email")
-                        .phoneNumber("123454567")
-                        .name("Owner")
-                        .build(),
-                "In Review",
+                UUID.randomUUID(),
+                "Vurdering",
                 null,
                 Collections.emptyList()
         );
         Car mappedCar = carRequestMapper.toCarFromAdminRequest(request);
-        Car savedCar = carApplicationService.addCarAsAdmin(mappedCar, null);
+        Car savedCar = carApplicationService.addCarAsAdmin(mappedCar, Collections.emptyList());
 
         assertNotNull(savedCar);
         assertNotNull(savedCar.getId());
@@ -90,14 +85,10 @@ public class CarApplicationServiceTest {
         assertEquals("Manuell", savedCar.getGearboxType().getValue());
         assertEquals("Framhjulstrekk", savedCar.getOperatingMode().getValue());
         assertEquals(1000, savedCar.getWeight());
-        assertEquals("In Review", savedCar.getStatus().getValue());
+        assertEquals("Vurdering", savedCar.getStatus().getValue());
         assertEquals(LocalDate.now().minusMonths(6), savedCar.getFirstTimeRegisteredInNorway());
-        assertEquals("email", savedCar.getOwnerInfo().email());
-        assertEquals("123454567", savedCar.getOwnerInfo().phoneNumber());
-        assertEquals("Owner", savedCar.getOwnerInfo().name());
+        assertNotNull(savedCar.getOwnerID());
         assertNull(savedCar.getAdditionalInformation());
         assertEquals(Collections.emptyList(), savedCar.getImagePaths());
-
-
     }
 }

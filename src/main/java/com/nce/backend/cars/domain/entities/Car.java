@@ -1,9 +1,6 @@
 package com.nce.backend.cars.domain.entities;
 
-import com.nce.backend.cars.domain.valueObjects.GearboxType;
-import com.nce.backend.cars.domain.valueObjects.OperatingMode;
-import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
-import com.nce.backend.cars.domain.valueObjects.Status;
+import com.nce.backend.cars.domain.valueObjects.*;
 import jakarta.persistence.ElementCollection;
 import lombok.*;
 
@@ -51,16 +48,33 @@ public class Car {
 
     private LocalDate nextEUControl;
 
-    private OwnerInfo ownerInfo;
+    private UUID ownerID;
 
     private Status status;
 
     private String additionalInformation;
 
+    @Builder.Default
     private List<String> imagePaths = new ArrayList<>();
 
     public void addNewImagePaths(List<String> newImagePaths) {
         imagePaths.addAll(newImagePaths);
+    }
+
+    public void updateDataFromApi(ApiCarData apiData){
+        this.setMake(apiData.make());
+        this.setModel(apiData.model());
+        this.setColor(apiData.color());
+        this.setEngineType(apiData.engineType());
+        this.setEngineVolume(apiData.engineVolume());
+        this.setFirstTimeRegisteredInNorway(apiData.firstTimeRegisteredInNorway());
+        this.setNextEUControl(apiData.nextEUControl());
+        this.setGearboxType(apiData.gearboxType());
+        this.setNumberOfDoors(apiData.numberOfDoors());
+        this.setNumberOfSeats(apiData.numberOfSeats());
+        this.setBodywork(apiData.bodywork());
+        this.setOperatingMode(apiData.operatingMode());
+        this.setWeight(apiData.weight());
     }
 
 }

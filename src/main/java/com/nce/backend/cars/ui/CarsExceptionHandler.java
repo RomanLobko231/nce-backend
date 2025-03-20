@@ -1,13 +1,9 @@
 package com.nce.backend.cars.ui;
 
 import com.nce.backend.cars.exceptions.CarAlreadyExistsException;
-import com.nce.backend.cars.ui.responses.ErrorResponse;
-import jakarta.validation.ValidationException;
+import com.nce.backend.common.exception.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;

@@ -1,9 +1,5 @@
 package com.nce.backend.cars.ui.responses;
 
-import com.nce.backend.cars.domain.valueObjects.GearboxType;
-import com.nce.backend.cars.domain.valueObjects.OperatingMode;
-import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
-import com.nce.backend.cars.domain.valueObjects.Status;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -45,7 +41,7 @@ public record CarResponse(
 
         LocalDate nextEUControl,
 
-        OwnerInfo ownerInfo,
+        UUID ownerId,
 
         String status,
 

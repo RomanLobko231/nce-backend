@@ -1,14 +1,10 @@
 package com.nce.backend.common.exception;
 
-import com.nce.backend.cars.ui.CarController;
-import com.nce.backend.cars.ui.responses.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @ControllerAdvice
 @ResponseBody
@@ -33,12 +29,32 @@ public class GlobalExceptionHandler {
         StringBuilder constraints = new StringBuilder();
         e.getBindingResult().getAllErrors().forEach((error) -> {
             String errorMessage = error.getDefaultMessage();
-            constraints.append(errorMessage).append("\n");
+            constraints.append(errorMessage);
         });
 
         return new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Validation error(s) occurred:\n".concat(constraints.toString())
+                "Validation error(s) occurred:".concat(constraints.toString())
+        );
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        log.info(e.getMessage());
+        return new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Max upload size of 10 MB exceeded. Try again with less data."
+        );
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleInvalidTokenException(InvalidTokenException e) {
+        log.info(e.getMessage());
+        return new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Provided token is invalid."
         );
     }
 }

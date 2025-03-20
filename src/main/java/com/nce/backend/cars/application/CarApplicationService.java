@@ -1,28 +1,21 @@
 package com.nce.backend.cars.application;
 
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.cars.domain.events.NewCarSavedEvent;
+import com.nce.backend.common.events.NewCarSavedEvent;
 import com.nce.backend.cars.domain.services.CarDomainService;
 import com.nce.backend.cars.domain.services.ExternalApiService;
-import com.nce.backend.cars.domain.services.ImageStorageService;
+import com.nce.backend.file_storage.FileStorageFacade;
+import com.nce.backend.file_storage.domain.FileStorageService;
 import com.nce.backend.cars.domain.valueObjects.ApiCarData;
-import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
-import com.nce.backend.cars.domain.valueObjects.Status;
-import com.nce.backend.cars.exceptions.ImageProcessingException;
-import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
-import com.nce.backend.cars.ui.requests.AddCarCustomerRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,15 +23,20 @@ public class CarApplicationService {
 
     private final CarDomainService carDomainService;
     private final ExternalApiService externalApiService;
-    private final ImageStorageService<MultipartFile> imageStorageService;
+    private final FileStorageFacade fileStorageFacade;
 
-    public Car addCarAsCustomer(Car carToAdd) {
+    public Car addCarAsCustomer(Car carToAdd, List<MultipartFile> imagesToUpload) {
+        if (imagesToUpload != null && !imagesToUpload.isEmpty()) {
+            List<String> imageUrls = fileStorageFacade.uploadFiles(imagesToUpload);
+            carToAdd.setImagePaths(imageUrls);
+        }
+
         return carDomainService.saveNewCarRequest(carToAdd);
     }
 
-    public Car addCarAsAdmin(Car carToAdd, List<MultipartFile> images) {
-        if (images != null && !images.isEmpty()) {
-            List<String> imageUrls = imageStorageService.uploadImages(images);
+    public Car addCarAsAdmin(Car carToAdd, List<MultipartFile> imagesToUpload) {
+        if (imagesToUpload != null && !imagesToUpload.isEmpty()) {
+            List<String> imageUrls = fileStorageFacade.uploadFiles(imagesToUpload);
             carToAdd.addNewImagePaths(imageUrls);
         }
 
@@ -61,19 +59,19 @@ public class CarApplicationService {
                 .toList();
 
         if (!imagesToDelete.isEmpty()) {
-            imageStorageService.deleteImages(imagesToDelete);
+            fileStorageFacade.deleteFiles(imagesToDelete);
         }
 
         if (imagesToUpload != null && !imagesToUpload.isEmpty()) {
-            List<String> imageUrls = imageStorageService.uploadImages(imagesToUpload);
+            List<String> imageUrls = fileStorageFacade.uploadFiles(imagesToUpload);
             car.addNewImagePaths(imageUrls);
         }
 
         return carDomainService.save(car);
     }
 
-    public void addImagesForCarById(UUID carId, List<MultipartFile> images) {
-        if (images == null) return;
+    public void addImagesForCarById(UUID carId, List<MultipartFile> imagesToUpload) {
+        if (imagesToUpload == null || imagesToUpload.isEmpty()) return;
 
         Car car = carDomainService
                 .findById(carId)
@@ -81,7 +79,7 @@ public class CarApplicationService {
                         () -> new NoSuchElementException("Car with id %s was not found".formatted(carId))
                 );
 
-        List<String> imageUrls = imageStorageService.uploadImages(images);
+        List<String> imageUrls = fileStorageFacade.uploadFiles(imagesToUpload);
         car.addNewImagePaths(imageUrls);
 
         carDomainService.save(car);
@@ -108,26 +106,13 @@ public class CarApplicationService {
     @Async
     @TransactionalEventListener
     public void saveApiDataOn(NewCarSavedEvent event) {
-        ApiCarData apiData = externalApiService.fetchCarData(event.registrationNumber());
         Car carToUpdate = carDomainService
-                .findById(event.id())
+                .findById(event.carId())
                 .orElseThrow(
-                        () -> new NoSuchElementException("Car with id %s was not found".formatted(event.id()))
+                        () -> new NoSuchElementException("Car with id %s was not found".formatted(event.carId()))
                 );
-
-        carToUpdate.setMake(apiData.make());
-        carToUpdate.setModel(apiData.model());
-        carToUpdate.setColor(apiData.color());
-        carToUpdate.setEngineType(apiData.engineType());
-        carToUpdate.setEngineVolume(apiData.engineVolume());
-        carToUpdate.setFirstTimeRegisteredInNorway(apiData.firstTimeRegisteredInNorway());
-        carToUpdate.setNextEUControl(apiData.nextEUControl());
-        carToUpdate.setGearboxType(apiData.gearboxType());
-        carToUpdate.setNumberOfDoors(apiData.numberOfDoors());
-        carToUpdate.setNumberOfSeats(apiData.numberOfSeats());
-        carToUpdate.setBodywork(apiData.bodywork());
-        carToUpdate.setOperatingMode(apiData.operatingMode());
-        carToUpdate.setWeight(apiData.weight());
+        ApiCarData apiData = externalApiService.fetchCarData(event.registrationNumber());
+        carToUpdate.updateDataFromApi(apiData);
 
         carDomainService.save(carToUpdate);
     }

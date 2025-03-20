@@ -28,23 +28,22 @@ public class CarController {
     private final CarResponseMapper carResponseMapper;
     private final CarRequestMapper carRequestMapper;
 
-    @PostMapping("/customer")
-    ResponseEntity<Void> addNewCarAsCustomer(@RequestBody @Valid AddCarCustomerRequest request) {
-        carService.addCarAsCustomer(carRequestMapper.toCarFromCustomerRequest(request));
+    @PostMapping(value = "/customer", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<Void> addNewCarAsCustomer(
+            @RequestPart(name = "carData") @Valid AddCarCustomerRequest request,
+            @RequestPart(name = "images", required = false) List<MultipartFile> images
+    ) {
+        carService.addCarAsCustomer(
+                carRequestMapper.toCarFromCustomerRequest(request),
+                images
+        );
 
         return ResponseEntity.ok().build();
     }
 
-//    @PostMapping("/admin")
-//    ResponseEntity<Void> addNewCarAsAdmin(@RequestBody @Valid AddCarAdminRequest request) {
-//        carService.addCarAsAdmin(carRequestMapper.toCarFromAdminRequest(request));
-//
-//        return ResponseEntity.ok().build();
-//    }
-
     @PostMapping(value = "/admin", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Void> addNewCarAsAdmin(
-            @RequestPart(name = "carData", required = true) @Valid AddCarAdminRequest carData,
+            @RequestPart(name = "carData") @Valid AddCarAdminRequest carData,
             @RequestPart(name = "images", required = false) List<MultipartFile> images) {
 
         carService.addCarAsAdmin(
@@ -54,11 +53,10 @@ public class CarController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(value = "/add-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/add_images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Void> addImagesForCar(
             @RequestParam(name = "carId") UUID id,
             @RequestParam(name = "images") List<MultipartFile> images) {
-
 
         carService.addImagesForCarById(id, images);
         return ResponseEntity.ok().build();
@@ -83,7 +81,7 @@ public class CarController {
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<Void> updateCar(@RequestPart(name = "carData", required = true) @Valid UpdateCarRequest carData,
+    ResponseEntity<Void> updateCar(@RequestPart(name = "carData") @Valid UpdateCarRequest carData,
                                    @RequestPart(name = "images", required = false) List<MultipartFile> images) {
 
         Car carToUpdate = carRequestMapper.toCarFromUpdateRequest(carData);

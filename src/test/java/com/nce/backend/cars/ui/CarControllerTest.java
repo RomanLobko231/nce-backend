@@ -3,7 +3,6 @@ package com.nce.backend.cars.ui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nce.backend.cars.application.CarApplicationService;
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
 import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
 import com.nce.backend.cars.ui.requests.AddCarCustomerRequest;
 import com.nce.backend.cars.ui.requests.CarRequestMapper;
@@ -19,7 +18,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.ObjectInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -27,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -52,19 +51,50 @@ public class CarControllerTest {
     @Test
     public void testAddCarAsCustomer() throws Exception {
         AddCarCustomerRequest request = new AddCarCustomerRequest(
-                "John Doe",
-                "123456789",
+                UUID.randomUUID(),
                 "ABC123",
-                "john.doe@example.com",
                 10
         );
 
-        mockMvc.perform(post("/api/v1/cars/customer")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(request)))
+        MockMultipartFile carDataPart = new MockMultipartFile(
+                "carData",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                new ObjectMapper().findAndRegisterModules().writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
+        );
+
+        MockMultipartFile image1 = new MockMultipartFile(
+                "images",
+                "image1.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "dummy-image-content1".getBytes()
+        );
+
+        MockMultipartFile image2 = new MockMultipartFile(
+                "images",
+                "image2.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "dummy-image-content2".getBytes()
+        );
+
+        Car mockCar = Car
+                .builder()
+                .registrationNumber(request.registrationNumber())
+                .kilometers(request.kilometers())
+                .build();
+
+        when(carRequestMapper.toCarFromCustomerRequest(any(AddCarCustomerRequest.class))).thenReturn(mockCar);
+        when(carService.addCarAsCustomer(any(Car.class), anyList())).thenReturn(mockCar);
+
+        mockMvc.perform(multipart("/api/v1/cars/customer")
+                        .file(carDataPart)
+                        .file(image1)
+                        .file(image2)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(carService).addCarAsCustomer(carRequestMapper.toCarFromCustomerRequest(request));
+        verify(carService).addCarAsCustomer(mockCar, List.of(image1, image2));
     }
 
     @Test
@@ -85,12 +115,8 @@ public class CarControllerTest {
                 "Framhjulstrekk",
                 10,
                 LocalDate.now().plusMonths(6),
-                OwnerInfo.builder()
-                        .email("email")
-                        .phoneNumber("123454567")
-                        .name("Owner")
-                        .build(),
-                "In Review",
+                UUID.randomUUID(),
+                "Vurdering",
                 null,
                 Collections.emptyList()
         );
@@ -115,6 +141,10 @@ public class CarControllerTest {
                 MediaType.IMAGE_PNG_VALUE,
                 "dummy-image-content2".getBytes()
         );
+        Car mockCar = Car.builder().build();
+
+        when(carRequestMapper.toCarFromAdminRequest(any(AddCarAdminRequest.class))).thenReturn(mockCar);
+        when(carService.addCarAsAdmin(any(Car.class), anyList())).thenReturn(mockCar);
 
         mockMvc.perform(multipart("/api/v1/cars/admin")
                         .file(carDataPart)
@@ -124,7 +154,7 @@ public class CarControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(carService).addCarAsAdmin(carRequestMapper.toCarFromAdminRequest(carData), List.of(image1, image2));
+        verify(carService).addCarAsAdmin(mockCar, List.of(image1, image2));
     }
 
     @Test
@@ -146,12 +176,8 @@ public class CarControllerTest {
                 "Framhjulstrekk",
                 1000,
                 LocalDate.now().plusMonths(6),
-                OwnerInfo.builder()
-                        .email("email")
-                        .phoneNumber("123454567")
-                        .name("Owner")
-                        .build(),
-                "In Review",
+                UUID.randomUUID(),
+                "Vurdering",
                 null,
                 Collections.emptyList()
         );
