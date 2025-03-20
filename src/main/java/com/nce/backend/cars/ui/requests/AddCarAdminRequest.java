@@ -1,9 +1,7 @@
 package com.nce.backend.cars.ui.requests;
 
-import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -64,7 +62,7 @@ public record AddCarAdminRequest(
         LocalDate nextEUControl,
 
         @NotNull
-        OwnerInfo ownerInfo,
+        UUID ownerId,
 
         @NotBlank(message = "Status cannot be null or blank")
         String status,

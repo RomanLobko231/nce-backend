@@ -3,7 +3,6 @@ package com.nce.backend.cars.ui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nce.backend.cars.application.CarApplicationService;
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.cars.domain.valueObjects.OwnerInfo;
 import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
 import com.nce.backend.cars.ui.requests.AddCarCustomerRequest;
 import com.nce.backend.cars.ui.requests.CarRequestMapper;
@@ -11,7 +10,6 @@ import com.nce.backend.cars.ui.requests.UpdateCarRequest;
 import com.nce.backend.cars.ui.responses.CarResponse;
 import com.nce.backend.cars.ui.responses.CarResponseMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +18,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.ObjectInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -54,10 +51,8 @@ public class CarControllerTest {
     @Test
     public void testAddCarAsCustomer() throws Exception {
         AddCarCustomerRequest request = new AddCarCustomerRequest(
-                "John Doe",
-                "123456789",
+                UUID.randomUUID(),
                 "ABC123",
-                "john.doe@example.com",
                 10
         );
 
@@ -84,12 +79,6 @@ public class CarControllerTest {
 
         Car mockCar = Car
                 .builder()
-                .ownerInfo(OwnerInfo
-                        .builder()
-                        .name(request.ownerName())
-                        .phoneNumber(request.phoneNumber())
-                        .email(request.email())
-                        .build())
                 .registrationNumber(request.registrationNumber())
                 .kilometers(request.kilometers())
                 .build();
@@ -126,11 +115,7 @@ public class CarControllerTest {
                 "Framhjulstrekk",
                 10,
                 LocalDate.now().plusMonths(6),
-                OwnerInfo.builder()
-                        .email("email")
-                        .phoneNumber("123454567")
-                        .name("Owner")
-                        .build(),
+                UUID.randomUUID(),
                 "Vurdering",
                 null,
                 Collections.emptyList()
@@ -191,11 +176,7 @@ public class CarControllerTest {
                 "Framhjulstrekk",
                 1000,
                 LocalDate.now().plusMonths(6),
-                OwnerInfo.builder()
-                        .email("email")
-                        .phoneNumber("123454567")
-                        .name("Owner")
-                        .build(),
+                UUID.randomUUID(),
                 "Vurdering",
                 null,
                 Collections.emptyList()

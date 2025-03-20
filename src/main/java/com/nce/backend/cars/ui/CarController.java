@@ -30,10 +30,13 @@ public class CarController {
 
     @PostMapping(value = "/customer", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Void> addNewCarAsCustomer(
-            @RequestPart(name = "request") @Valid AddCarCustomerRequest request,
+            @RequestPart(name = "carData") @Valid AddCarCustomerRequest request,
             @RequestPart(name = "images", required = false) List<MultipartFile> images
-            ) {
-        carService.addCarAsCustomer(carRequestMapper.toCarFromCustomerRequest(request), images);
+    ) {
+        carService.addCarAsCustomer(
+                carRequestMapper.toCarFromCustomerRequest(request),
+                images
+        );
 
         return ResponseEntity.ok().build();
     }
@@ -50,11 +53,10 @@ public class CarController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(value = "/add-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/add_images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Void> addImagesForCar(
             @RequestParam(name = "carId") UUID id,
             @RequestParam(name = "images") List<MultipartFile> images) {
-
 
         carService.addImagesForCarById(id, images);
         return ResponseEntity.ok().build();
@@ -79,7 +81,7 @@ public class CarController {
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<Void> updateCar(@RequestPart(name = "carData", required = true) @Valid UpdateCarRequest carData,
+    ResponseEntity<Void> updateCar(@RequestPart(name = "carData") @Valid UpdateCarRequest carData,
                                    @RequestPart(name = "images", required = false) List<MultipartFile> images) {
 
         Car carToUpdate = carRequestMapper.toCarFromUpdateRequest(carData);

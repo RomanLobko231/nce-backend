@@ -1,0 +1,1 @@
+ALTER TABLE base_user ADD COLUMN is_account_locked BOOLEAN NOT NULL DEFAULT FALSE;
