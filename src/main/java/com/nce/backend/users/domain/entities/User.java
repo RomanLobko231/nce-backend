@@ -24,4 +24,6 @@ public class User {
     private String phoneNumber;
 
     private Role role;
+
+    private boolean isAccountLocked;
 }

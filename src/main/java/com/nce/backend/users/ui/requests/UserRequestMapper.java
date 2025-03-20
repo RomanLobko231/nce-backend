@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserRequestMapper {
 
-    public SellerUser toSellerFromRequest(RegisterSellerRequest request){
+    public SellerUser toSellerFromRegisterRequest(RegisterSellerRequest request){
         return SellerUser
                 .builder()
                 .email(request.email())
@@ -20,7 +20,7 @@ public class UserRequestMapper {
                 .build();
     }
 
-    public BuyerUser toBuyerFromRequest(RegisterBuyerRequest request){
+    public BuyerUser toBuyerFromRegisterRequest(RegisterBuyerRequest request){
         return BuyerUser
                 .builder()
                 .email(request.email())

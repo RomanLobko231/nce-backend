@@ -30,7 +30,7 @@ public class BuyerJpaEntity extends UserJpaEntity {
     @Column(unique = true)
     private String organisationNumber;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "org_licence_urls",
             joinColumns = @JoinColumn(name = "buyer_id")

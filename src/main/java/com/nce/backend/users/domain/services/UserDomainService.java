@@ -8,6 +8,7 @@ import com.nce.backend.users.domain.repositories.SellerUserRepository;
 import com.nce.backend.users.domain.repositories.UserRepository;
 import com.nce.backend.users.domain.valueObjects.Role;
 import com.nce.backend.users.exceptions.UserAlreadyExistsException;
+import com.nce.backend.users.exceptions.UserDoesNotExistException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,25 +25,40 @@ public class UserDomainService {
     private final BuyerUserRepository buyerRepository;
 
     @Transactional
-    public SellerUser saveSeller(SellerUser userToSave) {
-        checkExistsByEmail(userToSave.getEmail());
+    public SellerUser registerSeller(SellerUser userToSave) {
         userToSave.setRole(Role.SELLER);
 
         return sellerRepository.save(userToSave);
     }
 
     @Transactional
-    public BuyerUser saveBuyer(BuyerUser userToSave) {
-        checkExistsByEmail(userToSave.getEmail());
+    public BuyerUser registerBuyer(BuyerUser userToSave) {
         userToSave.setRole(Role.BUYER);
+        userToSave.setAccountLocked(true);
 
         return buyerRepository.save(userToSave);
     }
 
     public User saveUser(User userToSave) {
-        checkExistsByEmail(userToSave.getEmail());
-
         return userRepository.save(userToSave);
+    }
+
+    public User updateUser(User userToSave) {
+        if (!userRepository.existsByEmail(userToSave.getEmail())) {
+            throw new UserDoesNotExistException("User with this email does not exist");
+        }
+
+        if (userToSave instanceof SellerUser sellerUser) {
+            return sellerRepository.save(sellerUser);
+        } else if (userToSave instanceof BuyerUser buyerUser) {
+            return buyerRepository.save(buyerUser);
+        }
+
+        return this.saveUser(userToSave);
+    }
+
+    public Optional<User> findUserById(UUID id) {
+        return userRepository.findById(id);
     }
 
     public Optional<SellerUser> findSellerById(UUID id) {
@@ -53,9 +69,7 @@ public class UserDomainService {
         return userRepository.findByEmail(email);
     }
 
-    private void checkExistsByEmail(String email) {
-        if (userRepository.existsByEmail(email)) {
-            throw new UserAlreadyExistsException("User with this email already exists");
-        }
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }

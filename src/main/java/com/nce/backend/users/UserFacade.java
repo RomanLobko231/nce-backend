@@ -27,16 +27,16 @@ public class UserFacade {
                 .email(fetchedUser.getEmail())
                 .password(fetchedUser.getPassword())
                 .role(fetchedUser.getRole().name())
+                .isAccountLocked(fetchedUser.isAccountLocked())
                 .build();
     }
 
     @Builder
     public record AuthenticatedUserDTO(
             String email,
-
             String password,
-
-            String role
+            String role,
+            boolean isAccountLocked
     ) {
     }
 }

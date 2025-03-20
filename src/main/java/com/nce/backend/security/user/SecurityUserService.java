@@ -27,6 +27,7 @@ public class SecurityUserService implements UserDetailsService {
                 .authorities(
                         new SimpleGrantedAuthority("ROLE_" + userDTO.role())
                 )
+                .accountLocked(userDTO.isAccountLocked())
                 .build();
     }
 }

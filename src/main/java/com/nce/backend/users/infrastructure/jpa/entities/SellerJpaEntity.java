@@ -21,7 +21,7 @@ public class SellerJpaEntity extends UserJpaEntity {
     @Embedded
     private AddressJpaEntity sellerAddress;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "seller_car_ids",
             joinColumns = @JoinColumn(name = "seller_id")

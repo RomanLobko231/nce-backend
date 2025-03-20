@@ -3,6 +3,7 @@ package com.nce.backend.users.infrastructure.jpa.repositories;
 import com.nce.backend.users.domain.entities.User;
 import com.nce.backend.users.domain.repositories.UserRepository;
 import com.nce.backend.users.infrastructure.jpa.UserJpaEntityMapper;
+import com.nce.backend.users.infrastructure.jpa.entities.UserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -45,20 +46,22 @@ public class UserRepositoryImpl implements UserRepository<User> {
 
     @Override
     public User save(User user) {
-
-        return User.builder().build();
+        UserJpaEntity savedUser = userJpaRepository.save(entityMapper.toUserJpaEntity(user));
+        return entityMapper.toUserDomainEntity(savedUser);
     }
 
     @Override
-    public void deleteById(UUID id) {}
+    public void deleteById(UUID id) {
+        userJpaRepository.deleteById(id);
+    }
 
     @Override
     public boolean existsByEmail(String email) {
-        return false;
+        return userJpaRepository.existsByEmail(email);
     }
 
     @Override
     public boolean existsById(UUID id) {
-        return false;
+        return userJpaRepository.existsById(id);
     }
 }

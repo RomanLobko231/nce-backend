@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 @Service
 public class JWTService {
@@ -19,12 +21,11 @@ public class JWTService {
 
     private final String ISSUER = "NCE_BACKEND";
 
-    public String generateJWT(UUID userId, String email) {
+    public String generateJWT(String email) {
         return Jwts
                 .builder()
                 .issuer(ISSUER)
-                .subject(userId.toString())
-                .claim("email", email)
+                .subject(email)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSigningKey())
@@ -36,18 +37,18 @@ public class JWTService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractEmail(String token) {
-        return parseClaims(token).get("email").toString();
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        Claims claims = this.parseClaims(token);
+
+        return claimsResolver.apply(claims);
     }
 
-    public UUID extractUserId(String token) {
-        return UUID.fromString(
-                parseClaims(token).getSubject()
-        );
+    public String extractEmail(String token) {
+        return this.extractClaim(token, Claims::getSubject);
     }
 
     public boolean isTokenValid(String token ){
-        return parseClaims(token).getExpiration().after(new Date());
+        return this.extractClaim(token, Claims::getExpiration).after(new Date());
     }
 
     public Claims parseClaims(String token) {

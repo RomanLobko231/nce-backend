@@ -29,12 +29,12 @@ public class GlobalExceptionHandler {
         StringBuilder constraints = new StringBuilder();
         e.getBindingResult().getAllErrors().forEach((error) -> {
             String errorMessage = error.getDefaultMessage();
-            constraints.append(errorMessage).append("\n");
+            constraints.append(errorMessage);
         });
 
         return new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Validation error(s) occurred:\n".concat(constraints.toString())
+                "Validation error(s) occurred:".concat(constraints.toString())
         );
     }
 
@@ -45,6 +45,16 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Max upload size of 10 MB exceeded. Try again with less data."
+        );
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleInvalidTokenException(InvalidTokenException e) {
+        log.info(e.getMessage());
+        return new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Provided token is invalid."
         );
     }
 }

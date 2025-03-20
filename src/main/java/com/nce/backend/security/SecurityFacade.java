@@ -14,6 +14,7 @@ import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -32,8 +33,8 @@ public class SecurityFacade {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
-    public String generateToken(UUID userId, String email) {
-        return tokenService.generateJWT(userId, email);
+    public String generateToken(String email) {
+        return tokenService.generateJWT(email);
     }
 
 }

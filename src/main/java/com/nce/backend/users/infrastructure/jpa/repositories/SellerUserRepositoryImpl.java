@@ -23,17 +23,25 @@ public class SellerUserRepositoryImpl implements SellerUserRepository {
 
     @Override
     public Optional<SellerUser> findById(UUID id) {
-        return Optional.empty();
+        return userJpaRepository
+                .findSellerUserById(id)
+                .map(userMapper::toSellerUserDomainEntity);
     }
 
     @Override
     public Optional<SellerUser> findByEmail(String email) {
-        return Optional.empty();
+        return userJpaRepository
+                .findByEmail(email)
+                .map((user) -> userMapper.toSellerUserDomainEntity((SellerJpaEntity) user));
     }
 
     @Override
     public List<SellerUser> findAll() {
-        return List.of();
+        return userJpaRepository
+                .findAllSellerUsers()
+                .stream()
+                .map(userMapper::toSellerUserDomainEntity)
+                .toList();
     }
 
     @Override
@@ -44,16 +52,16 @@ public class SellerUserRepositoryImpl implements SellerUserRepository {
 
     @Override
     public void deleteById(UUID id) {
-
+        userJpaRepository.deleteById(id);
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        return false;
+        return userJpaRepository.existsByEmail(email);
     }
 
     @Override
     public boolean existsById(UUID id) {
-        return false;
+        return userJpaRepository.existsById(id);
     }
 }

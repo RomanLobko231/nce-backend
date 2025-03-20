@@ -4,10 +4,7 @@ import com.nce.backend.users.domain.valueObjects.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.UUID;
@@ -19,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-public abstract class UserJpaEntity {
+public class UserJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -45,4 +42,7 @@ public abstract class UserJpaEntity {
     @NotNull(message = "Role cannot be null")
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Builder.Default
+    private boolean isAccountLocked = false;
 }

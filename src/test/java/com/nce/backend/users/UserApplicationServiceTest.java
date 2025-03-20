@@ -15,8 +15,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -44,7 +43,7 @@ public class UserApplicationServiceTest {
                         .build()
         );
 
-        SellerUser mappedUser = userRequestMapper.toSellerFromRequest(request);
+        SellerUser mappedUser = userRequestMapper.toSellerFromRegisterRequest(request);
         SellerUser savedUser = userApplicationService.registerSeller(mappedUser);
 
         assertNotNull(savedUser);
@@ -55,5 +54,6 @@ public class UserApplicationServiceTest {
         assertEquals(request.phoneNumber(), savedUser.getPhoneNumber());
         assertEquals(request.email(), savedUser.getEmail());
         assertEquals(request.address(), savedUser.getSellerAddress());
+        assertFalse(savedUser.isAccountLocked());
     }
 }

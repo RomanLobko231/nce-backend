@@ -30,7 +30,7 @@ public class CarController {
 
     @PostMapping(value = "/customer", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Void> addNewCarAsCustomer(
-            @RequestPart(name = "request") @Valid AddCarCustomerRequest request,
+            @RequestPart(name = "carData") @Valid AddCarCustomerRequest request,
             @RequestPart(name = "images", required = false) List<MultipartFile> images
     ) {
         carService.addCarAsCustomer(

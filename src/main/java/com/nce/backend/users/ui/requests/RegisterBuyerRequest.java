@@ -4,6 +4,7 @@ import com.nce.backend.users.domain.valueObjects.Address;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public record RegisterBuyerRequest(
 
         @NotNull(message = "Password cannot be null")
         @NotBlank(message = "Password cannot be blank")
-        @Min(value = 8, message = "Password should be at least 8 symbols long")
+        @Size(min = 8, message = "Password should be at least 8 symbols long")
         String password
 
 ) {
