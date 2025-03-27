@@ -31,7 +31,7 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UUID> {
             FROM buyer bu
             JOIN base_user u ON bu.buyer_id = u.id
             """, nativeQuery = true)
-    List<SellerJpaEntity> findAllBuyerUsers();
+    List<BuyerJpaEntity> findAllBuyerUsers();
 
     @Query(value = """
             SELECT su.*, u.*
