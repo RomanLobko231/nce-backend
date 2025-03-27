@@ -4,10 +4,9 @@ import com.nce.backend.users.application.UserApplicationService;
 import com.nce.backend.users.domain.entities.BuyerUser;
 import com.nce.backend.users.domain.entities.SellerUser;
 import com.nce.backend.users.domain.entities.User;
-import com.nce.backend.users.ui.requests.LoginRequest;
-import com.nce.backend.users.ui.requests.RegisterBuyerRequest;
-import com.nce.backend.users.ui.requests.RegisterSellerRequest;
-import com.nce.backend.users.ui.requests.UserRequestMapper;
+import com.nce.backend.users.infrastructure.jpa.entities.UserJpaEntity;
+import com.nce.backend.users.infrastructure.jpa.repositories.UserJpaRepository;
+import com.nce.backend.users.ui.requests.*;
 import com.nce.backend.users.ui.responses.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,15 +25,23 @@ import java.util.UUID;
 public class UserController {
 
     private final UserApplicationService userService;
-
     private final UserRequestMapper requestMapper;
-
     private final UserResponseMapper responseMapper;
+
 
     @PostMapping(value = "/register_seller")
     ResponseEntity<RegisterSuccessResponse> registerSeller(@RequestBody @Valid RegisterSellerRequest request) {
         User registeredUser = userService.registerSeller(
                 requestMapper.toSellerFromRegisterRequest(request)
+        );
+
+        return ResponseEntity.ok(responseMapper.toRegisterSuccessResponse(registeredUser));
+    }
+
+    @PostMapping(value = "/register_one_time_seller")
+    ResponseEntity<RegisterSuccessResponse> registerOneTimeSeller(@RequestBody @Valid RegisterOneTimeSellerRequest request) {
+        User registeredUser = userService.registerOneTimeSeller(
+                requestMapper.toOneTimeSellerUser(request)
         );
 
         return ResponseEntity.ok(responseMapper.toRegisterSuccessResponse(registeredUser));
@@ -63,17 +70,48 @@ public class UserController {
     @GetMapping("/{id}")
     ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
         User user = userService.findUserById(id);
-        UserResponse response;
-
-        if (user instanceof SellerUser sellerUser) {
-            System.out.println(sellerUser.getSellerAddress().streetAddress());
-            response = responseMapper.toSellerUserResponse(sellerUser);
-        } else if (user instanceof BuyerUser buyerUser) {
-            response = responseMapper.toBuyerUserResponse(buyerUser);
-        } else {
-            throw new IllegalStateException("Unknown user type");
-        }
+        UserResponse response = responseMapper.toUserResponse(user);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping()
+    ResponseEntity<List<UserResponse>> getAll() {
+        return ResponseEntity.ok(
+                userService
+                        .findAllUsers()
+                        .stream()
+                        .map(responseMapper::toUserResponse)
+                        .toList()
+        );
+    }
+
+    @GetMapping("/sellers")
+    ResponseEntity<List<SellerUserResponse>> getAllSellers() {
+        return ResponseEntity.ok(
+                userService
+                        .findAllSellers()
+                        .stream()
+                        .map(responseMapper::toSellerUserResponse)
+                        .toList()
+        );
+    }
+
+    @GetMapping("/buyers")
+    ResponseEntity<List<BuyerUserResponse>> getAllBuyers() {
+        return ResponseEntity.ok(
+                userService
+                        .findAllBuyers()
+                        .stream()
+                        .map(responseMapper::toBuyerUserResponse)
+                        .toList()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    ResponseEntity<Void> deleteUserById(@PathVariable UUID id) {
+        userService.deleteUserById(id);
+
+        return ResponseEntity.noContent().build();
     }
 }
