@@ -1,18 +1,17 @@
 package com.nce.backend.users.domain.services;
 
 import com.nce.backend.users.domain.entities.BuyerUser;
+import com.nce.backend.users.domain.entities.OneTimeSellerUser;
 import com.nce.backend.users.domain.entities.SellerUser;
 import com.nce.backend.users.domain.entities.User;
-import com.nce.backend.users.domain.repositories.BuyerUserRepository;
-import com.nce.backend.users.domain.repositories.SellerUserRepository;
 import com.nce.backend.users.domain.repositories.UserRepository;
 import com.nce.backend.users.domain.valueObjects.Role;
-import com.nce.backend.users.exceptions.UserAlreadyExistsException;
 import com.nce.backend.users.exceptions.UserDoesNotExistException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,23 +19,21 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserDomainService {
 
-    private final UserRepository<User> userRepository;
-    private final SellerUserRepository sellerRepository;
-    private final BuyerUserRepository buyerRepository;
+    private final UserRepository userRepository;
 
     @Transactional
-    public SellerUser registerSeller(SellerUser userToSave) {
+    public User registerSeller(SellerUser userToSave) {
         userToSave.setRole(Role.SELLER);
 
-        return sellerRepository.save(userToSave);
+        return userRepository.save(userToSave);
     }
 
     @Transactional
-    public BuyerUser registerBuyer(BuyerUser userToSave) {
+    public User registerBuyer(BuyerUser userToSave) {
         userToSave.setRole(Role.BUYER);
         userToSave.setAccountLocked(true);
 
-        return buyerRepository.save(userToSave);
+        return userRepository.save(userToSave);
     }
 
     public User saveUser(User userToSave) {
@@ -48,13 +45,19 @@ public class UserDomainService {
             throw new UserDoesNotExistException("User with this email does not exist");
         }
 
-        if (userToSave instanceof SellerUser sellerUser) {
-            return sellerRepository.save(sellerUser);
-        } else if (userToSave instanceof BuyerUser buyerUser) {
-            return buyerRepository.save(buyerUser);
-        }
-
         return this.saveUser(userToSave);
+    }
+
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public List<SellerUser> findAllSellers() {
+        return userRepository.findAllSellerUsers();
+    }
+
+    public List<BuyerUser> findAllBuyers() {
+        return userRepository.findAllBuyerUsers();
     }
 
     public Optional<User> findUserById(UUID id) {
@@ -62,7 +65,11 @@ public class UserDomainService {
     }
 
     public Optional<SellerUser> findSellerById(UUID id) {
-        return sellerRepository.findById(id);
+        return userRepository.findSellerUserById(id);
+    }
+
+    public Optional<BuyerUser> findBuyerById(UUID id) {
+        return userRepository.findBuyerUserById(id);
     }
 
     public Optional<User> findUserByEmail(String email) {
@@ -71,5 +78,19 @@ public class UserDomainService {
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    public void deleteUserById(UUID id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserDoesNotExistException("User with id %s does not exist".formatted(id));
+        }
+        userRepository.deleteById(id);
+    }
+
+    public User registerOneTimeSeller(OneTimeSellerUser userToSave) {
+        userToSave.setRole(Role.ONE_TIME_SELLER);
+        userToSave.setAccountLocked(true);
+
+        return userRepository.save(userToSave);
     }
 }

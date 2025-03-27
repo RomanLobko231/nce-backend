@@ -1,6 +1,5 @@
 package com.nce.backend.users.infrastructure.jpa.entities;
 
-import com.nce.backend.users.domain.valueObjects.Address;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

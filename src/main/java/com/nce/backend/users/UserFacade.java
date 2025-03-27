@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserFacade {
 
-    private final UserRepository<User> userRepository;
+    private final UserRepository userRepository;
 
     public AuthenticatedUserDTO getUserByEmail(String email) {
         User fetchedUser = userRepository
