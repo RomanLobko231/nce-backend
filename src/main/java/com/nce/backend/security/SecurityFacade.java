@@ -25,7 +25,7 @@ public class SecurityFacade {
 
     private final JWTService tokenService;
 
-    public String encodePassword(String rawPassword) {
+    public String encode(String rawPassword) {
         return passwordEncoder.encode(rawPassword);
     }
 
