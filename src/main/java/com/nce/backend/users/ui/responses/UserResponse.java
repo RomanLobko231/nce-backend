@@ -1,7 +1,6 @@
 package com.nce.backend.users.ui.responses;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;

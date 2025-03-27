@@ -1,46 +1,89 @@
 package com.nce.backend.users.infrastructure.jpa;
 
 import com.nce.backend.users.domain.entities.BuyerUser;
+import com.nce.backend.users.domain.entities.OneTimeSellerUser;
 import com.nce.backend.users.domain.entities.SellerUser;
 import com.nce.backend.users.domain.entities.User;
-import com.nce.backend.users.domain.repositories.SellerUserRepository;
 import com.nce.backend.users.domain.valueObjects.Address;
-import com.nce.backend.users.infrastructure.jpa.entities.AddressJpaEntity;
-import com.nce.backend.users.infrastructure.jpa.entities.BuyerJpaEntity;
-import com.nce.backend.users.infrastructure.jpa.entities.SellerJpaEntity;
-import com.nce.backend.users.infrastructure.jpa.entities.UserJpaEntity;
+import com.nce.backend.users.infrastructure.jpa.entities.*;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserJpaEntityMapper {
 
     public User toUserDomainEntity(UserJpaEntity jpaEntity) {
-        return SellerUser
-                .builder()
-                .phoneNumber(jpaEntity.getPhoneNumber())
-                .name(jpaEntity.getName())
-                .email(jpaEntity.getEmail())
-                .password(jpaEntity.getPassword())
-                .id(jpaEntity.getId())
-                .role(jpaEntity.getRole())
-                .isAccountLocked(jpaEntity.isAccountLocked())
-                .build();
+        if (jpaEntity instanceof SellerJpaEntity sellerEntity) {
+            return toSellerUserDomainEntity(sellerEntity);
+        } else if (jpaEntity instanceof BuyerJpaEntity buyerEntity) {
+            return toBuyerUserDomainEntity(buyerEntity);
+        } else if (jpaEntity instanceof OneTimeSellerJpaEntity oneTimeSellerEntity) {
+            return toOneTimeSellerDomainEntity(oneTimeSellerEntity);
+        } else {
+            return User
+                    .builder()
+                    .phoneNumber(jpaEntity.getPhoneNumber())
+                    .name(jpaEntity.getName())
+                    .email(jpaEntity.getEmail())
+                    .password(jpaEntity.getPassword())
+                    .id(jpaEntity.getId())
+                    .role(jpaEntity.getRole())
+                    .isAccountLocked(jpaEntity.isAccountLocked())
+                    .build();
+        }
     }
 
     public UserJpaEntity toUserJpaEntity(User domainEntity) {
-        return UserJpaEntity
+        if (domainEntity instanceof SellerUser sellerUser) {
+            return toSellerJpaEntity(sellerUser);
+        } else if (domainEntity instanceof BuyerUser buyerUser) {
+            return toBuyerJpaEntity(buyerUser);
+        } else if (domainEntity instanceof OneTimeSellerUser oneTimeSellerUser) {
+            return toOneTimeSellerJpaEntity(oneTimeSellerUser);
+        } else {
+            return UserJpaEntity
+                    .builder()
+                    .phoneNumber(domainEntity.getPhoneNumber())
+                    .name(domainEntity.getName())
+                    .email(domainEntity.getEmail())
+                    .password(domainEntity.getPassword())
+                    .id(domainEntity.getId())
+                    .role(domainEntity.getRole())
+                    .isAccountLocked(domainEntity.isAccountLocked())
+                    .build();
+        }
+
+    }
+
+    private OneTimeSellerUser toOneTimeSellerDomainEntity(OneTimeSellerJpaEntity oneTimeSellerEntity) {
+        return OneTimeSellerUser
                 .builder()
-                .phoneNumber(domainEntity.getPhoneNumber())
-                .name(domainEntity.getName())
-                .email(domainEntity.getEmail())
-                .password(domainEntity.getPassword())
-                .id(domainEntity.getId())
-                .role(domainEntity.getRole())
-                .isAccountLocked(domainEntity.isAccountLocked())
+                .id(oneTimeSellerEntity.getId())
+                .phoneNumber(oneTimeSellerEntity.getPhoneNumber())
+                .name(oneTimeSellerEntity.getName())
+                .email(oneTimeSellerEntity.getEmail())
+                .password(oneTimeSellerEntity.getPassword())
+                .carId(oneTimeSellerEntity.getCarId())
+                .role(oneTimeSellerEntity.getRole())
+                .isAccountLocked(oneTimeSellerEntity.isAccountLocked())
                 .build();
     }
 
-    public SellerJpaEntity toSellerJpaEntity(SellerUser domainEntity) {
+
+    private OneTimeSellerJpaEntity toOneTimeSellerJpaEntity(OneTimeSellerUser oneTimeSellerUser) {
+        return OneTimeSellerJpaEntity
+                .builder()
+                .id(oneTimeSellerUser.getId())
+                .phoneNumber(oneTimeSellerUser.getPhoneNumber())
+                .name(oneTimeSellerUser.getName())
+                .email(oneTimeSellerUser.getEmail())
+                .password(oneTimeSellerUser.getPassword())
+                .carId(oneTimeSellerUser.getCarId())
+                .role(oneTimeSellerUser.getRole())
+                .isAccountLocked(oneTimeSellerUser.isAccountLocked())
+                .build();
+    }
+
+    private SellerJpaEntity toSellerJpaEntity(SellerUser domainEntity) {
         return SellerJpaEntity
                 .builder()
                 .id(domainEntity.getId())
@@ -67,11 +110,11 @@ public class UserJpaEntityMapper {
                 .carIDs(jpaEntity.getCarIDs())
                 .sellerAddress(
                         Address
-                        .builder()
-                        .streetAddress(jpaEntity.getSellerAddress().getStreetAddress())
-                        .postalLocation(jpaEntity.getSellerAddress().getPostalLocation())
-                        .postalCode(jpaEntity.getSellerAddress().getPostalCode())
-                        .build()
+                                .builder()
+                                .streetAddress(jpaEntity.getSellerAddress().getStreetAddress())
+                                .postalLocation(jpaEntity.getSellerAddress().getPostalLocation())
+                                .postalCode(jpaEntity.getSellerAddress().getPostalCode())
+                                .build()
                 )
                 .isAccountLocked(jpaEntity.isAccountLocked())
                 .build();
@@ -101,7 +144,7 @@ public class UserJpaEntityMapper {
                 .build();
     }
 
-    public BuyerJpaEntity toBuyerJpaEntity(BuyerUser domainEntity) {
+    private BuyerJpaEntity toBuyerJpaEntity(BuyerUser domainEntity) {
         return BuyerJpaEntity
                 .builder()
                 .id(domainEntity.getId())

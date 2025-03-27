@@ -1,6 +1,7 @@
 package com.nce.backend.users.ui.responses;
 
 import com.nce.backend.users.domain.entities.BuyerUser;
+import com.nce.backend.users.domain.entities.OneTimeSellerUser;
 import com.nce.backend.users.domain.entities.SellerUser;
 import com.nce.backend.users.domain.entities.User;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,32 @@ public class UserResponseMapper {
                 .build();
     }
 
-    public UserResponse toSellerUserResponse(SellerUser user) {
-        System.out.println(user.getSellerAddress().streetAddress());
+    public UserResponse toUserResponse(User user) {
+        if (user instanceof SellerUser sellerUser) {
+           return toSellerUserResponse(sellerUser);
+        } else if (user instanceof BuyerUser buyerUser) {
+            return toBuyerUserResponse(buyerUser);
+        } else if (user instanceof OneTimeSellerUser oneTimeSellerUser) {
+            return toOneTimeSellerResponse(oneTimeSellerUser);
+        } else {
+            throw new IllegalStateException("Unknown user type");
+        }
+    }
+
+    private OneTimeSellerUserResponse toOneTimeSellerResponse(OneTimeSellerUser oneTimeSellerUser) {
+        return OneTimeSellerUserResponse
+                .builder()
+                .id(oneTimeSellerUser.getId())
+                .name(oneTimeSellerUser.getName())
+                .phoneNumber(oneTimeSellerUser.getPhoneNumber())
+                .role(oneTimeSellerUser.getRole().name())
+                .carId(oneTimeSellerUser.getCarId())
+                .email("-")
+                .isAccountLocked(oneTimeSellerUser.isAccountLocked())
+                .build();
+    }
+
+    public SellerUserResponse toSellerUserResponse(SellerUser user) {
         return SellerUserResponse
                 .builder()
                 .address(user.getSellerAddress())
@@ -31,7 +56,7 @@ public class UserResponseMapper {
                 .build();
     }
 
-    public UserResponse toBuyerUserResponse(BuyerUser user) {
+    public BuyerUserResponse toBuyerUserResponse(BuyerUser user) {
         return BuyerUserResponse
                 .builder()
                 .organisationAddress(user.getOrganisationAddress())

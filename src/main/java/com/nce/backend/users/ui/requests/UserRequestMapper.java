@@ -1,9 +1,11 @@
 package com.nce.backend.users.ui.requests;
 
 import com.nce.backend.users.domain.entities.BuyerUser;
+import com.nce.backend.users.domain.entities.OneTimeSellerUser;
 import com.nce.backend.users.domain.entities.SellerUser;
 import com.nce.backend.users.domain.entities.User;
 import com.nce.backend.users.domain.valueObjects.Role;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,6 +32,14 @@ public class UserRequestMapper {
                 .organisationAddress(request.organisationAddress())
                 .organisationName(request.organisationName())
                 .organisationNumber(request.organisationNumber())
+                .build();
+    }
+
+    public OneTimeSellerUser toOneTimeSellerUser( RegisterOneTimeSellerRequest request) {
+        return OneTimeSellerUser
+                .builder()
+                .name(request.name())
+                .phoneNumber(request.phoneNumber())
                 .build();
     }
 }
