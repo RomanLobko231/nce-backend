@@ -44,7 +44,7 @@ public class UserApplicationServiceTest {
         );
 
         SellerUser mappedUser = userRequestMapper.toSellerFromRegisterRequest(request);
-        SellerUser savedUser = userApplicationService.registerSeller(mappedUser);
+        SellerUser savedUser = (SellerUser) userApplicationService.registerSeller(mappedUser);
 
         assertNotNull(savedUser);
         assertNotNull(savedUser.getId());
