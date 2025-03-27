@@ -9,11 +9,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository<T extends User> {
-    Optional<T> findById(UUID id);
-    Optional<T> findByEmail(String email);
-    List<T> findAll();
-    T save(T user);
+public interface UserRepository {
+    Optional<User> findById(UUID id);
+    Optional<User> findByEmail(String email);
+    List<SellerUser> findAllSellerUsers();
+    List<BuyerUser> findAllBuyerUsers();
+    Optional<BuyerUser> findBuyerUserById(UUID id);
+    Optional<SellerUser> findSellerUserById(UUID id);
+    List<User> findAll();
+    User save(User user);
     void deleteById(UUID id);
     boolean existsByEmail(String email);
     boolean existsById(UUID id);
