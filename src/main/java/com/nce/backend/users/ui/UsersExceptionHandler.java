@@ -7,14 +7,12 @@ import com.nce.backend.users.exceptions.UserAlreadyExistsException;
 import com.nce.backend.users.exceptions.UserDoesNotExistException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
 
-@ControllerAdvice(assignableTypes = UserController.class)
+@RestControllerAdvice
 @ResponseBody
 @Slf4j
 public class UsersExceptionHandler {
@@ -35,6 +33,16 @@ public class UsersExceptionHandler {
         log.info(e.getMessage());
         return new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleBadCredentialsException(BadCredentialsException e) {
+        log.info(e.getMessage());
+        return new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
                 e.getMessage()
         );
     }
