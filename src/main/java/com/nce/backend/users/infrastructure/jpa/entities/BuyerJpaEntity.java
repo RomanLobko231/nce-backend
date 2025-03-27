@@ -1,6 +1,6 @@
 package com.nce.backend.users.infrastructure.jpa.entities;
 
-import com.nce.backend.users.domain.valueObjects.Address;
+import com.nce.backend.users.domain.entities.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -40,4 +40,5 @@ public class BuyerJpaEntity extends UserJpaEntity {
 
     @Embedded
     private AddressJpaEntity organisationAddress;
+
 }

@@ -1,5 +1,6 @@
 package com.nce.backend.users.infrastructure.jpa.entities;
 
+import com.nce.backend.users.domain.valueObjects.Address;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,4 +25,13 @@ public class AddressJpaEntity {
 
     @NotNull(message = "Postal code cannot be null")
     String postalCode;
+
+    public Address toDomainEntity(){
+        return Address
+                .builder()
+                .streetAddress(streetAddress)
+                .postalLocation(postalLocation)
+                .postalCode(postalCode)
+                .build();
+    }
 }
