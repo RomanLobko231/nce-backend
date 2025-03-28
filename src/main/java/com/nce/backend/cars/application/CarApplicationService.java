@@ -90,8 +90,6 @@ public class CarApplicationService {
     }
 
     public void deleteById(UUID id) {
-        if (!carDomainService.existsById(id))
-            throw new NoSuchElementException("Car with id %s was not found".formatted(id));
         carDomainService.deleteById(id);
     }
 

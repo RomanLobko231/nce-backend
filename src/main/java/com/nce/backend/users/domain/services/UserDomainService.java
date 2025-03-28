@@ -81,9 +81,6 @@ public class UserDomainService {
     }
 
     public void deleteUserById(UUID id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserDoesNotExistException("User with id %s does not exist".formatted(id));
-        }
         userRepository.deleteById(id);
     }
 
