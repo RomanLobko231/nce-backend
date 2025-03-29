@@ -1,6 +1,7 @@
 package com.nce.backend.security.config;
 
 import com.nce.backend.security.jwt.JWTAuthenticationFilter;
+import com.nce.backend.security.user.AuthenticatedUser;
 import com.nce.backend.users.ui.UserController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -45,14 +46,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"api/v1/users/login").permitAll()
                         .requestMatchers(HttpMethod.GET,"api/v1/users").hasAnyRole("ADMIN", "SELLER", "BUYER")
                         .requestMatchers(HttpMethod.GET,"api/v1/users/test").access((authentication, request) ->
-                                authentication.get().getPrincipal() instanceof UserDetails userDetails &&
-                                        !userDetails.isAccountNonLocked() &&
+                                authentication.get().getPrincipal() instanceof AuthenticatedUser userDetails &&
+                                        !userDetails.isAccountLocked() &&
                                         userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_BUYER")) ?
                                         new AuthorizationDecision(true) : new AuthorizationDecision(false)
                         )
                         .requestMatchers(HttpMethod.GET,"api/v1/users/test2").access((authentication, request) ->
-                                authentication.get().getPrincipal() instanceof UserDetails userDetails &&
-                                        userDetails.isAccountNonLocked() &&
+                                authentication.get().getPrincipal() instanceof AuthenticatedUser userDetails &&
+                                        userDetails.isAccountLocked() &&
                                         userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_BUYER")) ?
                                         new AuthorizationDecision(true) : new AuthorizationDecision(false)
                         )

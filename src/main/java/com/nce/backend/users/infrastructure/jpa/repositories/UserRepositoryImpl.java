@@ -90,6 +90,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public void setIsAccountLocked(UUID id, boolean isAccountLocked) {
+        userJpaRepository.setIsAccountLocked(id, isAccountLocked);
+    }
+
+    @Override
     public boolean existsByEmail(String email) {
         return userJpaRepository.existsByEmail(email);
     }

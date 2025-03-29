@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class UserFacade {
 
         return AuthenticatedUserDTO
                 .builder()
+                .id(fetchedUser.getId())
                 .email(fetchedUser.getEmail())
                 .password(fetchedUser.getPassword())
                 .role(fetchedUser.getRole().name())
@@ -33,6 +35,7 @@ public class UserFacade {
 
     @Builder
     public record AuthenticatedUserDTO(
+            UUID id,
             String email,
             String password,
             String role,

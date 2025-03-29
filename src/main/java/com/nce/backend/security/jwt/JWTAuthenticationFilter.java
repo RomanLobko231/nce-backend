@@ -1,6 +1,7 @@
 package com.nce.backend.security.jwt;
 
 import com.nce.backend.common.exception.InvalidTokenException;
+import com.nce.backend.security.user.AuthenticatedUser;
 import com.nce.backend.security.user.SecurityUserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -54,7 +55,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     private void authenticateUser(String email) {
         if (isNotBlank(email) && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails user =  userService.loadUserByUsername(email);
+            AuthenticatedUser user =  userService.loadUserByUsername(email);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     user,
                     user.getPassword(),

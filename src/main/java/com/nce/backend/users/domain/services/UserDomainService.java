@@ -36,10 +36,12 @@ public class UserDomainService {
         return userRepository.save(userToSave);
     }
 
+    @Transactional
     public User saveUser(User userToSave) {
         return userRepository.save(userToSave);
     }
 
+    @Transactional
     public User updateUser(User userToSave) {
         if (!userRepository.existsByEmail(userToSave.getEmail())) {
             throw new UserDoesNotExistException("User with this email does not exist");
@@ -84,10 +86,16 @@ public class UserDomainService {
         userRepository.deleteById(id);
     }
 
+    @Transactional
     public User registerOneTimeSeller(OneTimeSellerUser userToSave) {
         userToSave.setRole(Role.ONE_TIME_SELLER);
         userToSave.setAccountLocked(true);
 
         return userRepository.save(userToSave);
+    }
+
+    @Transactional
+    public void setIsAccountLocked(UUID id, boolean isAccountLocked) {
+        userRepository.setIsAccountLocked(id, isAccountLocked);
     }
 }

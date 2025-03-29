@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class SecurityUserService implements UserDetailsService {
@@ -17,17 +19,15 @@ public class SecurityUserService implements UserDetailsService {
     private final UserFacade userFacade;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public AuthenticatedUser loadUserByUsername(String username) throws UsernameNotFoundException {
         UserFacade.AuthenticatedUserDTO userDTO = userFacade.getUserByEmail(username);
 
-        return User
-                .builder()
-                .username(userDTO.email())
-                .password(userDTO.password())
-                .authorities(
-                        new SimpleGrantedAuthority("ROLE_" + userDTO.role())
-                )
-                .accountLocked(userDTO.isAccountLocked())
-                .build();
+        return new AuthenticatedUser(
+                userDTO.email(),
+                userDTO.password(),
+                List.of(new SimpleGrantedAuthority(userDTO.role())),
+                userDTO.id(),
+                userDTO.isAccountLocked()
+        );
     }
 }

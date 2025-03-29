@@ -100,6 +100,10 @@ public class UserApplicationService {
                 );
     }
 
+    public void setIsAccountLocked(UUID id, boolean isAccountLocked) {
+            userDomainService.setIsAccountLocked(id, isAccountLocked);
+    }
+
     public List<User> findAllUsers() {
         return userDomainService.findAllUsers();
     }

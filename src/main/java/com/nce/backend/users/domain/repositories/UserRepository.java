@@ -19,6 +19,7 @@ public interface UserRepository {
     List<User> findAll();
     User save(User user);
     void deleteById(UUID id);
+    void setIsAccountLocked(UUID id, boolean isAccountLocked);
     boolean existsByEmail(String email);
     boolean existsById(UUID id);
 }

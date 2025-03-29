@@ -12,6 +12,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +24,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+@EnableMethodSecurity
 public class UserController {
 
     private final UserApplicationService userService;
@@ -68,6 +71,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("#id == authentication.principal.id or hasRole('ROLE_ADMIN')")
     ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
         User user = userService.findUserById(id);
         UserResponse response = responseMapper.toUserResponse(user);
@@ -109,8 +113,19 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("#id == authentication.principal.id or hasRole('ROLE_ADMIN')")
     ResponseEntity<Void> deleteUserById(@PathVariable UUID id) {
         userService.deleteUserById(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/set_lock")
+    ResponseEntity<Void> unlockUserAccount(
+            @PathVariable UUID id,
+            @RequestParam(name = "isLocked") boolean isLocked
+    ) {
+        userService.setIsAccountLocked(id, isLocked);
 
         return ResponseEntity.noContent().build();
     }

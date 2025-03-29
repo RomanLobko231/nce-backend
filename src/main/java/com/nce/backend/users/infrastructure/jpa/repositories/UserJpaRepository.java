@@ -4,6 +4,7 @@ import com.nce.backend.users.infrastructure.jpa.entities.BuyerJpaEntity;
 import com.nce.backend.users.infrastructure.jpa.entities.SellerJpaEntity;
 import com.nce.backend.users.infrastructure.jpa.entities.UserJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -48,4 +49,8 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UUID> {
             WHERE bu.buyer_id = :id
             """, nativeQuery = true)
     Optional<BuyerJpaEntity> findBuyerUserById(@Param("id") UUID id);
+
+    @Modifying
+    @Query(value = "UPDATE base_user SET is_account_locked = :isAccountLocked WHERE id = :id", nativeQuery = true)
+    void setIsAccountLocked(@Param("id") UUID id, @Param("isAccountLocked") boolean isAccountLocked);
 }
