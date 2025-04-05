@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -18,14 +19,21 @@ public class FileStorageFacade {
     }
 
     public List<String> uploadFiles(List<MultipartFile> files) {
-       return fileStorageService.uploadFiles(files);
+        if (files == null || files.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return fileStorageService.uploadFiles(files);
     }
 
     public void deleteFile(String fileUrl) {
-        fileStorageService.deleteFile(fileUrl);
+        if (fileUrl != null) {
+            fileStorageService.deleteFile(fileUrl);
+        }
     }
 
     public void deleteFiles(List<String> fileUrls) {
-        fileStorageService.deleteFiles(fileUrls);
+        if (fileUrls != null && !fileUrls.isEmpty()) {
+            fileStorageService.deleteFiles(fileUrls);
+        }
     }
 }
