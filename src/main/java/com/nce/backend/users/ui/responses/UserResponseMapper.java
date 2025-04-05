@@ -4,6 +4,10 @@ import com.nce.backend.users.domain.entities.BuyerUser;
 import com.nce.backend.users.domain.entities.OneTimeSellerUser;
 import com.nce.backend.users.domain.entities.SellerUser;
 import com.nce.backend.users.domain.entities.User;
+import com.nce.backend.users.ui.responses.userData.BuyerUserResponse;
+import com.nce.backend.users.ui.responses.userData.OneTimeSellerUserResponse;
+import com.nce.backend.users.ui.responses.userData.SellerUserResponse;
+import com.nce.backend.users.ui.responses.userData.UserResponse;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,7 +41,7 @@ public class UserResponseMapper {
                 .phoneNumber(oneTimeSellerUser.getPhoneNumber())
                 .role(oneTimeSellerUser.getRole().name())
                 .carId(oneTimeSellerUser.getCarId())
-                .email("-")
+                .email(oneTimeSellerUser.getEmail())
                 .isAccountLocked(oneTimeSellerUser.isAccountLocked())
                 .build();
     }
