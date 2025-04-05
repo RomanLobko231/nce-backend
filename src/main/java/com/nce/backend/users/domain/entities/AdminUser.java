@@ -8,4 +8,5 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 public class AdminUser extends User {
+    private String fallbackEmail;
 }
