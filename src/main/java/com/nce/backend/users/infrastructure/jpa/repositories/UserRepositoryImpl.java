@@ -103,4 +103,9 @@ public class UserRepositoryImpl implements UserRepository {
     public boolean existsById(UUID id) {
         return userJpaRepository.existsById(id);
     }
+
+    @Override
+    public void deleteOneTimeSellerByCarId(UUID carId) {
+        userJpaRepository.deleteOneTimeSellerByCarId(carId);
+    }
 }
