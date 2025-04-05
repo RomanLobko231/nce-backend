@@ -6,6 +6,7 @@ import com.nce.backend.common.exception.ErrorResponse;
 import com.nce.backend.users.exceptions.UserAlreadyExistsException;
 import com.nce.backend.users.exceptions.UserDoesNotExistException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,24 @@ public class UsersExceptionHandler {
         return new ErrorResponse(
                 HttpStatus.CONFLICT.value(),
                 e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        log.info(e.getMessage());
+
+        String errorCause;
+        if (e.getMessage().contains("violates unique constraint \"base_user_email_key\"")) {
+            errorCause = "User with this email already exists";
+        } else {
+            errorCause = e.getMessage();
+        }
+
+        return new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                errorCause
         );
     }
 
