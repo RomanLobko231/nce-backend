@@ -43,10 +43,6 @@ public class UserDomainService {
 
     @Transactional
     public User updateUser(User userToSave) {
-        if (!userRepository.existsByEmail(userToSave.getEmail())) {
-            throw new UserDoesNotExistException("User with this email does not exist");
-        }
-
         return this.saveUser(userToSave);
     }
 
@@ -82,6 +78,7 @@ public class UserDomainService {
         return userRepository.existsByEmail(email);
     }
 
+    @Transactional
     public void deleteUserById(UUID id) {
         userRepository.deleteById(id);
     }
@@ -97,5 +94,10 @@ public class UserDomainService {
     @Transactional
     public void setIsAccountLocked(UUID id, boolean isAccountLocked) {
         userRepository.setIsAccountLocked(id, isAccountLocked);
+    }
+
+    @Transactional
+    public void deleteOneTimeSellerByCarId(UUID carId) {
+        userRepository.deleteOneTimeSellerByCarId(carId);
     }
 }
