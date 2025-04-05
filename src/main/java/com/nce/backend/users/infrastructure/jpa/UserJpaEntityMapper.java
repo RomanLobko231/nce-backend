@@ -1,10 +1,8 @@
 package com.nce.backend.users.infrastructure.jpa;
 
-import com.nce.backend.users.domain.entities.BuyerUser;
-import com.nce.backend.users.domain.entities.OneTimeSellerUser;
-import com.nce.backend.users.domain.entities.SellerUser;
-import com.nce.backend.users.domain.entities.User;
+import com.nce.backend.users.domain.entities.*;
 import com.nce.backend.users.domain.valueObjects.Address;
+import com.nce.backend.users.domain.valueObjects.BuyerAddress;
 import com.nce.backend.users.infrastructure.jpa.entities.*;
 import org.springframework.stereotype.Service;
 
@@ -18,17 +16,10 @@ public class UserJpaEntityMapper {
             return toBuyerUserDomainEntity(buyerEntity);
         } else if (jpaEntity instanceof OneTimeSellerJpaEntity oneTimeSellerEntity) {
             return toOneTimeSellerDomainEntity(oneTimeSellerEntity);
+        } else if (jpaEntity instanceof  AdminJpaEntity adminEntity) {
+            return toAdminDomainEntity(adminEntity);
         } else {
-            return User
-                    .builder()
-                    .phoneNumber(jpaEntity.getPhoneNumber())
-                    .name(jpaEntity.getName())
-                    .email(jpaEntity.getEmail())
-                    .password(jpaEntity.getPassword())
-                    .id(jpaEntity.getId())
-                    .role(jpaEntity.getRole())
-                    .isAccountLocked(jpaEntity.isAccountLocked())
-                    .build();
+            throw new IllegalArgumentException("Unsupported entity type: " + jpaEntity.getClass().getSimpleName());
         }
     }
 
@@ -39,19 +30,39 @@ public class UserJpaEntityMapper {
             return toBuyerJpaEntity(buyerUser);
         } else if (domainEntity instanceof OneTimeSellerUser oneTimeSellerUser) {
             return toOneTimeSellerJpaEntity(oneTimeSellerUser);
+        } else if (domainEntity instanceof  AdminUser adminUser) {
+            return toAdminJpaEntity(adminUser);
         } else {
-            return UserJpaEntity
-                    .builder()
-                    .phoneNumber(domainEntity.getPhoneNumber())
-                    .name(domainEntity.getName())
-                    .email(domainEntity.getEmail())
-                    .password(domainEntity.getPassword())
-                    .id(domainEntity.getId())
-                    .role(domainEntity.getRole())
-                    .isAccountLocked(domainEntity.isAccountLocked())
-                    .build();
+            throw new IllegalArgumentException("Unsupported entity type: " + domainEntity.getClass().getSimpleName());
         }
+    }
 
+    private AdminUser toAdminDomainEntity(AdminJpaEntity jpaEntity) {
+        return AdminUser
+                .builder()
+                .phoneNumber(jpaEntity.getPhoneNumber())
+                .name(jpaEntity.getName())
+                .email(jpaEntity.getEmail())
+                .password(jpaEntity.getPassword())
+                .id(jpaEntity.getId())
+                .role(jpaEntity.getRole())
+                .isAccountLocked(jpaEntity.isAccountLocked())
+                .fallbackEmail(jpaEntity.getFallbackEmail())
+                .build();
+    }
+
+    private AdminJpaEntity toAdminJpaEntity(AdminUser domainEntity) {
+       return AdminJpaEntity
+                .builder()
+                .phoneNumber(domainEntity.getPhoneNumber())
+                .name(domainEntity.getName())
+                .email(domainEntity.getEmail())
+                .password(domainEntity.getPassword())
+                .id(domainEntity.getId())
+                .role(domainEntity.getRole())
+                .isAccountLocked(domainEntity.isAccountLocked())
+                .fallbackEmail(domainEntity.getFallbackEmail())
+                .build();
     }
 
     private OneTimeSellerUser toOneTimeSellerDomainEntity(OneTimeSellerJpaEntity oneTimeSellerEntity) {
@@ -130,11 +141,12 @@ public class UserJpaEntityMapper {
                 .id(jpaEntity.getId())
                 .role(jpaEntity.getRole())
                 .organisationAddress(
-                        Address
+                        BuyerAddress
                                 .builder()
                                 .streetAddress(jpaEntity.getOrganisationAddress().getStreetAddress())
                                 .postalLocation(jpaEntity.getOrganisationAddress().getPostalLocation())
                                 .postalCode(jpaEntity.getOrganisationAddress().getPostalCode())
+                                .country(jpaEntity.getOrganisationAddress().getCountry())
                                 .build()
                 )
                 .organisationLicenceURLs(jpaEntity.getOrganisationLicenceURLs())
@@ -153,7 +165,7 @@ public class UserJpaEntityMapper {
                 .email(domainEntity.getEmail())
                 .password(domainEntity.getPassword())
                 .role(domainEntity.getRole())
-                .organisationAddress(toAddressJpaEntity(domainEntity.getOrganisationAddress()))
+                .organisationAddress(toBuyerAddressJpaEntity(domainEntity.getOrganisationAddress()))
                 .organisationName(domainEntity.getOrganisationName())
                 .organisationLicenceURLs(domainEntity.getOrganisationLicenceURLs())
                 .organisationNumber(domainEntity.getOrganisationNumber())
@@ -162,11 +174,22 @@ public class UserJpaEntityMapper {
     }
 
     private AddressJpaEntity toAddressJpaEntity(Address domainEntity) {
-        return new AddressJpaEntity(
-                domainEntity.streetAddress(),
-                domainEntity.postalLocation(),
-                domainEntity.postalCode()
-        );
+        return AddressJpaEntity
+                .builder()
+                .postalLocation(domainEntity.getPostalLocation())
+                .postalCode(domainEntity.getPostalCode())
+                .streetAddress(domainEntity.getStreetAddress())
+                .build();
+    }
+
+    private BuyerAddressJpaEntity toBuyerAddressJpaEntity(BuyerAddress domainEntity) {
+        return BuyerAddressJpaEntity
+                .builder()
+                .postalLocation(domainEntity.getPostalLocation())
+                .postalCode(domainEntity.getPostalCode())
+                .streetAddress(domainEntity.getStreetAddress())
+                .country(domainEntity.getCountry())
+                .build();
     }
 
 }
