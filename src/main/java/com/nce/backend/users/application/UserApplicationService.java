@@ -1,5 +1,7 @@
 package com.nce.backend.users.application;
 
+import com.nce.backend.common.events.CarDeletedEvent;
+import com.nce.backend.common.events.CarSaveFailedRollbackUserEvent;
 import com.nce.backend.common.events.NewCarSavedEvent;
 import com.nce.backend.file_storage.FileStorageFacade;
 import com.nce.backend.security.SecurityFacade;
@@ -11,20 +13,17 @@ import com.nce.backend.users.domain.services.UserDomainService;
 import com.nce.backend.users.domain.valueObjects.Role;
 import com.nce.backend.users.exceptions.UserAlreadyExistsException;
 import com.nce.backend.users.exceptions.UserDoesNotExistException;
-import com.nce.backend.users.infrastructure.jpa.entities.UserJpaEntity;
 import com.nce.backend.users.ui.requests.LoginRequest;
 import com.nce.backend.users.ui.responses.AuthSuccessResponse;
-import com.nce.backend.users.ui.responses.UserResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.random.RandomGenerator;
 
 @Service
 @RequiredArgsConstructor
@@ -49,17 +48,16 @@ public class UserApplicationService {
         }
 
         this.setEncodedPassword(userToRegister);
-        if (organisationLicences != null && !organisationLicences.isEmpty()) {
-            List<String> filesUrls = fileStorageFacade.uploadFiles(organisationLicences);
-            userToRegister.setOrganisationLicenceURLs(filesUrls);
-        }
+
+        List<String> filesUrls = fileStorageFacade.uploadFiles(organisationLicences);
+        userToRegister.setOrganisationLicenceURLs(filesUrls);
 
         return userDomainService.registerBuyer(userToRegister);
     }
 
     public User registerOneTimeSeller(OneTimeSellerUser userToRegister) {
         String randomEmail = UUID.randomUUID().toString();
-        String randomPassword = securityFacade.encode(UUID.randomUUID().toString());
+        String randomPassword = securityFacade.generateHash(UUID.randomUUID().toString());
 
         userToRegister.setEmail(randomEmail);
         userToRegister.setPassword(randomPassword);
@@ -88,7 +86,7 @@ public class UserApplicationService {
     }
 
     private void setEncodedPassword(User user) {
-        String encodedPassword = securityFacade.encode(user.getPassword());
+        String encodedPassword = securityFacade.generateHash(user.getPassword());
         user.setPassword(encodedPassword);
     }
 
@@ -120,6 +118,29 @@ public class UserApplicationService {
         userDomainService.deleteUserById(id);
     }
 
+    private User addCarIdToUser(User user, UUID carId) {
+        if (user instanceof OneTimeSellerUser oneTimeSellerUser) {
+            oneTimeSellerUser.setCarId(carId);
+            return oneTimeSellerUser;
+        } else if (user instanceof SellerUser sellerUser) {
+            sellerUser.addCarId(carId);
+            return sellerUser;
+        }
+        throw new IllegalStateException("Wrong user type");
+    }
+
+    public void updateUser(User userToUpdate) {
+        User user = userDomainService
+                .findUserById(userToUpdate.getId())
+                .orElseThrow(
+                        () -> new UserDoesNotExistException("User with id %s was not found".formatted(userToUpdate.getId()))
+                );
+
+        userToUpdate.setPassword(user.getPassword());
+
+        userDomainService.updateUser(userToUpdate);
+    }
+
     @Async
     @TransactionalEventListener
     public void addCarToUserOn(NewCarSavedEvent event) {
@@ -134,14 +155,15 @@ public class UserApplicationService {
         userDomainService.updateUser(userToUpdate);
     }
 
-    private User addCarIdToUser(User user, UUID carId) {
-        if (user instanceof OneTimeSellerUser oneTimeSellerUser) {
-            oneTimeSellerUser.setCarId(carId);
-            return oneTimeSellerUser;
-        } else if (user instanceof SellerUser sellerUser) {
-            sellerUser.addCarId(carId);
-            return sellerUser;
-        }
-        throw new IllegalStateException("Wrong user type");
+    @Async
+    @TransactionalEventListener
+    public void deleteOneTimeUserByCarId(CarDeletedEvent event) {
+        userDomainService.deleteOneTimeSellerByCarId(event.carId());
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
+    public void rollbackUserById(CarSaveFailedRollbackUserEvent event) {
+        userDomainService.deleteUserById(event.userId());
     }
 }
