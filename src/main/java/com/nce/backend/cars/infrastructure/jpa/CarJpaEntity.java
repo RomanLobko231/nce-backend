@@ -69,7 +69,7 @@ public class CarJpaEntity {
 
     private String additionalInformation;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "car_image_paths",
             joinColumns = @JoinColumn(name = "car_id")
