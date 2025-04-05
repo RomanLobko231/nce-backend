@@ -34,7 +34,7 @@ public class CarRequestMapper {
                 .build();
     }
 
-    public Car toCarFromAdminRequest(AddCarAdminRequest request) {
+    public Car toCarFromAdminRequest(AddCarCompleteRequest request) {
         return Car.builder()
                 .make(request.make())
                 .model(request.model())
@@ -58,7 +58,7 @@ public class CarRequestMapper {
                 .build();
     }
     
-    public Car toCarFromCustomerRequest(AddCarCustomerRequest request) {
+    public Car toCarFromCustomerRequest(AddCarSimplifiedRequest request) {
         return Car.builder()
                 .registrationNumber(request.registrationNumber())
                 .ownerID(request.ownerId())
