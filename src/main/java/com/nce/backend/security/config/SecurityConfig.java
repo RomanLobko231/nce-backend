@@ -33,31 +33,36 @@ public class SecurityConfig {
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, UserController userController) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET,"api/v1/cars").permitAll()
-                        .requestMatchers(HttpMethod.GET,"api/v1/cars/{id}").hasAnyRole("ADMIN", "SELLER", "BUYER")
-                        .requestMatchers(HttpMethod.DELETE,"api/v1/cars/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST,"api/v1/users/**", "api/v1/cars/**").permitAll()
-                        .requestMatchers(HttpMethod.POST,"api/v1/users/login").permitAll()
-                        .requestMatchers(HttpMethod.GET,"api/v1/users").hasAnyRole("ADMIN", "SELLER", "BUYER")
-                        .requestMatchers(HttpMethod.GET,"api/v1/users/test").access((authentication, request) ->
-                                authentication.get().getPrincipal() instanceof AuthenticatedUser userDetails &&
-                                        !userDetails.isAccountLocked() &&
-                                        userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_BUYER")) ?
-                                        new AuthorizationDecision(true) : new AuthorizationDecision(false)
-                        )
-                        .requestMatchers(HttpMethod.GET,"api/v1/users/test2").access((authentication, request) ->
-                                authentication.get().getPrincipal() instanceof AuthenticatedUser userDetails &&
-                                        userDetails.isAccountLocked() &&
-                                        userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_BUYER")) ?
-                                        new AuthorizationDecision(true) : new AuthorizationDecision(false)
-                        )
-                        .anyRequest().authenticated()
+                                .requestMatchers(HttpMethod.GET, "api/v1/cars").permitAll()
+                                .requestMatchers(HttpMethod.POST, "api/v1/cars/add_simplified").permitAll()
+                                .requestMatchers(HttpMethod.POST, "api/v1/cars/add_complete").hasAnyRole("ADMIN", "SELLER")
+                                .requestMatchers(HttpMethod.GET, "api/v1/cars/**").hasAnyRole("ADMIN", "SELLER", "BUYER")
+                                .requestMatchers(HttpMethod.DELETE, "api/v1/cars/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "api/v1/cars/**").hasAnyRole("ADMIN", "SELLER")
+                                .requestMatchers(HttpMethod.POST, "api/v1/users/**", "api/v1/users/login").permitAll()
+                                .requestMatchers(HttpMethod.GET, "api/v1/users/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "api/v1/users").hasAnyRole("ADMIN", "SELLER", "BUYER")
+                                .requestMatchers(HttpMethod.PUT, "api/v1/users").hasAnyRole("ADMIN", "SELLER", "BUYER")
+                                .requestMatchers(HttpMethod.DELETE, "api/v1/users/**").hasRole("ADMIN")
+//                        .requestMatchers(HttpMethod.GET,"api/v1/users/test").access((authentication, request) ->
+//                                authentication.get().getPrincipal() instanceof AuthenticatedUser userDetails &&
+//                                        !userDetails.isAccountLocked() &&
+//                                        userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_BUYER")) ?
+//                                        new AuthorizationDecision(true) : new AuthorizationDecision(false)
+//                        )
+//                        .requestMatchers(HttpMethod.GET,"api/v1/users/test2").access((authentication, request) ->
+//                                authentication.get().getPrincipal() instanceof AuthenticatedUser userDetails &&
+//                                        userDetails.isAccountLocked() &&
+//                                        userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_BUYER")) ?
+//                                        new AuthorizationDecision(true) : new AuthorizationDecision(false)
+//                        )
+                                .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -65,7 +70,7 @@ public class SecurityConfig {
 
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3001", "https://norwaycarexport.netlify.app"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3001", "https://norwaycarexport.no"));
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");
