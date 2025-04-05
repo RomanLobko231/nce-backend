@@ -25,7 +25,7 @@ public class SecurityUserService implements UserDetailsService {
         return new AuthenticatedUser(
                 userDTO.email(),
                 userDTO.password(),
-                List.of(new SimpleGrantedAuthority(userDTO.role())),
+                List.of(new SimpleGrantedAuthority("ROLE_" + userDTO.role())),
                 userDTO.id(),
                 userDTO.isAccountLocked()
         );
