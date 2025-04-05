@@ -1,21 +1,9 @@
 package com.nce.backend.security;
 
 import com.nce.backend.security.jwt.JWTService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import javax.crypto.SecretKey;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +13,7 @@ public class SecurityFacade {
 
     private final JWTService tokenService;
 
-    public String encode(String rawPassword) {
+    public String generateHash(String rawPassword) {
         return passwordEncoder.encode(rawPassword);
     }
 
