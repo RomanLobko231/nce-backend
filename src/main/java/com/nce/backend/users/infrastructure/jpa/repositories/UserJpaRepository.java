@@ -3,6 +3,7 @@ package com.nce.backend.users.infrastructure.jpa.repositories;
 import com.nce.backend.users.infrastructure.jpa.entities.BuyerJpaEntity;
 import com.nce.backend.users.infrastructure.jpa.entities.SellerJpaEntity;
 import com.nce.backend.users.infrastructure.jpa.entities.UserJpaEntity;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -53,4 +54,12 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UUID> {
     @Modifying
     @Query(value = "UPDATE base_user SET is_account_locked = :isAccountLocked WHERE id = :id", nativeQuery = true)
     void setIsAccountLocked(@Param("id") UUID id, @Param("isAccountLocked") boolean isAccountLocked);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            DELETE FROM base_user
+            WHERE id IN (SELECT one_time_seller_id FROM one_time_seller WHERE car_id = :carId)
+            """, nativeQuery = true)
+    void deleteOneTimeSellerByCarId(@Param("carId") UUID carId);
 }

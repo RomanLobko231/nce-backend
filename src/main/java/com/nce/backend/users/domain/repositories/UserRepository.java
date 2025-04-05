@@ -22,4 +22,5 @@ public interface UserRepository {
     void setIsAccountLocked(UUID id, boolean isAccountLocked);
     boolean existsByEmail(String email);
     boolean existsById(UUID id);
+    void deleteOneTimeSellerByCarId(UUID carId);
 }
