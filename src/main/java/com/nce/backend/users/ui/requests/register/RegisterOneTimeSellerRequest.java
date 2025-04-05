@@ -1,4 +1,4 @@
-package com.nce.backend.users.ui.requests;
+package com.nce.backend.users.ui.requests.register;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

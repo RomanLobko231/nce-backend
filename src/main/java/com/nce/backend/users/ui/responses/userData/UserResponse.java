@@ -1,4 +1,4 @@
-package com.nce.backend.users.ui.responses;
+package com.nce.backend.users.ui.responses.userData;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
