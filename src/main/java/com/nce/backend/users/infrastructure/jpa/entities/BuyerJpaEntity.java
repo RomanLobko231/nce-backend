@@ -39,6 +39,6 @@ public class BuyerJpaEntity extends UserJpaEntity {
     private List<String> organisationLicenceURLs;
 
     @Embedded
-    private AddressJpaEntity organisationAddress;
+    private BuyerAddressJpaEntity organisationAddress;
 
 }

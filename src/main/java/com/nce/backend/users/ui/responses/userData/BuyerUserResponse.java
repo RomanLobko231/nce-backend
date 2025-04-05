@@ -1,6 +1,6 @@
-package com.nce.backend.users.ui.responses;
+package com.nce.backend.users.ui.responses.userData;
 
-import com.nce.backend.users.domain.valueObjects.Address;
+import com.nce.backend.users.domain.valueObjects.BuyerAddress;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
@@ -18,5 +18,5 @@ public class BuyerUserResponse extends UserResponse {
 
     private List<String> organisationLicenceURLs;
 
-    private Address organisationAddress;
+    private BuyerAddress organisationAddress;
 }

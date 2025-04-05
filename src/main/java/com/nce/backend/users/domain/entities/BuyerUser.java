@@ -1,6 +1,7 @@
 package com.nce.backend.users.domain.entities;
 
 import com.nce.backend.users.domain.valueObjects.Address;
+import com.nce.backend.users.domain.valueObjects.BuyerAddress;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
@@ -18,5 +19,5 @@ public class BuyerUser extends User {
 
      private List<String> organisationLicenceURLs;
 
-     private Address organisationAddress;
+     private BuyerAddress organisationAddress;
 }
