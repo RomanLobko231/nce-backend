@@ -25,13 +25,4 @@ public class AddressJpaEntity {
 
     @NotNull(message = "Postal code cannot be null")
     String postalCode;
-
-    public Address toDomainEntity(){
-        return Address
-                .builder()
-                .streetAddress(streetAddress)
-                .postalLocation(postalLocation)
-                .postalCode(postalCode)
-                .build();
-    }
 }
