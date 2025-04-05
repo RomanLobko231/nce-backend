@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-public record AddCarAdminRequest(
+public record AddCarCompleteRequest(
 
         @NotBlank(message = "Registration number cannot be null or blank")
         String registrationNumber,
