@@ -1,8 +1,8 @@
 package com.nce.backend.cars.application;
 
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
-import com.nce.backend.cars.ui.requests.AddCarCustomerRequest;
+import com.nce.backend.cars.ui.requests.AddCarCompleteRequest;
+import com.nce.backend.cars.ui.requests.AddCarSimplifiedRequest;
 import com.nce.backend.cars.ui.requests.CarRequestMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -29,14 +29,14 @@ public class CarApplicationServiceTest {
     @Test
     @Transactional
     void testAddCarAsCustomer_savesCarSuccessfully() {
-        AddCarCustomerRequest request = new AddCarCustomerRequest(
+        AddCarSimplifiedRequest request = new AddCarSimplifiedRequest(
                UUID.randomUUID(),
                 "ABC123",
                 10
         );
 
         Car mappedCar = carRequestMapper.toCarFromCustomerRequest(request);
-        Car savedCar = carApplicationService.addCarAsCustomer(mappedCar, Collections.emptyList());
+        Car savedCar = carApplicationService.addCarSimplified(mappedCar, Collections.emptyList());
 
         assertNotNull(savedCar);
         assertEquals("ABC123", savedCar.getRegistrationNumber());
@@ -48,7 +48,7 @@ public class CarApplicationServiceTest {
     @Test
     @Transactional
     void testAddCarAsAdmin_savesCarSuccessfully() {
-        AddCarAdminRequest request = new AddCarAdminRequest(
+        AddCarCompleteRequest request = new AddCarCompleteRequest(
                 "ABC123",
                 10,
                 "Make",
@@ -70,7 +70,7 @@ public class CarApplicationServiceTest {
                 Collections.emptyList()
         );
         Car mappedCar = carRequestMapper.toCarFromAdminRequest(request);
-        Car savedCar = carApplicationService.addCarAsAdmin(mappedCar, Collections.emptyList());
+        Car savedCar = carApplicationService.addCarComplete(mappedCar, Collections.emptyList());
 
         assertNotNull(savedCar);
         assertNotNull(savedCar.getId());

@@ -3,8 +3,8 @@ package com.nce.backend.cars.ui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nce.backend.cars.application.CarApplicationService;
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
-import com.nce.backend.cars.ui.requests.AddCarCustomerRequest;
+import com.nce.backend.cars.ui.requests.AddCarCompleteRequest;
+import com.nce.backend.cars.ui.requests.AddCarSimplifiedRequest;
 import com.nce.backend.cars.ui.requests.CarRequestMapper;
 import com.nce.backend.cars.ui.requests.UpdateCarRequest;
 import com.nce.backend.cars.ui.responses.CarResponse;
@@ -50,7 +50,7 @@ public class CarControllerTest {
 
     @Test
     public void testAddCarAsCustomer() throws Exception {
-        AddCarCustomerRequest request = new AddCarCustomerRequest(
+        AddCarSimplifiedRequest request = new AddCarSimplifiedRequest(
                 UUID.randomUUID(),
                 "ABC123",
                 10
@@ -83,8 +83,8 @@ public class CarControllerTest {
                 .kilometers(request.kilometers())
                 .build();
 
-        when(carRequestMapper.toCarFromCustomerRequest(any(AddCarCustomerRequest.class))).thenReturn(mockCar);
-        when(carService.addCarAsCustomer(any(Car.class), anyList())).thenReturn(mockCar);
+        when(carRequestMapper.toCarFromCustomerRequest(any(AddCarSimplifiedRequest.class))).thenReturn(mockCar);
+        when(carService.addCarSimplified(any(Car.class), anyList())).thenReturn(mockCar);
 
         mockMvc.perform(multipart("/api/v1/cars/customer")
                         .file(carDataPart)
@@ -94,12 +94,12 @@ public class CarControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(carService).addCarAsCustomer(mockCar, List.of(image1, image2));
+        verify(carService).addCarSimplified(mockCar, List.of(image1, image2));
     }
 
     @Test
     public void testAddCarAsAdmin() throws Exception {
-        AddCarAdminRequest carData = new AddCarAdminRequest(
+        AddCarCompleteRequest carData = new AddCarCompleteRequest(
                 "ABC123",
                 10,
                 "Make",
@@ -143,8 +143,8 @@ public class CarControllerTest {
         );
         Car mockCar = Car.builder().build();
 
-        when(carRequestMapper.toCarFromAdminRequest(any(AddCarAdminRequest.class))).thenReturn(mockCar);
-        when(carService.addCarAsAdmin(any(Car.class), anyList())).thenReturn(mockCar);
+        when(carRequestMapper.toCarFromAdminRequest(any(AddCarCompleteRequest.class))).thenReturn(mockCar);
+        when(carService.addCarComplete(any(Car.class), anyList())).thenReturn(mockCar);
 
         mockMvc.perform(multipart("/api/v1/cars/admin")
                         .file(carDataPart)
@@ -154,7 +154,7 @@ public class CarControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(carService).addCarAsAdmin(mockCar, List.of(image1, image2));
+        verify(carService).addCarComplete(mockCar, List.of(image1, image2));
     }
 
     @Test
