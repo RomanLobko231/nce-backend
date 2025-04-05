@@ -2,8 +2,8 @@ package com.nce.backend.cars.ui;
 
 import com.nce.backend.cars.application.CarApplicationService;
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
-import com.nce.backend.cars.ui.requests.AddCarCustomerRequest;
+import com.nce.backend.cars.ui.requests.AddCarCompleteRequest;
+import com.nce.backend.cars.ui.requests.AddCarSimplifiedRequest;
 import com.nce.backend.cars.ui.requests.CarRequestMapper;
 import com.nce.backend.cars.ui.requests.UpdateCarRequest;
 import com.nce.backend.cars.ui.responses.CarResponse;
@@ -28,12 +28,12 @@ public class CarController {
     private final CarResponseMapper carResponseMapper;
     private final CarRequestMapper carRequestMapper;
 
-    @PostMapping(value = "/customer", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<Void> addNewCarAsCustomer(
-            @RequestPart(name = "carData") @Valid AddCarCustomerRequest request,
+    @PostMapping(value = "/add_simplified", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<Void> addNewCarSimplified(
+            @RequestPart(name = "carData") @Valid AddCarSimplifiedRequest request,
             @RequestPart(name = "images", required = false) List<MultipartFile> images
     ) {
-        carService.addCarAsCustomer(
+        carService.addCarSimplified(
                 carRequestMapper.toCarFromCustomerRequest(request),
                 images
         );
@@ -41,16 +41,17 @@ public class CarController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(value = "/admin", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<Void> addNewCarAsAdmin(
-            @RequestPart(name = "carData") @Valid AddCarAdminRequest carData,
+    @PostMapping(value = "/add_complete", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<CarResponse> addNewCarComplete(
+            @RequestPart(name = "carData") @Valid AddCarCompleteRequest carData,
             @RequestPart(name = "images", required = false) List<MultipartFile> images) {
 
-        carService.addCarAsAdmin(
+        Car savedCar = carService.addCarComplete(
                 carRequestMapper.toCarFromAdminRequest(carData),
                 images
         );
-        return ResponseEntity.ok().build();
+
+        return ResponseEntity.ok(carResponseMapper.toCarResponse(savedCar));
     }
 
     @PostMapping(value = "/add_images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
