@@ -1,13 +1,16 @@
 package com.nce.backend.users.ui;
 
+import com.nce.backend.users.ui.requests.update.UpdateUserRequest;
 import com.nce.backend.users.application.UserApplicationService;
-import com.nce.backend.users.domain.entities.BuyerUser;
-import com.nce.backend.users.domain.entities.SellerUser;
 import com.nce.backend.users.domain.entities.User;
-import com.nce.backend.users.infrastructure.jpa.entities.UserJpaEntity;
-import com.nce.backend.users.infrastructure.jpa.repositories.UserJpaRepository;
 import com.nce.backend.users.ui.requests.*;
+import com.nce.backend.users.ui.requests.register.RegisterBuyerRequest;
+import com.nce.backend.users.ui.requests.register.RegisterOneTimeSellerRequest;
+import com.nce.backend.users.ui.requests.register.RegisterSellerRequest;
 import com.nce.backend.users.ui.responses.*;
+import com.nce.backend.users.ui.responses.userData.BuyerUserResponse;
+import com.nce.backend.users.ui.responses.userData.SellerUserResponse;
+import com.nce.backend.users.ui.responses.userData.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -79,6 +82,13 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping()
+    ResponseEntity<Void> updateUser(@RequestBody @Valid UpdateUserRequest request){
+        User user = requestMapper.toDomainEntity(request);
+        userService.updateUser(user);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping()
     ResponseEntity<List<UserResponse>> getAll() {
         return ResponseEntity.ok(
@@ -121,6 +131,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/set_lock")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     ResponseEntity<Void> unlockUserAccount(
             @PathVariable UUID id,
             @RequestParam(name = "isLocked") boolean isLocked
