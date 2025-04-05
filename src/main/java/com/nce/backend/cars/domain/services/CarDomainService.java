@@ -1,9 +1,9 @@
 package com.nce.backend.cars.domain.services;
 
 import com.nce.backend.cars.domain.entities.Car;
+import com.nce.backend.common.events.CarDeletedEvent;
 import com.nce.backend.common.events.NewCarSavedEvent;
 import com.nce.backend.cars.domain.repositories.CarRepository;
-import com.nce.backend.cars.exceptions.CarAlreadyExistsException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -18,11 +18,15 @@ import java.util.UUID;
 public class CarDomainService {
 
     private final CarRepository carRepository;
-
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Car save(Car car) {
+        return carRepository.save(car);
+    }
+
+    @Transactional
+    public Car update(Car car) {
         return carRepository.save(car);
     }
 
@@ -33,6 +37,7 @@ public class CarDomainService {
     @Transactional
     public void deleteById(UUID id) {
         carRepository.deleteById(id);
+        eventPublisher.publishEvent(new CarDeletedEvent(id));
     }
 
     public Optional<Car> findById(UUID id) {
@@ -43,14 +48,12 @@ public class CarDomainService {
         return carRepository.existsById(id);
     }
 
+    public boolean existsByRegNumber(String regNumber) {
+        return carRepository.existsByRegNumber(regNumber);
+    }
+
     @Transactional
     public Car saveNewCarRequest(Car car) {
-        if (carRepository.existsByRegNumber(car.getRegistrationNumber())) {
-            throw new CarAlreadyExistsException(
-                    "Car with the registration number '%s' already exists".formatted(car.getRegistrationNumber())
-            );
-        }
-
         Car savedCar = carRepository.save(car);
         eventPublisher.publishEvent(
                 new NewCarSavedEvent(savedCar.getId(), savedCar.getOwnerID(), savedCar.getRegistrationNumber())
