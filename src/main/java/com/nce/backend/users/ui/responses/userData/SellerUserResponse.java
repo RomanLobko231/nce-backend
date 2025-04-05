@@ -1,4 +1,4 @@
-package com.nce.backend.users.ui.responses;
+package com.nce.backend.users.ui.responses.userData;
 
 import com.nce.backend.users.domain.valueObjects.Address;
 import lombok.Getter;
