@@ -1,4 +1,4 @@
-package com.nce.backend.file_storage.exceptions;
+package com.nce.backend.common.exception;
 
 public class FileProcessingException extends RuntimeException {
     public FileProcessingException(String message) {

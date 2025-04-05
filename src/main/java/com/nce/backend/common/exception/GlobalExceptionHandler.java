@@ -39,6 +39,16 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleFileProcessingException(FileProcessingException e) {
+        log.info(e.getMessage());
+        return new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
         log.info(e.getMessage());
