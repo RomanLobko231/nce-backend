@@ -19,9 +19,7 @@ public class VegvesenApiJsonMapper {
 
 
     public ApiCarData mapFromJson(JsonNode jsonNode) {
-
         JsonNode technicalDetailsNode = jsonNode.at("/kjoretoydataListe/0/godkjenning/tekniskGodkjenning/tekniskeData");
-
 
         return ApiCarData.builder()
                 .make(

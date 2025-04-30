@@ -3,6 +3,9 @@ package com.nce.backend.file_storage.infrastructure.aws;
 import com.nce.backend.file_storage.domain.FileStorageService;
 import com.nce.backend.common.exception.FileProcessingException;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -19,7 +22,8 @@ public class S3FIleStorageService implements FileStorageService<MultipartFile> {
 
     private final S3Client s3Client;
 
-    private final String BUCKET_NAME = "maro-nalo";
+    @Value("${aws.s3.bucket-name}")
+    private String BUCKET_NAME;
 
     @Override
     public String uploadFile(MultipartFile file) {
@@ -65,6 +69,7 @@ public class S3FIleStorageService implements FileStorageService<MultipartFile> {
     }
 
     @Override
+    @Async
     public void deleteFiles(List<String> fileUrls) {
         fileUrls.forEach(this::deleteFile);
     }
