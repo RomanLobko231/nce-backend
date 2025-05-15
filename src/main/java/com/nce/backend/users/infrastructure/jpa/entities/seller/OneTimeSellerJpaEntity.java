@@ -1,5 +1,6 @@
-package com.nce.backend.users.infrastructure.jpa.entities;
+package com.nce.backend.users.infrastructure.jpa.entities.seller;
 
+import com.nce.backend.users.infrastructure.jpa.entities.UserJpaEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import lombok.*;

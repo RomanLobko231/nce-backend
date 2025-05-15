@@ -1,5 +1,6 @@
-package com.nce.backend.users.ui.responses.userData;
+package com.nce.backend.users.ui.responses.userData.seller;
 
+import com.nce.backend.users.ui.responses.userData.UserResponse;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;

@@ -1,12 +1,11 @@
-package com.nce.backend.users.infrastructure.jpa.entities;
+package com.nce.backend.users.infrastructure.jpa.entities.seller;
 
+import com.nce.backend.users.infrastructure.jpa.entities.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity(name = "seller")
 @SuperBuilder
@@ -27,5 +26,5 @@ public class SellerJpaEntity extends UserJpaEntity {
     )
     @Column(name = "car_id")
     @Builder.Default
-    private List<UUID> carIDs = new ArrayList<>();
+    private Set<UUID> carIDs = new HashSet<>();
 }

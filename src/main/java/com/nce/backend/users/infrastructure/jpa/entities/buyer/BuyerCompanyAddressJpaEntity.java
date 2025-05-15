@@ -1,10 +1,9 @@
-package com.nce.backend.users.infrastructure.jpa.entities;
+package com.nce.backend.users.infrastructure.jpa.entities.buyer;
 
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 @Builder
 @Getter
@@ -12,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
-public class BuyerAddressJpaEntity {
+public class BuyerCompanyAddressJpaEntity {
 
     @NotNull(message = "Country cannot be null")
     @NotBlank(message = "Country cannot be blank")
@@ -27,5 +26,6 @@ public class BuyerAddressJpaEntity {
     String postalLocation;
 
     @NotNull(message = "Postal code cannot be null")
+    @NotBlank(message = "Postal location cannot be blank")
     String postalCode;
 }
