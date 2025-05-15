@@ -1,7 +1,8 @@
 package com.nce.backend.users.domain.repositories;
 
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.users.domain.entities.BuyerUser;
+import com.nce.backend.users.domain.entities.BuyerCompanyUser;
+import com.nce.backend.users.domain.entities.BuyerRepresentativeUser;
 import com.nce.backend.users.domain.entities.SellerUser;
 import com.nce.backend.users.domain.entities.User;
 
@@ -13,8 +14,9 @@ public interface UserRepository {
     Optional<User> findById(UUID id);
     Optional<User> findByEmail(String email);
     List<SellerUser> findAllSellerUsers();
-    List<BuyerUser> findAllBuyerUsers();
-    Optional<BuyerUser> findBuyerUserById(UUID id);
+    List<BuyerCompanyUser> findAllBuyerCompanyUsers();
+    Optional<BuyerCompanyUser> findBuyerCompanyUserById(UUID id);
+    Optional<BuyerRepresentativeUser> findBuyerRepresentativeById(UUID id);
     Optional<SellerUser> findSellerUserById(UUID id);
     List<User> findAll();
     User save(User user);
@@ -23,4 +25,7 @@ public interface UserRepository {
     boolean existsByEmail(String email);
     boolean existsById(UUID id);
     void deleteOneTimeSellerByCarId(UUID carId);
+    void deleteCarIdFromSeller(UUID carId);
+    List<BuyerCompanyUser> findAllBuyerCompanyUsersByLocked(boolean isLocked);
+    List<String> findLicencesByBuyerId(UUID buyerId);
 }

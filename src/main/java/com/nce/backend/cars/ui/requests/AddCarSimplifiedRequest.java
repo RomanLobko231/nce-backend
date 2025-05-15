@@ -17,6 +17,10 @@ public record AddCarSimplifiedRequest(
 
         @NotNull(message = "KMs cannot be null")
         @Min(value = 0, message = "Kilometers value cannot be less than 0")
-        Integer kilometers
+        Integer kilometers,
+
+        @Min(value = 0, message = "Price must be no less than 0")
+        @NotNull(message = "Price cannot be null")
+        Integer expectedPrice
 ) {
 }

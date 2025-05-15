@@ -27,6 +27,7 @@ public class CarJpaEntityMapper {
                 .status(car.getStatus())
                 .ownerId(car.getOwnerID())
                 .additionalInformation(car.getAdditionalInformation())
+                .expectedPrice(car.getExpectedPrice())
                 .imagePaths(car.getImagePaths())
                 .build();
     }
@@ -53,6 +54,7 @@ public class CarJpaEntityMapper {
                 .ownerID(carJpaEntity.getOwnerId())
                 .additionalInformation(carJpaEntity.getAdditionalInformation())
                 .imagePaths(carJpaEntity.getImagePaths())
+                .expectedPrice(carJpaEntity.getExpectedPrice())
                 .build();
     }
 }

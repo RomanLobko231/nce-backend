@@ -27,6 +27,7 @@ public class CarResponseMapper {
                 .status(car.getStatus().getValue())
                 .ownerId(car.getOwnerID())
                 .additionalInformation(car.getAdditionalInformation())
+                .expectedPrice(car.getExpectedPrice())
                 .imagePaths(car.getImagePaths())
                 .build();
     }

@@ -1,15 +1,12 @@
 package com.nce.backend.users.ui.requests.register;
 
-import com.nce.backend.users.domain.valueObjects.Address;
-import com.nce.backend.users.ui.requests.address.ValidatedAddress;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.UUID;
 
-public record RegisterSellerRequest(
-
+public record RegisterRepresentativeRequest(
         @NotNull(message = "Name cannot be null")
         @NotBlank(message = "Name cannot be blank")
         String name,
@@ -27,8 +24,7 @@ public record RegisterSellerRequest(
         @Size(min = 8, message = "Password should be at least 8 symbols long")
         String password,
 
-        @NotNull(message = "Address cannot be null")
-        @Valid
-        ValidatedAddress address
+        @NotNull(message = "Company Id cannot be null")
+        UUID buyerCompanyId
 ) {
 }

@@ -1,13 +1,13 @@
 package com.nce.backend.users;
 
+import com.nce.backend.users.domain.entities.BuyerRepresentativeUser;
 import com.nce.backend.users.domain.entities.User;
 import com.nce.backend.users.domain.repositories.UserRepository;
+import com.nce.backend.users.exceptions.UserDoesNotExistException;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -20,7 +20,7 @@ public class UserFacade {
         User fetchedUser = userRepository
                 .findByEmail(email)
                 .orElseThrow(
-                        () -> new UsernameNotFoundException("User with email %s was not found".formatted(email))
+                        () -> new UserDoesNotExistException("User with email %s was not found".formatted(email))
                 );
 
         return AuthenticatedUserDTO

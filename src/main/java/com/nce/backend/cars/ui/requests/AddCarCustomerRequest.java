@@ -1,18 +1,17 @@
 package com.nce.backend.cars.ui.requests;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
+public record AddCarCustomerRequest(
 
-public record UpdateCarRequest(
-
-        @NotNull(message = "ID cannot be null")
-        UUID id,
-
+        @NotBlank(message = "Registration number cannot be null or blank")
         String registrationNumber,
 
         @PositiveOrZero(message = "Kilometers cannot be less then 0")
@@ -25,7 +24,6 @@ public record UpdateCarRequest(
         @NotBlank(message = "Model cannot be null or blank")
         String model,
 
-        @PastOrPresent(message = "Car cannot be registered in the future")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         LocalDate firstTimeRegisteredInNorway,
 
@@ -70,8 +68,6 @@ public record UpdateCarRequest(
         @NotNull(message = "Price cannot be null")
         Integer expectedPrice,
 
-        String additionalInformation,
-
-        List<String> imagePaths
+        String additionalInformation
 ) {
 }

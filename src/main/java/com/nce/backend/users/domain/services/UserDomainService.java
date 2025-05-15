@@ -1,14 +1,13 @@
 package com.nce.backend.users.domain.services;
 
-import com.nce.backend.users.domain.entities.BuyerUser;
-import com.nce.backend.users.domain.entities.OneTimeSellerUser;
-import com.nce.backend.users.domain.entities.SellerUser;
-import com.nce.backend.users.domain.entities.User;
+import com.nce.backend.common.events.UserDeletedEvent;
+import com.nce.backend.users.domain.entities.*;
 import com.nce.backend.users.domain.repositories.UserRepository;
 import com.nce.backend.users.domain.valueObjects.Role;
 import com.nce.backend.users.exceptions.UserDoesNotExistException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +19,7 @@ import java.util.UUID;
 public class UserDomainService {
 
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public User registerSeller(SellerUser userToSave) {
@@ -29,11 +29,18 @@ public class UserDomainService {
     }
 
     @Transactional
-    public User registerBuyer(BuyerUser userToSave) {
-        userToSave.setRole(Role.BUYER);
+    public User registerBuyerCompany(BuyerCompanyUser userToSave) {
+        userToSave.setRole(Role.BUYER_COMPANY);
         userToSave.setAccountLocked(true);
 
         return userRepository.save(userToSave);
+    }
+
+    @Transactional
+    public User registerRepresentative(BuyerRepresentativeUser representative) {
+        representative.setRole(Role.BUYER_REPRESENTATIVE);
+
+        return userRepository.save(representative);
     }
 
     @Transactional
@@ -54,20 +61,40 @@ public class UserDomainService {
         return userRepository.findAllSellerUsers();
     }
 
-    public List<BuyerUser> findAllBuyers() {
-        return userRepository.findAllBuyerUsers();
+    public List<BuyerCompanyUser> findAllBuyerCompanies() {
+        return userRepository.findAllBuyerCompanyUsers();
+    }
+
+    public List<BuyerCompanyUser> findAllBuyerCompaniesByLocked(Boolean isLocked) {
+        return userRepository.findAllBuyerCompanyUsersByLocked(isLocked);
     }
 
     public Optional<User> findUserById(UUID id) {
         return userRepository.findById(id);
     }
 
-    public Optional<SellerUser> findSellerById(UUID id) {
-        return userRepository.findSellerUserById(id);
+    public SellerUser findSellerById(UUID id) {
+        return userRepository
+                .findSellerUserById(id)
+                .orElseThrow(
+                        () -> new UserDoesNotExistException("User with id '%s' does not exist".formatted(id))
+                );
     }
 
-    public Optional<BuyerUser> findBuyerById(UUID id) {
-        return userRepository.findBuyerUserById(id);
+    public BuyerCompanyUser findBuyerById(UUID id) {
+        return userRepository
+                .findBuyerCompanyUserById(id)
+                .orElseThrow(
+                        () -> new UserDoesNotExistException("User with id '%s' does not exist".formatted(id))
+                );
+    }
+
+    public BuyerRepresentativeUser findRepresentativeById(UUID id) {
+        return userRepository
+                .findBuyerRepresentativeById(id)
+                .orElseThrow(
+                        () -> new UserDoesNotExistException("User with id '%s' does not exist".formatted(id))
+                );
     }
 
     public Optional<User> findUserByEmail(String email) {
@@ -78,9 +105,20 @@ public class UserDomainService {
         return userRepository.existsByEmail(email);
     }
 
+    public boolean companyHasRepresentativeById(UUID companyId, UUID representativeId) {
+        BuyerRepresentativeUser rep = userRepository
+                .findBuyerRepresentativeById(representativeId)
+                .orElseThrow(
+                        () -> new UserDoesNotExistException("User with id '%s' does not exist".formatted(representativeId))
+                );
+
+        return rep.getBuyerCompanyId().equals(companyId);
+    }
+
     @Transactional
     public void deleteUserById(UUID id) {
         userRepository.deleteById(id);
+        eventPublisher.publishEvent(new UserDeletedEvent(id));
     }
 
     @Transactional
@@ -99,5 +137,15 @@ public class UserDomainService {
     @Transactional
     public void deleteOneTimeSellerByCarId(UUID carId) {
         userRepository.deleteOneTimeSellerByCarId(carId);
+    }
+
+    @Transactional
+    public void deleteCarIdFromSeller(UUID carId) {
+        userRepository.deleteCarIdFromSeller(carId);
+    }
+
+
+    public List<String> findLicencesByBuyerId(UUID id) {
+        return userRepository.findLicencesByBuyerId(id);
     }
 }

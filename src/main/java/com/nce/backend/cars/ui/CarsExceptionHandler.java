@@ -1,6 +1,7 @@
 package com.nce.backend.cars.ui;
 
 import com.nce.backend.cars.exceptions.CarAlreadyExistsException;
+import com.nce.backend.cars.exceptions.OnAuctionUpdateNotAllowedException;
 import com.nce.backend.common.exception.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ public class CarsExceptionHandler {
     @ExceptionHandler(CarAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleCarAlreadyExistsException(CarAlreadyExistsException e) {
-        log.info(e.getMessage());
+        log.error(e.getMessage(), e);
         return new ErrorResponse(
                 HttpStatus.CONFLICT.value(),
                 e.getMessage()
@@ -29,9 +30,19 @@ public class CarsExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleCarDoesNotExistException(NoSuchElementException e) {
-        log.info(e.getMessage());
+        log.error(e.getMessage(), e);
         return new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(OnAuctionUpdateNotAllowedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleOnAuctionUpdateNotAllowedException(OnAuctionUpdateNotAllowedException e) {
+        log.error(e.getMessage(), e);
+        return new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
                 e.getMessage()
         );
     }

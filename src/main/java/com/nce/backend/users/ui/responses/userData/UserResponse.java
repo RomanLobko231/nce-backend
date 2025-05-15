@@ -1,5 +1,6 @@
 package com.nce.backend.users.ui.responses.userData;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,5 +24,6 @@ public abstract class UserResponse {
 
     private UUID id;
 
+    @JsonProperty(value = "accountLocked")
     private boolean isAccountLocked;
 }

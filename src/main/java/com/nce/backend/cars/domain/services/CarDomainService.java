@@ -1,6 +1,7 @@
 package com.nce.backend.cars.domain.services;
 
 import com.nce.backend.cars.domain.entities.Car;
+import com.nce.backend.cars.domain.valueObjects.Status;
 import com.nce.backend.common.events.CarDeletedEvent;
 import com.nce.backend.common.events.NewCarSavedEvent;
 import com.nce.backend.cars.domain.repositories.CarRepository;
@@ -18,7 +19,6 @@ import java.util.UUID;
 public class CarDomainService {
 
     private final CarRepository carRepository;
-    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Car save(Car car) {
@@ -37,7 +37,6 @@ public class CarDomainService {
     @Transactional
     public void deleteById(UUID id) {
         carRepository.deleteById(id);
-        eventPublisher.publishEvent(new CarDeletedEvent(id));
     }
 
     public Optional<Car> findById(UUID id) {
@@ -52,13 +51,20 @@ public class CarDomainService {
         return carRepository.existsByRegNumber(regNumber);
     }
 
-    @Transactional
-    public Car saveNewCarRequest(Car car) {
-        Car savedCar = carRepository.save(car);
-        eventPublisher.publishEvent(
-                new NewCarSavedEvent(savedCar.getId(), savedCar.getOwnerID(), savedCar.getRegistrationNumber())
-        );
+    public List<Car> getAllCarsByOwnerId(UUID ownerId) {
+        return carRepository.findAllByOwnerId(ownerId);
+    }
 
-        return savedCar;
+    public List<Car> getAllCarsByStatus(Status status) {
+        return carRepository.findAllByStatus(status);
+    }
+
+    @Transactional
+    public void updateCarStatus(Status status, UUID carId) {
+        carRepository.updateCarStatusById(status, carId);
+    }
+
+    public void deleteByOwnerId(UUID id) {
+        carRepository.deleteByOwnerId(id);
     }
 }

@@ -2,20 +2,21 @@ package com.nce.backend.users.ui.requests.update;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.nce.backend.users.domain.valueObjects.Address;
+import com.nce.backend.users.ui.requests.address.ValidatedAddress;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @JsonTypeName("SELLER")
 public class UpdateSellerRequest extends UpdateUserRequest {
 
     @NotNull(message = "Address cannot be null")
-    private Address address;
+    @Valid
+    private ValidatedAddress address;
 
-    private List<UUID> carIDs = new ArrayList<>();
+    private Set<UUID> carIDs = new HashSet<>();
 }

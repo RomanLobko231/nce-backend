@@ -7,4 +7,5 @@ public interface FileStorageService<T> {
     List<String> uploadFiles(List<T> files);
     void deleteFile(String fileUrl);
     void deleteFiles(List<String> fileUrls);
+    String generatePresignedUrl(String key);
 }

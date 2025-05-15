@@ -1,6 +1,7 @@
 package com.nce.backend.users.infrastructure.jpa.repositories;
 
-import com.nce.backend.users.domain.entities.BuyerUser;
+import com.nce.backend.users.domain.entities.BuyerCompanyUser;
+import com.nce.backend.users.domain.entities.BuyerRepresentativeUser;
 import com.nce.backend.users.domain.entities.SellerUser;
 import com.nce.backend.users.domain.entities.User;
 import com.nce.backend.users.domain.repositories.UserRepository;
@@ -47,19 +48,40 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<BuyerUser> findAllBuyerUsers() {
+    public List<BuyerCompanyUser> findAllBuyerCompanyUsers() {
         return userJpaRepository
-                .findAllBuyerUsers()
+                .findAllBuyerCompanyUsers()
                 .stream()
-                .map(entityMapper::toBuyerUserDomainEntity)
+                .map(entityMapper::toBuyerCompanyUserDomainEntity)
                 .toList();
     }
 
     @Override
-    public Optional<BuyerUser> findBuyerUserById(UUID id) {
+    public List<BuyerCompanyUser> findAllBuyerCompanyUsersByLocked(boolean isLocked) {
         return userJpaRepository
-                .findBuyerUserById(id)
-                .map(entityMapper::toBuyerUserDomainEntity);
+                .findAllBuyerCompanyUsersByLocked(isLocked)
+                .stream()
+                .map(entityMapper::toBuyerCompanyUserDomainEntity)
+                .toList();
+    }
+
+    @Override
+    public List<String> findLicencesByBuyerId(UUID buyerId) {
+        return userJpaRepository.findLicencesByBuyerId(buyerId);
+    }
+
+    @Override
+    public Optional<BuyerCompanyUser> findBuyerCompanyUserById(UUID id) {
+        return userJpaRepository
+                .findBuyerCompanyUserById(id)
+                .map(entityMapper::toBuyerCompanyUserDomainEntity);
+    }
+
+    @Override
+    public Optional<BuyerRepresentativeUser> findBuyerRepresentativeById(UUID id) {
+        return userJpaRepository
+                .findBuyerRepresentativeById(id)
+                .map(entityMapper::toBuyerRepresentativeDomain);
     }
 
     @Override
@@ -108,4 +130,11 @@ public class UserRepositoryImpl implements UserRepository {
     public void deleteOneTimeSellerByCarId(UUID carId) {
         userJpaRepository.deleteOneTimeSellerByCarId(carId);
     }
+
+    @Override
+    public void deleteCarIdFromSeller(UUID carId) {
+        userJpaRepository.deleteCarIdFromSeller(carId);
+    }
+
+
 }

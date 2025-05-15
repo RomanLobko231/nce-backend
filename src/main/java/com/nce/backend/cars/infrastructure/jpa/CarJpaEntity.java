@@ -28,6 +28,7 @@ public class CarJpaEntity {
 
     @NotNull(message = "Registration number can't be null")
     @NotBlank(message = "Registration number can't be null")
+    @Column(unique = true, nullable = false)
     private String registrationNumber;
 
     private Integer kilometers;
@@ -68,6 +69,8 @@ public class CarJpaEntity {
     private Status status;
 
     private String additionalInformation;
+
+    private Integer expectedPrice;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(

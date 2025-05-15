@@ -2,16 +2,15 @@ package com.nce.backend.cars.ui;
 
 import com.nce.backend.cars.application.CarApplicationService;
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.cars.ui.requests.AddCarCompleteRequest;
-import com.nce.backend.cars.ui.requests.AddCarSimplifiedRequest;
-import com.nce.backend.cars.ui.requests.CarRequestMapper;
-import com.nce.backend.cars.ui.requests.UpdateCarRequest;
+import com.nce.backend.cars.domain.valueObjects.Status;
+import com.nce.backend.cars.ui.requests.*;
 import com.nce.backend.cars.ui.responses.CarResponse;
 import com.nce.backend.cars.ui.responses.CarResponseMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +20,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/cars")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class CarController {
 
     private final CarApplicationService carService;
@@ -34,20 +32,34 @@ public class CarController {
             @RequestPart(name = "images", required = false) List<MultipartFile> images
     ) {
         carService.addCarSimplified(
-                carRequestMapper.toCarFromCustomerRequest(request),
+                carRequestMapper.toCarFromCustomerSimpleRequest(request),
                 images
         );
+        System.out.println("thread 1");
 
         return ResponseEntity.ok().build();
     }
 
     @PostMapping(value = "/add_complete", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<CarResponse> addNewCarComplete(
-            @RequestPart(name = "carData") @Valid AddCarCompleteRequest carData,
+            @RequestPart(name = "carData") @Valid AddCarAdminRequest carData,
             @RequestPart(name = "images", required = false) List<MultipartFile> images) {
 
         Car savedCar = carService.addCarComplete(
                 carRequestMapper.toCarFromAdminRequest(carData),
+                images
+        );
+
+        return ResponseEntity.ok(carResponseMapper.toCarResponse(savedCar));
+    }
+
+    @PostMapping(value = "/add_complete_user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<CarResponse> addNewCarCompleteAsUser(
+            @RequestPart(name = "carData") @Valid AddCarCustomerRequest carData,
+            @RequestPart(name = "images", required = false) List<MultipartFile> images) {
+
+        Car savedCar = carService.addCarComplete(
+                carRequestMapper.toCarFromCustomerRequest(carData),
                 images
         );
 
@@ -64,9 +76,11 @@ public class CarController {
     }
 
     @GetMapping
-    ResponseEntity<List<CarResponse>> getAllCars() {
+    ResponseEntity<List<CarResponse>> getAllCars(
+            @RequestParam(name = "status", required = false) String status
+    ) {
         List<CarResponse> fetchedCars = carService
-                .getAllCars()
+                .getAllCarsByStatus(Status.fromString(status))
                 .stream()
                 .map(carResponseMapper::toCarResponse)
                 .toList();
@@ -74,7 +88,19 @@ public class CarController {
         return ResponseEntity.ok(fetchedCars);
     }
 
-    @GetMapping(path = "/{id}")
+    @GetMapping(value = "/by_owner/{ownerId}")
+    @PreAuthorize("#ownerId == authentication.principal.id or hasRole('ROLE_ADMIN')")
+    ResponseEntity<List<CarResponse>> getAllCarsByOwnerId(@PathVariable UUID ownerId) {
+        List<CarResponse> fetchedCars = carService
+                .getAllCarsByOwnerId(ownerId)
+                .stream()
+                .map(carResponseMapper::toCarResponse)
+                .toList();
+
+        return ResponseEntity.ok(fetchedCars);
+    }
+
+    @GetMapping(value = "/{id}")
     ResponseEntity<CarResponse> getCarById(@PathVariable UUID id) {
         CarResponse fetchedCar = carResponseMapper.toCarResponse(carService.findById(id));
 
@@ -82,6 +108,7 @@ public class CarController {
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("#carData.ownerId() == authentication.principal.id or hasRole('ROLE_ADMIN')")
     ResponseEntity<Void> updateCar(@RequestPart(name = "carData") @Valid UpdateCarRequest carData,
                                    @RequestPart(name = "images", required = false) List<MultipartFile> images) {
 
@@ -90,7 +117,24 @@ public class CarController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping(path = "/{id}")
+    @PutMapping("/{carId}")
+    ResponseEntity<Void> updateCarStatus(
+            @RequestParam(name = "status", required = true) String status,
+            @PathVariable UUID carId
+    ) {
+
+        carService.updateCarStatus(Status.fromString(status), carId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/exists")
+    ResponseEntity<Boolean> existsByRegNumber(@RequestParam(name = "regNumber") String regNumber) {
+        boolean exists = carService.existsByRegNumber(regNumber);
+
+        return ResponseEntity.ok(exists);
+    }
+
+    @DeleteMapping(value = "/{id}")
     ResponseEntity<Void> deleteCar(@PathVariable UUID id) {
         carService.deleteById(id);
 

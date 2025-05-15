@@ -21,7 +21,8 @@ import java.util.UUID;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = UpdateSellerRequest.class, name = "SELLER"),
         @JsonSubTypes.Type(value = UpdateOneTimeSellerRequest.class, name = "ONE_TIME_SELLER"),
-        @JsonSubTypes.Type(value = UpdateBuyerRequest.class, name = "BUYER"),
+        @JsonSubTypes.Type(value = UpdateBuyerCompanyRequest.class, name = "BUYER_COMPANY"),
+        @JsonSubTypes.Type(value = UpdateBuyerRepresentativeRequest.class, name = "BUYER_REPRESENTATIVE"),
 })
 @Getter
 @AllArgsConstructor
@@ -49,5 +50,6 @@ public class UpdateUserRequest {
     private String email;
 
     @NotNull(message = "isAccountLocked cannot be null")
+    @JsonProperty(value = "accountLocked")
     private boolean isAccountLocked;
 }

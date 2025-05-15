@@ -11,9 +11,15 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 
 @Service
@@ -21,6 +27,7 @@ import java.util.List;
 public class S3FIleStorageService implements FileStorageService<MultipartFile> {
 
     private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
 
     @Value("${aws.s3.bucket-name}")
     private String BUCKET_NAME;
@@ -45,7 +52,7 @@ public class S3FIleStorageService implements FileStorageService<MultipartFile> {
             );
         }
 
-        return s3Client.utilities().getUrl(builder -> builder.bucket(BUCKET_NAME).key(uniqueFileName)).toExternalForm();
+        return uniqueFileName;
     }
 
     @Override
@@ -72,6 +79,23 @@ public class S3FIleStorageService implements FileStorageService<MultipartFile> {
     @Async
     public void deleteFiles(List<String> fileUrls) {
         fileUrls.forEach(this::deleteFile);
+    }
+
+    @Override
+    public String generatePresignedUrl(String key) {
+        GetObjectRequest objectRequest = GetObjectRequest.builder()
+                .bucket(BUCKET_NAME)
+                .key(key)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(10))
+                .getObjectRequest(objectRequest)
+                .build();
+
+        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
+
+        return presignedRequest.url().toExternalForm();
     }
 
     private String extractFileNameFromUrl(String url) {

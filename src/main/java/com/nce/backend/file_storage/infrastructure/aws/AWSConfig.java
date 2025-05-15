@@ -8,16 +8,17 @@ import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
 public class AWSConfig {
 
     private final Region REGION = Region.EU_NORTH_1;
 
-    @Value("${AWS_ACCESS_KEY_ID}")
+    @Value("${aws.s3.access-key-id}")
     private String accessKeyId;
 
-    @Value("${AWS_SECRET_ACCESS_KEY}")
+    @Value("${aws.s3.secret-access-key}")
     private String secretAccessKey;
 
     @Bean
@@ -25,6 +26,17 @@ public class AWSConfig {
         AwsCredentials credentials = AwsBasicCredentials.create(accessKeyId, secretAccessKey);
 
         return  S3Client
+                .builder()
+                .region(REGION)
+                .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                .build();
+    }
+
+    @Bean
+    S3Presigner s3Presigner() {
+        AwsCredentials credentials = AwsBasicCredentials.create(accessKeyId, secretAccessKey);
+
+        return S3Presigner
                 .builder()
                 .region(REGION)
                 .credentialsProvider(StaticCredentialsProvider.create(credentials))

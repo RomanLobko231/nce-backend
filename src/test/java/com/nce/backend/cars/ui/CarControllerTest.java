@@ -3,7 +3,7 @@ package com.nce.backend.cars.ui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nce.backend.cars.application.CarApplicationService;
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.cars.ui.requests.AddCarCompleteRequest;
+import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
 import com.nce.backend.cars.ui.requests.AddCarSimplifiedRequest;
 import com.nce.backend.cars.ui.requests.CarRequestMapper;
 import com.nce.backend.cars.ui.requests.UpdateCarRequest;
@@ -53,7 +53,8 @@ public class CarControllerTest {
         AddCarSimplifiedRequest request = new AddCarSimplifiedRequest(
                 UUID.randomUUID(),
                 "ABC123",
-                10
+                10,
+                10000
         );
 
         MockMultipartFile carDataPart = new MockMultipartFile(
@@ -83,7 +84,7 @@ public class CarControllerTest {
                 .kilometers(request.kilometers())
                 .build();
 
-        when(carRequestMapper.toCarFromCustomerRequest(any(AddCarSimplifiedRequest.class))).thenReturn(mockCar);
+        when(carRequestMapper.toCarFromCustomerSimpleRequest(any(AddCarSimplifiedRequest.class))).thenReturn(mockCar);
         when(carService.addCarSimplified(any(Car.class), anyList())).thenReturn(mockCar);
 
         mockMvc.perform(multipart("/api/v1/cars/customer")
@@ -99,7 +100,7 @@ public class CarControllerTest {
 
     @Test
     public void testAddCarAsAdmin() throws Exception {
-        AddCarCompleteRequest carData = new AddCarCompleteRequest(
+        AddCarAdminRequest carData = new AddCarAdminRequest(
                 "ABC123",
                 10,
                 "Make",
@@ -116,7 +117,7 @@ public class CarControllerTest {
                 10,
                 LocalDate.now().plusMonths(6),
                 UUID.randomUUID(),
-                "Vurdering",
+                10000,
                 null,
                 Collections.emptyList()
         );
@@ -143,7 +144,7 @@ public class CarControllerTest {
         );
         Car mockCar = Car.builder().build();
 
-        when(carRequestMapper.toCarFromAdminRequest(any(AddCarCompleteRequest.class))).thenReturn(mockCar);
+        when(carRequestMapper.toCarFromAdminRequest(any(AddCarAdminRequest.class))).thenReturn(mockCar);
         when(carService.addCarComplete(any(Car.class), anyList())).thenReturn(mockCar);
 
         mockMvc.perform(multipart("/api/v1/cars/admin")
@@ -177,7 +178,7 @@ public class CarControllerTest {
                 1000,
                 LocalDate.now().plusMonths(6),
                 UUID.randomUUID(),
-                "Vurdering",
+                1000,
                 null,
                 Collections.emptyList()
         );

@@ -10,6 +10,7 @@ import java.util.UUID;
 @Setter
 @SuperBuilder
 @AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     @Setter(AccessLevel.NONE)
@@ -26,4 +27,5 @@ public class User {
     private Role role;
 
     private boolean isAccountLocked;
+
 }

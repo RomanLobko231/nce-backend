@@ -21,9 +21,9 @@ public enum Status {
         this.value = value;
     }
 
-    public static Status fromString(String apiValue) {
+    public static Status fromString(String value) {
         for (Status type : values()) {
-            if (type.value.equalsIgnoreCase(apiValue)) {
+            if (type.value.equalsIgnoreCase(value)) {
                 return type;
             }
         }

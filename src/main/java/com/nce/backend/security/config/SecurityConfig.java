@@ -4,6 +4,7 @@ import com.nce.backend.security.jwt.JWTAuthenticationFilter;
 import com.nce.backend.security.user.AuthenticatedUser;
 import com.nce.backend.users.ui.UserController;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -32,6 +33,9 @@ public class SecurityConfig {
 
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
+    @Value("#{'${security.allowed-origins}'.split(',')}")
+    private List<String> ALLOWED_ORIGINS;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -39,29 +43,23 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                                .requestMatchers("/ws-auction/**").authenticated()
                                 .requestMatchers(HttpMethod.GET, "api/v1/cars").permitAll()
+                                .requestMatchers(HttpMethod.GET, "api/v1/cars/exists").permitAll()
                                 .requestMatchers(HttpMethod.POST, "api/v1/cars/add_simplified").permitAll()
                                 .requestMatchers(HttpMethod.POST, "api/v1/cars/add_complete").hasAnyRole("ADMIN", "SELLER")
-                                .requestMatchers(HttpMethod.GET, "api/v1/cars/**").hasAnyRole("ADMIN", "SELLER", "BUYER")
-                                .requestMatchers(HttpMethod.DELETE, "api/v1/cars/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "api/v1/cars/**").hasAnyRole("ADMIN", "SELLER", "BUYER_COMPANY", "BUYER_REPRESENTATIVE")
+                                .requestMatchers(HttpMethod.DELETE, "api/v1/cars/**").hasAnyRole("ADMIN", "SELLER")
                                 .requestMatchers(HttpMethod.POST, "api/v1/cars/**").hasAnyRole("ADMIN", "SELLER")
                                 .requestMatchers(HttpMethod.POST, "api/v1/users/**", "api/v1/users/login").permitAll()
                                 .requestMatchers(HttpMethod.GET, "api/v1/users/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "api/v1/users").hasAnyRole("ADMIN", "SELLER", "BUYER")
-                                .requestMatchers(HttpMethod.PUT, "api/v1/users").hasAnyRole("ADMIN", "SELLER", "BUYER")
-                                .requestMatchers(HttpMethod.DELETE, "api/v1/users/**").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.GET,"api/v1/users/test").access((authentication, request) ->
-//                                authentication.get().getPrincipal() instanceof AuthenticatedUser userDetails &&
-//                                        !userDetails.isAccountLocked() &&
-//                                        userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_BUYER")) ?
-//                                        new AuthorizationDecision(true) : new AuthorizationDecision(false)
-//                        )
-//                        .requestMatchers(HttpMethod.GET,"api/v1/users/test2").access((authentication, request) ->
-//                                authentication.get().getPrincipal() instanceof AuthenticatedUser userDetails &&
-//                                        userDetails.isAccountLocked() &&
-//                                        userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_BUYER")) ?
-//                                        new AuthorizationDecision(true) : new AuthorizationDecision(false)
-//                        )
+                                .requestMatchers(HttpMethod.GET, "api/v1/users").hasAnyRole("ADMIN", "SELLER", "BUYER_COMPANY")
+                                .requestMatchers(HttpMethod.PUT, "api/v1/users").hasAnyRole("ADMIN", "SELLER", "BUYER_COMPANY")
+                                .requestMatchers(HttpMethod.DELETE, "api/v1/users/**").hasAnyRole("ADMIN", "BUYER_COMPANY")
+                                .requestMatchers(HttpMethod.GET, "api/v1/auctions").authenticated()
+                                .requestMatchers(HttpMethod.PUT, "api/v1/auctions").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "api/v1/auctions").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "api/v1/auctions").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -70,7 +68,7 @@ public class SecurityConfig {
 
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3001", "https://norwaycarexport.no"));
+        configuration.setAllowedOrigins(ALLOWED_ORIGINS);
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");

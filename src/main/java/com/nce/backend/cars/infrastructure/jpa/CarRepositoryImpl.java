@@ -2,6 +2,7 @@ package com.nce.backend.cars.infrastructure.jpa;
 
 import com.nce.backend.cars.domain.entities.Car;
 import com.nce.backend.cars.domain.repositories.CarRepository;
+import com.nce.backend.cars.domain.valueObjects.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -35,6 +36,15 @@ public class CarRepositoryImpl implements CarRepository {
     }
 
     @Override
+    public List<Car> findAllByOwnerId(UUID ownerId) {
+        return carJpaRepository
+                .findAllByOwnerId(ownerId)
+                .stream()
+                .map(mapper::toDomainEntity)
+                .toList();
+    }
+
+    @Override
     public Car save(Car car) {
         CarJpaEntity entity = mapper.toJpaEntity(car);
         CarJpaEntity savedEntity = carJpaRepository.save(entity);
@@ -54,5 +64,24 @@ public class CarRepositoryImpl implements CarRepository {
     @Override
     public boolean existsById(UUID id) {
         return carJpaRepository.existsById(id);
+    }
+
+    @Override
+    public List<Car> findAllByStatus(Status status) {
+        return carJpaRepository
+                .findAllByStatus(status.name())
+                .stream()
+                .map(mapper::toDomainEntity)
+                .toList();
+    }
+
+    @Override
+    public void updateCarStatusById(Status status, UUID carId) {
+        carJpaRepository.updateCarStatusById(status.name(), carId);
+    }
+
+    @Override
+    public void deleteByOwnerId(UUID id) {
+        carJpaRepository.deleteByOwnerId(id);
     }
 }

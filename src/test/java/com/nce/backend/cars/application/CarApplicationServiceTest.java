@@ -1,7 +1,7 @@
 package com.nce.backend.cars.application;
 
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.cars.ui.requests.AddCarCompleteRequest;
+import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
 import com.nce.backend.cars.ui.requests.AddCarSimplifiedRequest;
 import com.nce.backend.cars.ui.requests.CarRequestMapper;
 import jakarta.transaction.Transactional;
@@ -32,10 +32,11 @@ public class CarApplicationServiceTest {
         AddCarSimplifiedRequest request = new AddCarSimplifiedRequest(
                UUID.randomUUID(),
                 "ABC123",
-                10
+                10,
+                10000
         );
 
-        Car mappedCar = carRequestMapper.toCarFromCustomerRequest(request);
+        Car mappedCar = carRequestMapper.toCarFromCustomerSimpleRequest(request);
         Car savedCar = carApplicationService.addCarSimplified(mappedCar, Collections.emptyList());
 
         assertNotNull(savedCar);
@@ -48,7 +49,7 @@ public class CarApplicationServiceTest {
     @Test
     @Transactional
     void testAddCarAsAdmin_savesCarSuccessfully() {
-        AddCarCompleteRequest request = new AddCarCompleteRequest(
+        AddCarAdminRequest request = new AddCarAdminRequest(
                 "ABC123",
                 10,
                 "Make",
@@ -65,7 +66,7 @@ public class CarApplicationServiceTest {
                 1000,
                 LocalDate.now().plusMonths(6),
                 UUID.randomUUID(),
-                "Vurdering",
+                10000,
                 null,
                 Collections.emptyList()
         );
