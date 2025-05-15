@@ -8,7 +8,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BuyerAddress extends Address {
+public class BuyerCompanyAddress extends Address {
 
     private String country;
 }

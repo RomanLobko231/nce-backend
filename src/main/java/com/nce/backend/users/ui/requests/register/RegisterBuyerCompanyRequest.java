@@ -1,11 +1,13 @@
 package com.nce.backend.users.ui.requests.register;
 
-import com.nce.backend.users.domain.valueObjects.BuyerAddress;
+import com.nce.backend.users.domain.valueObjects.BuyerCompanyAddress;
+import com.nce.backend.users.ui.requests.address.ValidatedBuyerCompanyAddress;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public record RegisterBuyerRequest(
+public record RegisterBuyerCompanyRequest(
 
         @NotNull(message = "Organisation Name cannot be null")
         @NotBlank(message = "Organisation Name cannot be blank")
@@ -16,7 +18,8 @@ public record RegisterBuyerRequest(
         String organisationNumber,
 
         @NotNull(message = "Address cannot be null")
-        BuyerAddress organisationAddress,
+        @Valid
+        ValidatedBuyerCompanyAddress organisationAddress,
 
         @NotNull(message = "Name cannot be null")
         @NotBlank(message = "Name cannot be blank")

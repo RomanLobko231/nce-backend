@@ -1,17 +1,19 @@
 package com.nce.backend.users.domain.entities;
 
 import com.nce.backend.users.domain.valueObjects.Address;
-import com.nce.backend.users.domain.valueObjects.BuyerAddress;
+import com.nce.backend.users.domain.valueObjects.BuyerCompanyAddress;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @SuperBuilder
-public class BuyerUser extends User {
+public class BuyerCompanyUser extends User {
 
      private String organisationName;
 
@@ -19,5 +21,9 @@ public class BuyerUser extends User {
 
      private List<String> organisationLicenceURLs;
 
-     private BuyerAddress organisationAddress;
+     private BuyerCompanyAddress organisationAddress;
+
+     @Builder.Default
+     private List<BuyerRepresentativeUser> companyRepresentatives = new ArrayList<>();
+
 }

@@ -1,5 +1,6 @@
 package com.nce.backend.cars.ui.requests;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -9,7 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-public record AddCarCompleteRequest(
+public record AddCarAdminRequest(
 
         @NotBlank(message = "Registration number cannot be null or blank")
         String registrationNumber,
@@ -64,8 +65,9 @@ public record AddCarCompleteRequest(
         @NotNull
         UUID ownerId,
 
-        @NotBlank(message = "Status cannot be null or blank")
-        String status,
+        @Min(value = 0, message = "Price must be no less than 0")
+        @NotNull(message = "Price cannot be null")
+        Integer expectedPrice,
 
         String additionalInformation,
 
