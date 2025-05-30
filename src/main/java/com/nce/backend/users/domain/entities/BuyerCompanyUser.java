@@ -26,4 +26,18 @@ public class BuyerCompanyUser extends User {
      @Builder.Default
      private List<BuyerRepresentativeUser> companyRepresentatives = new ArrayList<>();
 
+     @Override
+     protected void updateFieldsFrom(User source) {
+          BuyerCompanyUser other = (BuyerCompanyUser) source;
+
+          if(other.getName() != null) this.setName(other.getName());
+          if(other.getPhoneNumber() != null) this.setPhoneNumber(other.getPhoneNumber());
+          if(other.getOrganisationAddress() != null) this.setOrganisationAddress(other.getOrganisationAddress());
+     }
+
+     @Override
+     public void setAccountLock(boolean isAccountLocked) {
+          this.setAccountLocked(isAccountLocked);
+          companyRepresentatives.forEach(r -> r.setAccountLocked(isAccountLocked));
+     }
 }

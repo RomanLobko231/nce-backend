@@ -7,13 +7,14 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
 @JsonTypeName("BUYER_REPRESENTATIVE")
 public class UpdateBuyerRepresentativeRequest extends UpdateUserRequest {
 
-    private List<UUID> savedCarIds;
+    private Set<UUID> savedCarIds;
 
     private UUID buyerCompanyId;
 }

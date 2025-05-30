@@ -1,9 +1,10 @@
 package com.nce.backend.users.application;
 
-import com.nce.backend.common.events.CarDeletedEvent;
-import com.nce.backend.common.events.CarSaveFailedRollbackUserEvent;
-import com.nce.backend.common.events.NewCarSavedEvent;
-import com.nce.backend.file_storage.FileStorageFacade;
+import com.nce.backend.common.events.auction.NewBidPlacedEvent;
+import com.nce.backend.common.events.car.CarDeletedEvent;
+import com.nce.backend.common.events.car.CarSaveFailedRollbackUserEvent;
+import com.nce.backend.common.events.car.NewCarSavedEvent;
+import com.nce.backend.filestorage.FileStorageFacade;
 import com.nce.backend.security.SecurityFacade;
 import com.nce.backend.users.domain.entities.*;
 import com.nce.backend.users.domain.services.UserDomainService;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.util.*;
 
@@ -178,14 +178,17 @@ public class UserApplicationService {
                 );
 
         //todo: make verify integrity polymorphic method
-        userToUpdate.setPassword(user.getPassword());
-        userToUpdate.setAccountLocked(user.isAccountLocked());
-        if (user instanceof BuyerCompanyUser buyerCompanyUser) {
-            ((BuyerCompanyUser) userToUpdate)
-                    .setCompanyRepresentatives(buyerCompanyUser.getCompanyRepresentatives());
-        }
+//        userToUpdate.setPassword(user.getPassword());
+//        userToUpdate.setAccountLocked(user.isAccountLocked());
+//        if (user instanceof BuyerCompanyUser buyerCompanyUser) {
+//            ((BuyerCompanyUser) userToUpdate)
+//                    .setCompanyRepresentatives(buyerCompanyUser.getCompanyRepresentatives());
+//            ((BuyerCompanyUser) userToUpdate)
+//                    .setOrganisationLicenceURLs(buyerCompanyUser.getOrganisationLicenceURLs());
+//        }
+        user.applyChangesFrom(userToUpdate);
 
-        return userDomainService.updateUser(userToUpdate);
+        return userDomainService.updateUser(user);
     }
 
     private void setEncodedPassword(User user) {
@@ -219,6 +222,12 @@ public class UserApplicationService {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
     public void rollbackUserByIdOn(CarSaveFailedRollbackUserEvent event) {
         userDomainService.deleteUserById(event.userId());
+    }
+
+    @Async("eventTaskExecutor")
+    @TransactionalEventListener
+    public void addSavedCarOn(NewBidPlacedEvent event) {
+        userDomainService.addCarIdToSaved(event.bidderId(), event.carId());
     }
 
 }

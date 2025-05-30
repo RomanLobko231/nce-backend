@@ -1,7 +1,6 @@
-package com.nce.backend.common.events;
+package com.nce.backend.common.events.user;
 
 import org.jmolecules.event.annotation.DomainEvent;
-import org.springframework.context.ApplicationEvent;
 
 import java.util.UUID;
 

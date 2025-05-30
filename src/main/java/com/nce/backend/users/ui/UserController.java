@@ -14,6 +14,7 @@ import com.nce.backend.users.ui.responses.*;
 import com.nce.backend.users.ui.responses.userData.*;
 import com.nce.backend.users.ui.responses.userData.buyer.BuyerCompanyUserBasicInfo;
 import com.nce.backend.users.ui.responses.userData.buyer.BuyerCompanyUserResponse;
+import com.nce.backend.users.ui.responses.userData.representative.RepresentativeUserResponse;
 import com.nce.backend.users.ui.responses.userData.representative.RepresentativeWithCompanyResponse;
 import com.nce.backend.users.ui.responses.userData.seller.SellerUserResponse;
 import jakarta.validation.Valid;
@@ -40,7 +41,7 @@ public class UserController {
     private final UserResponseMapper responseMapper;
 
 
-    @PostMapping(value = "/register_seller")
+    @PostMapping(value = "/register-seller")
     ResponseEntity<RegisterSuccessResponse> registerSeller(@RequestBody @Valid RegisterSellerRequest request) {
         User registeredUser = userService.registerSeller(
                 requestMapper.toSellerFromRegister(request)
@@ -49,7 +50,7 @@ public class UserController {
         return ResponseEntity.ok(responseMapper.toRegisterSuccessResponse(registeredUser));
     }
 
-    @PostMapping(value = "/register_one_time_seller")
+    @PostMapping(value = "/register-one-time-seller")
     ResponseEntity<RegisterSuccessResponse> registerOneTimeSeller(@RequestBody @Valid RegisterOneTimeSellerRequest request) {
         User registeredUser = userService.registerOneTimeSeller(
                 requestMapper.toOneTimeSellerFromRegister(request)
@@ -58,7 +59,7 @@ public class UserController {
         return ResponseEntity.ok(responseMapper.toRegisterSuccessResponse(registeredUser));
     }
 
-    @PostMapping(value = "/register_buyer", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/register-buyer", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<RegisterSuccessResponse> registerBuyerCompany(
             @RequestPart(name = "buyerData") @Valid RegisterBuyerCompanyRequest request,
             @RequestPart(name = "organisationLicences") List<MultipartFile> organisationLicences
@@ -71,16 +72,16 @@ public class UserController {
         return ResponseEntity.ok(responseMapper.toRegisterSuccessResponse(registeredUser));
     }
 
-    @PostMapping(value = "/register_representative")
+    @PostMapping(value = "/register-representative")
     @PreAuthorize("authentication.principal.isAccountLocked == false")
-    ResponseEntity<RegisterSuccessResponse> registerBuyerRepresentative(
+    ResponseEntity<UserResponse> registerBuyerRepresentative(
             @RequestBody @Valid RegisterRepresentativeRequest request
     ) {
         User registeredUser = userService.registerRepresentative(
                 requestMapper.toRepresentativeFromRegister(request)
         );
 
-        return ResponseEntity.ok(responseMapper.toRegisterSuccessResponse(registeredUser));
+        return ResponseEntity.ok(responseMapper.toUserResponse(registeredUser));
     }
 
     @PostMapping("/login")
@@ -99,7 +100,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/by_email/{email}")
+    @GetMapping("/by-email/{email}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     ResponseEntity<UserResponse> getUserByEmail(@PathVariable(name = "email") String email) {
         User user = userService.findUserByEmail(email);
@@ -177,7 +178,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/representatives/{id}/with_company")
+    @GetMapping("/representatives/{id}/with-company")
     @PreAuthorize("#id == authentication.principal.id or hasRole('ROLE_ADMIN')")
     ResponseEntity<RepresentativeWithCompanyResponse> getRepresentativeWithCompanyById(@PathVariable UUID id) {
         BuyerRepresentativeUser representative = userService.getRepresentativeById(id);
@@ -201,7 +202,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/set_lock")
+    @PatchMapping("/{id}/set-lock")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     ResponseEntity<Void> setLockOnUserAccount(
             @PathVariable UUID id,

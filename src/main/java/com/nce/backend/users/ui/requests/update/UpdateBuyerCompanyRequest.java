@@ -28,10 +28,4 @@ public class UpdateBuyerCompanyRequest extends UpdateUserRequest{
     @NotBlank(message = "Organisation number cannot be blank")
     @NotNull(message = "Organisation number cannot be null")
     private String organisationNumber;
-
-    @NotNull(message = "Organisation licences cannot be blank")
-    private List<String> organisationLicenceURLs;
-
-    @NotNull(message = "Representatives cannot be blank")
-    private List<BuyerRepresentativeUser> representatives;
 }

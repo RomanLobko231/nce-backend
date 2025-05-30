@@ -78,7 +78,6 @@ public class UserRequestMapper {
                 .isAccountLocked(request.isAccountLocked())
                 .id(request.getId())
                 .name(request.getName())
-                .organisationLicenceURLs(request.getOrganisationLicenceURLs())
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .organisationName(request.getOrganisationName())
@@ -86,7 +85,6 @@ public class UserRequestMapper {
                 .organisationAddress(
                         toDomainBuyerCompanyAddress(request.getAddress())
                 )
-                .companyRepresentatives(request.getRepresentatives())
                 .build();
     }
 

@@ -1,6 +1,6 @@
 package com.nce.backend.users.domain.services;
 
-import com.nce.backend.common.events.UserDeletedEvent;
+import com.nce.backend.common.events.user.UserDeletedEvent;
 import com.nce.backend.users.domain.entities.*;
 import com.nce.backend.users.domain.repositories.UserRepository;
 import com.nce.backend.users.domain.valueObjects.Role;
@@ -31,7 +31,7 @@ public class UserDomainService {
     @Transactional
     public User registerBuyerCompany(BuyerCompanyUser userToSave) {
         userToSave.setRole(Role.BUYER_COMPANY);
-        userToSave.setAccountLocked(true);
+        userToSave.setAccountLock(true);
 
         return userRepository.save(userToSave);
     }
@@ -124,14 +124,21 @@ public class UserDomainService {
     @Transactional
     public User registerOneTimeSeller(OneTimeSellerUser userToSave) {
         userToSave.setRole(Role.ONE_TIME_SELLER);
-        userToSave.setAccountLocked(true);
+        userToSave.setAccountLock(true);
 
         return userRepository.save(userToSave);
     }
 
     @Transactional
     public void setIsAccountLocked(UUID id, boolean isAccountLocked) {
-        userRepository.setIsAccountLocked(id, isAccountLocked);
+        User user = userRepository
+                .findById(id)
+                .orElseThrow(
+                        () -> new UserDoesNotExistException("User with id '%s' does not exist".formatted(id))
+                );
+
+        user.setAccountLock(isAccountLocked);
+        userRepository.save(user);
     }
 
     @Transactional
@@ -147,5 +154,18 @@ public class UserDomainService {
 
     public List<String> findLicencesByBuyerId(UUID id) {
         return userRepository.findLicencesByBuyerId(id);
+    }
+
+    @Transactional
+    public void addCarIdToSaved(UUID userId, UUID carId) {
+        BuyerRepresentativeUser rep = userRepository
+                .findBuyerRepresentativeById(userId)
+                .orElseThrow(
+                        () -> new UserDoesNotExistException("Representative with id '%s' does not exist".formatted(userId))
+                );
+
+        rep.addNewSavedCar(carId);
+
+        userRepository.save(rep);
     }
 }

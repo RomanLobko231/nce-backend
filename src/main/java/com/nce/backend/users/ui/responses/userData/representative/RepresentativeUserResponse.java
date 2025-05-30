@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @SuperBuilder
@@ -13,7 +14,7 @@ import java.util.UUID;
 @Setter
 public class RepresentativeUserResponse extends UserResponse {
 
-    private List<UUID> savedCarIds;
+    private Set<UUID> savedCarIds;
 
     private UUID buyerCompanyId;
 }

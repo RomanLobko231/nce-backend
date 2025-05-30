@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity(name = "buyer_representative")
 @SuperBuilder
@@ -25,7 +23,7 @@ public class BuyerRepresentativeJpaEntity extends UserJpaEntity {
     )
     @Column(name = "car_id")
     @Builder.Default
-    private List<UUID> savedCarIds = new ArrayList<>();
+    private Set<UUID> savedCarIds = new HashSet<>();
 
     @Column(nullable = false, name = "buyer_company_id")
     private UUID buyerCompanyId;

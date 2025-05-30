@@ -1,4 +1,4 @@
-package com.nce.backend.common.events;
+package com.nce.backend.common.events.car;
 
 import org.jmolecules.event.annotation.DomainEvent;
 
