@@ -1,10 +1,14 @@
 package com.nce.backend.auction.infrastructure.redis;
 
 import com.nce.backend.auction.domain.repository.AuctionRepository;
+import com.nce.backend.auction.domain.service.AuctionTaskScheduler;
 import com.nce.backend.auction.domain.valueObjects.AuctionStatus;
-import com.nce.backend.common.events.NewAuctionStarted;
+import com.nce.backend.common.events.auction.AuctionEndedEvent;
+import com.nce.backend.common.events.auction.AuctionRestartedEvent;
+import com.nce.backend.common.events.auction.NewAuctionStartedEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -18,47 +22,76 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class RedisTaskScheduler {
+public class RedisTaskScheduler implements AuctionTaskScheduler {
 
     private final StringRedisTemplate redisTemplate;
     private final ThreadPoolTaskScheduler taskScheduler;
     private final AuctionRepository auctionRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     private static final String AUCTION_JOB_KEY = "auction_job_";
 
     @Async(("eventTaskExecutor"))
     @TransactionalEventListener
-    public void onAuctionCreated(NewAuctionStarted event) {
-        if (isPastDeadline(event.endDateTime())) {
+    public void onAuctionCreated(NewAuctionStartedEvent event) {
+        this.scheduleAuctionFinish(event.auctionId(), event.endDateTime());
+    }
+
+    @Async(("eventTaskExecutor"))
+    @TransactionalEventListener
+    public void onAuctionRestarted(AuctionRestartedEvent event) {
+        String jobKey = AUCTION_JOB_KEY + event.auctionId();
+
+        String endDateTimeStr = redisTemplate.opsForValue().get(jobKey);
+
+        if (endDateTimeStr != null && !endDateTimeStr.isEmpty()) {
+            Instant existingDeadline = Instant.parse(endDateTimeStr);
+
+            if(isDeadlineInFuture(existingDeadline) && existingDeadline.isBefore(event.newEndDateTime())){
+                return;
+            }
+        }
+
+        this.scheduleAuctionFinish(event.auctionId(), event.newEndDateTime());
+    }
+
+
+    @Override
+    public void scheduleAuctionFinish(UUID auctionId, Instant finishTime) {
+        if (isDeadlinePassed(finishTime)) {
             return;
         }
 
-        String jobKey = AUCTION_JOB_KEY + event.auctionId();
+        String jobKey = AUCTION_JOB_KEY + auctionId;
 
         redisTemplate
                 .opsForValue()
-                .set(jobKey, event.endDateTime().toString());
+                .set(jobKey, finishTime.toString());
 
         taskScheduler.schedule(() -> auctionRepository
-                .findById(event.auctionId())
+                .findById(auctionId)
                 .ifPresent(auction -> {
-                    if (auction.getStatus().equals(AuctionStatus.ACTIVE) &&
-                            !isPastDeadline(auction.getEndDateTime())){
-                        this.scheduleStatusChange(event.auctionId(), auction.getEndDateTime());
+                    if (auction.getStatus() == AuctionStatus.ACTIVE &&
+                            !isDeadlinePassed(auction.getEndDateTime())) {
+                        this.scheduleAuctionFinish(auctionId, auction.getEndDateTime());
                         return;
                     }
-
-                    if (auction.getStatus().equals(AuctionStatus.ACTIVE) &&
-                            isPastDeadline(event.endDateTime())) {
+                    if (auction.getStatus() == AuctionStatus.ACTIVE &&
+                            isDeadlinePassed(auction.getEndDateTime())) {
                         auctionRepository.updateAuctionStatusById(AuctionStatus.FINISHED, auction.getId());
+                        redisTemplate.delete(jobKey);
+
+                        eventPublisher.publishEvent(
+                                new AuctionEndedEvent(auction.getId(), auction.getCarDetails().getCarId())
+                        );
                     }
 
-                    redisTemplate.delete(jobKey);
-                }), event.endDateTime().atZone(ZoneId.systemDefault()).toInstant());
+                }), finishTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
+    @Override
     @PostConstruct
-    public void restoreScheduledAuctions() {
+    public void restoreScheduledFinishes() {
         Set<String> jobKeys = redisTemplate.keys(AUCTION_JOB_KEY + "*");
 
         if (jobKeys == null || jobKeys.isEmpty()) return;
@@ -71,46 +104,22 @@ public class RedisTaskScheduler {
 
             Instant endDateTime = Instant.parse(endDateTimeStr);
 
-            if (isPastDeadline(endDateTime)) {
+            if (isDeadlinePassed(endDateTime)) {
                 redisTemplate.delete(jobKey);
                 continue;
             }
 
             UUID auctionId = UUID.fromString(auctionIdStr);
 
-            taskScheduler.schedule(() -> auctionRepository
-                    .findById(auctionId)
-                    .ifPresent(auction -> {
-                        if (auction.getStatus().equals(AuctionStatus.ACTIVE) &&
-                                isPastDeadline(auction.getEndDateTime())) {
-                            auctionRepository.updateAuctionStatusById(AuctionStatus.FINISHED, auction.getId());
-                        }
-
-                        redisTemplate.delete(jobKey);
-                    }), endDateTime.atZone(ZoneId.systemDefault()).toInstant());
+            this.scheduleAuctionFinish(auctionId, endDateTime);
         }
     }
 
-    private void scheduleStatusChange(UUID auctionId, Instant endDateTime) {
-        String jobKey = AUCTION_JOB_KEY + auctionId;
-
-        redisTemplate
-                .opsForValue()
-                .set(jobKey, endDateTime.toString());
-
-        taskScheduler.schedule(() -> auctionRepository
-                .findById(auctionId)
-                .ifPresent(auction -> {
-                    if (auction.getStatus().equals(AuctionStatus.ACTIVE) &&
-                            isPastDeadline(auction.getEndDateTime())) {
-                        auctionRepository.updateAuctionStatusById(AuctionStatus.FINISHED, auction.getId());
-                    }
-
-                    redisTemplate.delete(jobKey);
-                }), endDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    private boolean isDeadlinePassed(Instant deadline) {
+        return Instant.now().isAfter(deadline);
     }
 
-    private boolean isPastDeadline(Instant deadline) {
-        return Instant.now().isAfter(deadline);
+    private boolean isDeadlineInFuture(Instant deadline) {
+        return Instant.now().isBefore(deadline);
     }
 }
