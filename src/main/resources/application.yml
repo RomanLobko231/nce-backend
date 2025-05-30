@@ -41,6 +41,7 @@ security:
 
 aws:
   s3:
-    bucket-name: ${S3_BUCKET_NAME}
+    private-bucket-name: ${S3_PRIVATE_BUCKET_NAME}
+    public-bucket-name: ${S3_PUBLIC_BUCKET_NAME}
     secret-access-key: ${AWS_SECRET_ACCESS_KEY}
     access-key-id: ${AWS_ACCESS_KEY_ID}

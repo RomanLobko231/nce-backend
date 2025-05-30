@@ -1,14 +1,10 @@
-package com.nce.backend.file_storage;
+package com.nce.backend.filestorage;
 
-import com.nce.backend.file_storage.domain.FileStorageService;
+import com.nce.backend.filestorage.domain.FileStorageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,8 +39,8 @@ public class FileStorageFacade {
         fileStorageService.deleteFiles(fileUrls);
     }
 
-    public String generatePresignedUrl(String key) {
-        return fileStorageService.generatePresignedUrl(key);
+    public String generatePresignedUrl(String fileUrl) {
+        return fileStorageService.generatePresignedUrl(fileUrl);
     }
 
 }

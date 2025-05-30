@@ -1,4 +1,4 @@
-package com.nce.backend.file_storage.domain;
+package com.nce.backend.filestorage.domain;
 
 import java.util.List;
 

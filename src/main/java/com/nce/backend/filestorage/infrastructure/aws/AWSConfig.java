@@ -1,4 +1,4 @@
-package com.nce.backend.file_storage.infrastructure.aws;
+package com.nce.backend.filestorage.infrastructure.aws;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

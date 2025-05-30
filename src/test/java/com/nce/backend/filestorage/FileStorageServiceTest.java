@@ -1,6 +1,6 @@
-package com.nce.backend.file_storage;
+package com.nce.backend.filestorage;
 
-import com.nce.backend.file_storage.infrastructure.aws.S3FIleStorageService;
+import com.nce.backend.filestorage.infrastructure.aws.S3FIleStorageService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
