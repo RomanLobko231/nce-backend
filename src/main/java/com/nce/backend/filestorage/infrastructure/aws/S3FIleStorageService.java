@@ -1,9 +1,8 @@
-package com.nce.backend.file_storage.infrastructure.aws;
+package com.nce.backend.filestorage.infrastructure.aws;
 
-import com.nce.backend.file_storage.domain.FileStorageService;
+import com.nce.backend.filestorage.domain.FileStorageService;
 import com.nce.backend.common.exception.FileProcessingException;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -16,11 +15,14 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -29,15 +31,30 @@ public class S3FIleStorageService implements FileStorageService<MultipartFile> {
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
 
-    @Value("${aws.s3.bucket-name}")
-    private String BUCKET_NAME;
+    @Value("${aws.s3.private-bucket-name}")
+    private String PRIVATE_BUCKET_NAME;
+
+    @Value("${aws.s3.public-bucket-name}")
+    private String PUBLIC_BUCKET_NAME;
+
+    private static final Set<String> PUBLIC_IMAGE_TYPES = Set.of(
+            "image/png",
+            "image/jpeg"
+    );
+
+    private static final Set<String> PRIVATE_DOC_TYPES = Set.of(
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/pdf"
+    );
 
     @Override
     public String uploadFile(MultipartFile file) {
         String uniqueFileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        String bucket = this.getBucketByFileType(file);
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(BUCKET_NAME)
+                .bucket(bucket)
                 .key(uniqueFileName)
                 .contentType(file.getContentType())
                 .build();
@@ -52,7 +69,7 @@ public class S3FIleStorageService implements FileStorageService<MultipartFile> {
             );
         }
 
-        return uniqueFileName;
+        return s3Client.utilities().getUrl(builder -> builder.bucket(bucket).key(uniqueFileName)).toExternalForm();
     }
 
     @Override
@@ -65,11 +82,13 @@ public class S3FIleStorageService implements FileStorageService<MultipartFile> {
 
     @Override
     public void deleteFile(String fileUrl) {
-        String fileToDelete = extractFileNameFromUrl(fileUrl);
+        String fileToDelete = this.extractFileNameFromUrl(fileUrl);
+        String bucket = this.extractBucketNameFromUrl(fileUrl);
+
         s3Client.deleteObject(
                 DeleteObjectRequest
                         .builder()
-                        .bucket(BUCKET_NAME)
+                        .bucket(bucket)
                         .key(fileToDelete)
                         .build()
         );
@@ -82,9 +101,11 @@ public class S3FIleStorageService implements FileStorageService<MultipartFile> {
     }
 
     @Override
-    public String generatePresignedUrl(String key) {
+    public String generatePresignedUrl(String fileUrl) {
+        String key = this.extractFileNameFromUrl(fileUrl);
+
         GetObjectRequest objectRequest = GetObjectRequest.builder()
-                .bucket(BUCKET_NAME)
+                .bucket(PRIVATE_BUCKET_NAME)
                 .key(key)
                 .build();
 
@@ -99,6 +120,34 @@ public class S3FIleStorageService implements FileStorageService<MultipartFile> {
     }
 
     private String extractFileNameFromUrl(String url) {
-        return url.substring(url.lastIndexOf("/") + 1);
+        String key = url.substring(url.lastIndexOf("/") + 1);
+
+        return URLDecoder.decode(key, StandardCharsets.UTF_8);
+    }
+
+    private String extractBucketNameFromUrl(String url) {
+        URI uri = URI.create(url);
+
+        return uri
+                .getHost()
+                .split("\\.")[0];
+    }
+
+    private String getBucketByFileType(MultipartFile file) {
+        String fileType = file.getContentType();
+
+        if (fileType == null || fileType.isBlank()) {
+            throw new FileProcessingException("File content type is null or empty");
+        }
+
+        if (PUBLIC_IMAGE_TYPES.contains(fileType)) {
+            return PUBLIC_BUCKET_NAME;
+        }
+
+        if (PRIVATE_DOC_TYPES.contains(fileType)) {
+            return PRIVATE_BUCKET_NAME;
+        }
+
+        throw new FileProcessingException("Unsupported file type: " + fileType);
     }
 }
