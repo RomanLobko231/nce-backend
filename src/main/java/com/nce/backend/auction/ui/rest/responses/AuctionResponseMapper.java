@@ -3,6 +3,8 @@ package com.nce.backend.auction.ui.rest.responses;
 import com.nce.backend.auction.domain.entities.Auction;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AuctionResponseMapper {
 
@@ -18,5 +20,12 @@ public class AuctionResponseMapper {
                 .carDetails(auction.getCarDetails())
                 .status(auction.getStatus().getValue())
                 .build();
+    }
+
+    public List<AuctionResponse> toAuctionResponses(List<Auction> auctions) {
+        return auctions
+                .stream()
+                .map(this::toAuctionResponse)
+                .toList();
     }
 }

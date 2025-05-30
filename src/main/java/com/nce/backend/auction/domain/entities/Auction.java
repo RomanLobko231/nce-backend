@@ -1,6 +1,7 @@
 package com.nce.backend.auction.domain.entities;
 
 import com.nce.backend.auction.domain.valueObjects.AuctionStatus;
+import com.nce.backend.auction.domain.valueObjects.AutoBid;
 import com.nce.backend.auction.domain.valueObjects.Bid;
 import com.nce.backend.auction.domain.valueObjects.CarDetails;
 import com.nce.backend.auction.exceptions.AuctionClosedException;
@@ -10,12 +11,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Builder
 @Getter
@@ -38,27 +39,79 @@ public class Auction {
     @Builder.Default
     private List<Bid> bids = new ArrayList<>();
 
+    @Builder.Default
+    private List<AutoBid> autoBids = new ArrayList<>();
+
     private AuctionStatus status;
 
     public void placeNewBid(Bid bid) {
+        this.checkAuctionAvailability();
+        this.validateBid(bid);
+
+        // Extend auction time by 2 minutes due to last-minute bids
+        if (Duration.between(Instant.now(), endDateTime).toMinutes() < 10) {
+            endDateTime = endDateTime.plus(2, ChronoUnit.MINUTES);
+        }
+
+        bid.setPlacedAt(Instant.now());
+        bids.add(bid);
+        highestBid = bid;
+    }
+
+    public void placeNewAutoBid(AutoBid autoBid) {
+        this.validateAutoBid(autoBid);
+
+        Bid bid = Bid
+                .builder()
+                .bidderId(autoBid.getBidderId())
+                .auctionId(this.getId())
+                .amount(highestBid.getAmount().add(minimalStep))
+                .build();
+
+        this.placeNewBid(bid);
+
+        autoBid.setPlacedAt(Instant.now());
+        autoBids.add(autoBid);
+    }
+
+    private void validateBid(Bid bid) {
         if (bid == null) {
             throw new InvalidBidException("Bid cannot be null");
         }
 
-        this.checkAuctionAvailability();
-
         BigDecimal minAcceptableAmount = bids.isEmpty()
-                ? this.startingPrice
-                : this.highestBid.getAmount().add(minimalStep);
+                ? startingPrice
+                : highestBid.getAmount().add(minimalStep);
 
         if (bid.getAmount().compareTo(minAcceptableAmount) < 0) {
             throw new InvalidBidException("Bid is too low. Must be at least %.2f".formatted(minAcceptableAmount));
         }
+    }
 
-        bid.setPlacedAt(Instant.now());
-        this.endDateTime = endDateTime.plus(5, ChronoUnit.MINUTES);
-        this.bids.add(bid);
-        this.highestBid = bid;
+    private void validateAutoBid(AutoBid autoBid) {
+        if (autoBid == null) {
+            throw new InvalidBidException("Auto Bid cannot be null");
+        }
+
+        BigDecimal minAcceptableAmount = bids.isEmpty()
+                ? startingPrice
+                : highestBid.getAmount().add(minimalStep);
+
+        if (autoBid.getLimitAmount().compareTo(minAcceptableAmount) < 0) {
+            throw new InvalidBidException(
+                    "Auto Bid is too low. Must be at least %.2f".formatted(minAcceptableAmount)
+            );
+        }
+    }
+
+    public void checkAuctionAvailability() {
+        if (Instant.now().isAfter(endDateTime) ||
+                this.status == AuctionStatus.FINISHED) {
+            throw new AuctionClosedException("Auction is already closed. Cannot place new bid.");
+        }
+        if (this.status == AuctionStatus.DISABLED) {
+            throw new AuctionClosedException("Auction is currently paused.");
+        }
     }
 
     public void applyChangesFrom(Auction auction) {
@@ -73,13 +126,49 @@ public class Auction {
         if (auction.getStartingPrice() != null) this.startingPrice = auction.getStartingPrice();
     }
 
-    public void checkAuctionAvailability(){
-        if(Instant.now().isAfter(endDateTime) ||
-                status == AuctionStatus.FINISHED ) {
-            throw new AuctionClosedException("Auction is already closed. Cannot place new bid.");
-        }
-        if (status == AuctionStatus.DISABLED) {
-            throw new AuctionClosedException("Auction is currently paused.");
-        }
+
+    public void triggerAutoBids() {
+        boolean placed;
+        do {
+            placed = false;
+
+            Optional<AutoBid> nextAutoBid = autoBids
+                    .stream()
+                    .filter(autoBid -> autoBid
+                            .getLimitAmount()
+                            .compareTo(highestBid.getAmount().add(minimalStep)) >= 0)
+                    .filter(autoBid -> !autoBid
+                            .getBidderId()
+                            .equals(highestBid.getBidderId()))
+                    .min(Comparator
+                            .comparing(AutoBid::getLimitAmount)
+                            .thenComparing(AutoBid::getPlacedAt));
+
+            if (nextAutoBid.isPresent()) {
+                placeNewBid(Bid
+                                .builder()
+                                .amount(highestBid.getAmount().add(minimalStep))
+                                .auctionId(id)
+                                .bidderId(nextAutoBid.get().getBidderId())
+                                .build());
+                placed = true;
+            }
+
+        } while (placed);
     }
+
+    public void restartWithNewData(Auction newAuctionData) {
+        if (newAuctionData.getEndDateTime().isBefore(Instant.now())) {
+            throw new IllegalStateException(
+                    "New end date should be in future. Your is '%s'".formatted(newAuctionData.getEndDateTime().toString())
+            );
+        }
+        if (this.status == AuctionStatus.ACTIVE) {
+            throw new IllegalStateException("Cannot restart. Auction has already been started");
+        }
+
+        applyChangesFrom(newAuctionData);
+        this.status = AuctionStatus.ACTIVE;
+    }
+
 }

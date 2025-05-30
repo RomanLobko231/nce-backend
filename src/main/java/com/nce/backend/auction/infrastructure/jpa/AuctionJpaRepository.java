@@ -1,7 +1,5 @@
 package com.nce.backend.auction.infrastructure.jpa;
 
-import com.nce.backend.auction.domain.entities.Auction;
-import com.nce.backend.auction.domain.valueObjects.AuctionStatus;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -32,18 +30,6 @@ public interface AuctionJpaRepository extends JpaRepository<AuctionJpaEntity, UU
     @Query(value = "UPDATE auction SET status = :status WHERE id = :auctionId", nativeQuery = true)
     void updateAuctionStatusById(@Param("status") String status, @Param("auctionId") UUID auctionId);
 
-    @Modifying
-    @Transactional
-    @Query(value = """
-            UPDATE auction
-            SET starting_price = :startingPrice, expected_price = :expectedPrice, minimal_step = :minimalStep, end_date_time = :endDateTime
-            WHERE id = :auctionId AND status != 'ACTIVE'
-            """, nativeQuery = true)
-    int updateAuctionSpecificFields(
-            @Param("startingPrice") BigDecimal startingPrice,
-            @Param("expectedPrice") BigDecimal expectedPrice,
-            @Param("minimalStep") BigDecimal minimalStep,
-            @Param("endDateTime") Instant endDateTime,
-            @Param("auctionId") UUID auctionId
-    );
+    @Query(value = "SELECT * FROM auction WHERE car_id IN (:ids) AND status = :status", nativeQuery = true)
+    List<AuctionJpaEntity> findAllByCarIdsAndStatus(@Param("ids") List<UUID> ids, @Param("status") String status);
 }

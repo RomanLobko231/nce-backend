@@ -1,9 +1,9 @@
-package com.nce.backend.common.events;
+package com.nce.backend.common.events.auction;
 
 import java.time.Instant;
 import java.util.UUID;
 
-public record NewAuctionStarted(
+public record NewAuctionStartedEvent(
         UUID auctionId,
         UUID carId,
         Instant endDateTime

@@ -5,6 +5,7 @@ import com.nce.backend.auction.domain.entities.Auction;
 import com.nce.backend.auction.domain.repository.AuctionRepository;
 import com.nce.backend.auction.domain.service.AuctionDomainService;
 import com.nce.backend.auction.domain.valueObjects.AuctionStatus;
+import com.nce.backend.auction.domain.valueObjects.Bid;
 import com.nce.backend.auction.domain.valueObjects.CarDetails;
 import com.nce.backend.auction.infrastructure.redis.RedisTaskScheduler;
 import jakarta.transaction.Transactional;
@@ -42,7 +43,13 @@ public class AuctionIntegrationTest {
 
         Auction auction = Auction
                 .builder()
-                .highestBid(BigDecimal.valueOf(1000))
+                .highestBid(Bid
+                        .builder()
+                        .amount(BigDecimal.valueOf(1000))
+                        .auctionId(UUID.randomUUID())
+                        .bidderId(UUID.randomUUID())
+                        .build()
+                )
                 .carDetails(
                         CarDetails
                                 .builder()
@@ -74,7 +81,12 @@ public class AuctionIntegrationTest {
     @Test
     void listenerShouldBeInvokedOnAuctionCreatedEvent() {
         Auction auction = Auction.builder()
-                .highestBid(BigDecimal.valueOf(1000))
+                .highestBid(Bid
+                        .builder()
+                        .amount(BigDecimal.valueOf(1000))
+                        .auctionId(UUID.randomUUID())
+                        .bidderId(UUID.randomUUID())
+                        .build())
                 .carDetails(
                         CarDetails
                                 .builder()

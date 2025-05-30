@@ -1,6 +1,7 @@
 package com.nce.backend.auction.infrastructure.jpa;
 
 import com.nce.backend.auction.domain.valueObjects.AuctionStatus;
+import com.nce.backend.auction.domain.valueObjects.AutoBid;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,7 +40,8 @@ public class AuctionJpaEntity {
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "highest_bid_amount")),
             @AttributeOverride(name = "bidderId", column = @Column(name = "highest_bid_bidder_id")),
-            @AttributeOverride(name = "placedAt", column = @Column(name = "highest_bid_placed_at"))
+            @AttributeOverride(name = "placedAt", column = @Column(name = "highest_bid_placed_at")),
+            @AttributeOverride(name = "bidDiscriminator", column = @Column(name = "highest_bid_bid_discriminator"))
     })
     private BidEmbeddable highestBid;
 
@@ -53,6 +55,14 @@ public class AuctionJpaEntity {
     )
     @Builder.Default
     private List<BidEmbeddable> bids = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "auction_auto_bids",
+            joinColumns = @JoinColumn(name = "auction_id")
+    )
+    @Builder.Default
+    private List<AutoBidEmbeddable> autoBids = new ArrayList<>();
 
     @Embedded
     private CarDetailsEmbeddable carDetails;

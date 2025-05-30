@@ -8,10 +8,15 @@ import com.nce.backend.auction.ui.rest.requests.NewAuctionRequest;
 import com.nce.backend.auction.ui.rest.requests.UpdateAuctionRequest;
 import com.nce.backend.auction.ui.rest.responses.AuctionResponse;
 import com.nce.backend.auction.ui.rest.responses.AuctionResponseMapper;
-import com.nce.backend.cars.domain.valueObjects.Status;
+import com.nce.backend.auction.ui.websocket.requests.AutoBidMessage;
+import com.nce.backend.auction.ui.websocket.requests.BidMessage;
+import com.nce.backend.auction.ui.websocket.responses.AuctionUpdatedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,17 +40,43 @@ public class AuctionController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/place-bid")
+    @PreAuthorize("authentication.principal.isAccountLocked == false")
+    public ResponseEntity<AuctionResponse> placeBid(@RequestBody @Valid BidMessage bid) {
+        Auction auction = applicationService.placeBid(
+                bid.toDomain()
+        );
+
+        return ResponseEntity.ok(responseMapper.toAuctionResponse(auction));
+    }
+
+    @PostMapping("/place-auto-bid")
+    @PreAuthorize("authentication.principal.isAccountLocked == false")
+    public ResponseEntity<AuctionResponse> placeAutoBid(@RequestBody @Valid AutoBidMessage bid) {
+        Auction auction = applicationService.placeAutoBid(
+                bid.toDomain()
+        );
+
+        return ResponseEntity.ok(responseMapper.toAuctionResponse(auction));
+    }
+
+
     @GetMapping()
     ResponseEntity<List<AuctionResponse>> getAllByStatus(
-            @RequestParam(value = "status", required = true) String status
+            @RequestParam(value = "status", required = true) String auctionStatus,
+            @RequestParam(value = "ids", required = false) List<UUID> carIds
     ) {
-        List<AuctionResponse> response = applicationService
-                .getAllAuctionsByStatus(AuctionStatus.fromString(status))
-                .stream()
-                .map(responseMapper::toAuctionResponse)
-                .toList();
 
-        return ResponseEntity.ok(response);
+        List<Auction> auctions;
+        AuctionStatus status = AuctionStatus.fromString(auctionStatus);
+
+        if(carIds != null && !carIds.isEmpty()) {
+            auctions = applicationService.getAllByCarIdsAndStatus(carIds, status);
+        } else {
+            auctions = applicationService.getAllByStatus(status);
+        }
+
+        return ResponseEntity.ok(responseMapper.toAuctionResponses(auctions));
     }
 
     @GetMapping("/{id}")
@@ -62,7 +93,7 @@ public class AuctionController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/by_car/{carId}")
+    @GetMapping("/by-car/{carId}")
     ResponseEntity<Auction> getAuctionByCarId(@PathVariable UUID carId) {
         Auction auction = applicationService.getAuctionByCarId(carId);
 
@@ -72,6 +103,17 @@ public class AuctionController {
     @PutMapping()
     ResponseEntity<Void> updateAuction(@Valid @RequestBody UpdateAuctionRequest request) {
         applicationService.updateAuction(
+                requestMapper.toDomainFromUpdate(request)
+        );
+
+        System.out.println(request.endDateTime().toString());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/update-restart")
+    ResponseEntity<Void> restartUpdateAuction(@Valid @RequestBody UpdateAuctionRequest request) {
+        applicationService.updateRestartAuction(
                 requestMapper.toDomainFromUpdate(request)
         );
 

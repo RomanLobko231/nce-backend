@@ -3,7 +3,6 @@ package com.nce.backend.auction.infrastructure.jpa;
 import com.nce.backend.auction.domain.entities.Auction;
 import com.nce.backend.auction.domain.repository.AuctionRepository;
 import com.nce.backend.auction.domain.valueObjects.AuctionStatus;
-import com.nce.backend.auction.exceptions.AuctionDoesNotExist;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +26,7 @@ public class AuctionRepositoryImpl implements AuctionRepository {
 
     @Override
     public List<Auction> findAll() {
+
         return auctionRepository
                 .findAll()
                 .stream()
@@ -76,5 +76,14 @@ public class AuctionRepositoryImpl implements AuctionRepository {
     @Override
     public void updateAuctionStatusById(AuctionStatus status, UUID auctionId) {
         auctionRepository.updateAuctionStatusById(status.name(), auctionId);
+    }
+
+    @Override
+    public List<Auction> findAllByCarIdsAndStatus(List<UUID> ids, AuctionStatus status) {
+        return auctionRepository
+                .findAllByCarIdsAndStatus(ids, status.name())
+                .stream()
+                .map(mapper::toDomainAuction)
+                .toList();
     }
 }

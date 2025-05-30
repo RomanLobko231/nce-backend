@@ -1,6 +1,7 @@
 package com.nce.backend.auction.infrastructure.jpa;
 
 import com.nce.backend.auction.domain.entities.Auction;
+import com.nce.backend.auction.domain.valueObjects.AutoBid;
 import com.nce.backend.auction.domain.valueObjects.Bid;
 import com.nce.backend.auction.domain.valueObjects.CarDetails;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,19 @@ public class AuctionJpaMapper {
                                         .amount(bidEmbeddable.getAmount())
                                         .placedAt(bidEmbeddable.getPlacedAt())
                                         .bidderId(bidEmbeddable.getBidderId())
+                                        .build())
+                                .collect(Collectors.toCollection(ArrayList::new))
+                )
+                .autoBids(
+                        jpaEntity
+                                .getAutoBids()
+                                .stream()
+                                .map(autoBidEmbeddable -> AutoBid
+                                        .builder()
+                                        .auctionId(jpaEntity.getId())
+                                        .limitAmount(autoBidEmbeddable.getLimitAmount())
+                                        .placedAt(autoBidEmbeddable.getPlacedAt())
+                                        .bidderId(autoBidEmbeddable.getBidderId())
                                         .build())
                                 .collect(Collectors.toCollection(ArrayList::new))
                 )
@@ -53,6 +67,13 @@ public class AuctionJpaMapper {
                                 .map(this::toJpaBid)
                                 .collect(Collectors.toCollection(ArrayList::new))
                 )
+                .autoBids(
+                        auction
+                                .getAutoBids()
+                                .stream()
+                                .map(this::toJpaAutoBid)
+                                .collect(Collectors.toCollection(ArrayList::new))
+                )
                 .expectedPrice(auction.getExpectedPrice())
                 .status(auction.getStatus())
                 .endDateTime(auction.getEndDateTime())
@@ -73,6 +94,15 @@ public class AuctionJpaMapper {
                 .amount(domainBid.getAmount())
                 .bidderId(domainBid.getBidderId())
                 .placedAt(domainBid.getPlacedAt())
+                .build();
+    }
+
+    private AutoBidEmbeddable toJpaAutoBid(AutoBid domainAutoBid) {
+        return AutoBidEmbeddable
+                .builder()
+                .limitAmount(domainAutoBid.getLimitAmount())
+                .bidderId(domainAutoBid.getBidderId())
+                .placedAt(domainAutoBid.getPlacedAt())
                 .build();
     }
 
