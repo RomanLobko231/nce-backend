@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -34,6 +35,17 @@ public class AuctionWebSocketExceptionHandler {
         log.error(e.getMessage(), e);
         return new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
+                e.getMessage()
+        );
+    }
+
+    @MessageExceptionHandler
+    @SendToUser("/queue/errors")
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+        log.error(e.getMessage(), e);
+        return new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
                 e.getMessage()
         );
     }
