@@ -26,7 +26,7 @@ public class CarController {
     private final CarResponseMapper carResponseMapper;
     private final CarRequestMapper carRequestMapper;
 
-    @PostMapping(value = "/add_simplified", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/add-simplified", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Void> addNewCarSimplified(
             @RequestPart(name = "carData") @Valid AddCarSimplifiedRequest request,
             @RequestPart(name = "images", required = false) List<MultipartFile> images
@@ -40,7 +40,7 @@ public class CarController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(value = "/add_complete", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/add-complete", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<CarResponse> addNewCarComplete(
             @RequestPart(name = "carData") @Valid AddCarAdminRequest carData,
             @RequestPart(name = "images", required = false) List<MultipartFile> images) {
@@ -53,7 +53,7 @@ public class CarController {
         return ResponseEntity.ok(carResponseMapper.toCarResponse(savedCar));
     }
 
-    @PostMapping(value = "/add_complete_user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/add-complete-user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<CarResponse> addNewCarCompleteAsUser(
             @RequestPart(name = "carData") @Valid AddCarCustomerRequest carData,
             @RequestPart(name = "images", required = false) List<MultipartFile> images) {
@@ -66,7 +66,7 @@ public class CarController {
         return ResponseEntity.ok(carResponseMapper.toCarResponse(savedCar));
     }
 
-    @PostMapping(value = "/add_images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/add-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Void> addImagesForCar(
             @RequestParam(name = "carId") UUID id,
             @RequestParam(name = "images") List<MultipartFile> images) {
@@ -88,7 +88,7 @@ public class CarController {
         return ResponseEntity.ok(fetchedCars);
     }
 
-    @GetMapping(value = "/by_owner/{ownerId}")
+    @GetMapping(value = "/by-owner/{ownerId}")
     @PreAuthorize("#ownerId == authentication.principal.id or hasRole('ROLE_ADMIN')")
     ResponseEntity<List<CarResponse>> getAllCarsByOwnerId(@PathVariable UUID ownerId) {
         List<CarResponse> fetchedCars = carService

@@ -2,12 +2,9 @@ package com.nce.backend.cars.domain.services;
 
 import com.nce.backend.cars.domain.entities.Car;
 import com.nce.backend.cars.domain.valueObjects.Status;
-import com.nce.backend.common.events.CarDeletedEvent;
-import com.nce.backend.common.events.NewCarSavedEvent;
 import com.nce.backend.cars.domain.repositories.CarRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

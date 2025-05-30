@@ -4,11 +4,15 @@ import com.nce.backend.cars.domain.entities.Car;
 import com.nce.backend.cars.domain.valueObjects.Status;
 import com.nce.backend.cars.exceptions.CarAlreadyExistsException;
 import com.nce.backend.cars.exceptions.OnAuctionUpdateNotAllowedException;
-import com.nce.backend.common.events.*;
 import com.nce.backend.cars.domain.services.CarDomainService;
 import com.nce.backend.cars.domain.services.ExternalApiService;
-import com.nce.backend.file_storage.FileStorageFacade;
-import com.nce.backend.cars.domain.valueObjects.ApiCarData;
+import com.nce.backend.common.events.auction.AuctionEndedEvent;
+import com.nce.backend.common.events.auction.AuctionRestartedEvent;
+import com.nce.backend.common.events.auction.NewAuctionStartedEvent;
+import com.nce.backend.common.events.car.CarDeletedEvent;
+import com.nce.backend.common.events.car.NewCarSavedEvent;
+import com.nce.backend.common.events.user.UserDeletedEvent;
+import com.nce.backend.filestorage.FileStorageFacade;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -75,7 +78,7 @@ public class CarApplicationService {
                         () -> new NoSuchElementException("Car with id %s was not found".formatted(carToUpdate.getId()))
                 );
 
-        if(existingCar.getStatus() == Status.ON_AUCTION){
+        if (existingCar.getStatus() == Status.ON_AUCTION) {
             throw new OnAuctionUpdateNotAllowedException("Car is already on the auction. Cannot update.");
         }
 
@@ -185,8 +188,21 @@ public class CarApplicationService {
 
     @Async("eventTaskExecutor")
     @TransactionalEventListener
-    public void updateCarOn(NewAuctionStarted event) {
+    public void setCarAuctionedOn(NewAuctionStartedEvent event) {
         carDomainService.updateCarStatus(Status.ON_AUCTION, event.carId());
+    }
+
+    @Async("eventTaskExecutor")
+    @TransactionalEventListener
+    public void setCarAuctionedOn(AuctionRestartedEvent event) {
+        carDomainService.updateCarStatus(Status.ON_AUCTION, event.carId());
+    }
+
+    @Async("eventTaskExecutor")
+    @TransactionalEventListener
+    public void setCarSoldOn(AuctionEndedEvent event) {
+        System.out.println("sold");
+        carDomainService.updateCarStatus(Status.SOLD, event.carId());
     }
 
 }
