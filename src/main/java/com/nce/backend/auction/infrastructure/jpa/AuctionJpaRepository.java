@@ -1,6 +1,8 @@
 package com.nce.backend.auction.infrastructure.jpa;
 
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,7 +22,7 @@ public interface AuctionJpaRepository extends JpaRepository<AuctionJpaEntity, UU
     boolean existsByCarId(@Param(value = "carId") UUID carId);
 
     @Query(value = "SELECT * FROM auction WHERE status = :status", nativeQuery = true)
-    List<AuctionJpaEntity> findAllByStatus(@Param(value = "status") String status);
+    Page<AuctionJpaEntity> findAllByStatus(@Param(value = "status") String status, Pageable pageable);
 
     @Query(value = "SELECT * FROM auction WHERE car_id = :carId", nativeQuery = true)
     Optional<AuctionJpaEntity> findByCarId(@Param(value = "carId") UUID carId);
@@ -31,5 +33,5 @@ public interface AuctionJpaRepository extends JpaRepository<AuctionJpaEntity, UU
     void updateAuctionStatusById(@Param("status") String status, @Param("auctionId") UUID auctionId);
 
     @Query(value = "SELECT * FROM auction WHERE car_id IN (:ids) AND status = :status", nativeQuery = true)
-    List<AuctionJpaEntity> findAllByCarIdsAndStatus(@Param("ids") List<UUID> ids, @Param("status") String status);
+    Page<AuctionJpaEntity> findAllByCarIdsAndStatus(@Param("ids") List<UUID> ids, @Param("status") String status, Pageable pageable);
 }

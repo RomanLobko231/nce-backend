@@ -1,9 +1,10 @@
 package com.nce.backend.cars.application;
 
 import com.nce.backend.cars.domain.entities.Car;
+import com.nce.backend.cars.domain.valueObjects.PaginatedResult;
 import com.nce.backend.cars.domain.valueObjects.Status;
 import com.nce.backend.cars.exceptions.CarAlreadyExistsException;
-import com.nce.backend.cars.exceptions.OnAuctionUpdateNotAllowedException;
+import com.nce.backend.cars.exceptions.UpdateNotAllowedException;
 import com.nce.backend.cars.domain.services.CarDomainService;
 import com.nce.backend.cars.domain.services.ExternalApiService;
 import com.nce.backend.common.events.auction.AuctionEndedEvent;
@@ -17,6 +18,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -79,7 +81,11 @@ public class CarApplicationService {
                 );
 
         if (existingCar.getStatus() == Status.ON_AUCTION) {
-            throw new OnAuctionUpdateNotAllowedException("Car is already on the auction. Cannot update.");
+            throw new UpdateNotAllowedException("Car is already on the auction. Cannot update.");
+        }
+
+        if (existingCar.getStatus() == Status.SOLD) {
+            throw new UpdateNotAllowedException("Car is already sold. Cannot update.");
         }
 
         this.compareAndDeleteImages(
@@ -107,12 +113,12 @@ public class CarApplicationService {
         return carDomainService.getAll();
     }
 
-    public List<Car> getAllCarsByStatus(Status status) {
-        return carDomainService.getAllCarsByStatus(status);
+    public PaginatedResult<Car> getAllCarsByStatus(Status status, int page, int size) {
+        return carDomainService.getAllCarsByStatus(status, page, size);
     }
 
-    public List<Car> getAllCarsByOwnerId(UUID ownerId) {
-        return carDomainService.getAllCarsByOwnerId(ownerId);
+    public PaginatedResult<Car> getAllCarsByOwnerId(UUID ownerId, int page, int size) {
+        return carDomainService.getAllCarsByOwnerId(ownerId, page, size);
     }
 
     @Transactional
@@ -199,9 +205,8 @@ public class CarApplicationService {
     }
 
     @Async("eventTaskExecutor")
-    @TransactionalEventListener
+    @EventListener
     public void setCarSoldOn(AuctionEndedEvent event) {
-        System.out.println("sold");
         carDomainService.updateCarStatus(Status.SOLD, event.carId());
     }
 

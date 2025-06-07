@@ -28,4 +28,5 @@ public interface UserRepository {
     void deleteCarIdFromSeller(UUID carId);
     List<BuyerCompanyUser> findAllBuyerCompanyUsersByLocked(boolean isLocked);
     List<String> findLicencesByBuyerId(UUID buyerId);
+    Optional<User> findByPhoneNumber(String number);
 }

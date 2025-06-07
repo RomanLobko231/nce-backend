@@ -2,9 +2,13 @@ package com.nce.backend.cars.infrastructure.jpa;
 
 import com.nce.backend.cars.domain.entities.Car;
 import com.nce.backend.cars.domain.repositories.CarRepository;
+import com.nce.backend.cars.domain.valueObjects.PaginatedResult;
 import com.nce.backend.cars.domain.valueObjects.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -36,12 +40,22 @@ public class CarRepositoryImpl implements CarRepository {
     }
 
     @Override
-    public List<Car> findAllByOwnerId(UUID ownerId) {
-        return carJpaRepository
-                .findAllByOwnerId(ownerId)
+    public PaginatedResult<Car> findAllByOwnerId(UUID ownerId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CarJpaEntity> result = carJpaRepository.findAllByOwnerId(ownerId, pageable);
+
+        List<Car> cars = result
+                .getContent()
                 .stream()
                 .map(mapper::toDomainEntity)
                 .toList();
+
+        return new PaginatedResult<>(
+                cars,
+                result.getTotalPages(),
+                result.getTotalElements(),
+                result.getNumber()
+        );
     }
 
     @Override
@@ -67,12 +81,22 @@ public class CarRepositoryImpl implements CarRepository {
     }
 
     @Override
-    public List<Car> findAllByStatus(Status status) {
-        return carJpaRepository
-                .findAllByStatus(status.name())
+    public PaginatedResult<Car> findAllByStatus(Status status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CarJpaEntity> result = carJpaRepository.findAllByStatus(status.name(), pageable);
+
+        List<Car> cars = result
+                .getContent()
                 .stream()
                 .map(mapper::toDomainEntity)
                 .toList();
+
+        return new PaginatedResult<>(
+                cars,
+                result.getTotalPages(),
+                result.getTotalElements(),
+                result.getNumber()
+        );
     }
 
     @Override

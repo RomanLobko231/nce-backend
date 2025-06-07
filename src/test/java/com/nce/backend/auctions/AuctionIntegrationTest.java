@@ -8,6 +8,7 @@ import com.nce.backend.auction.domain.valueObjects.AuctionStatus;
 import com.nce.backend.auction.domain.valueObjects.Bid;
 import com.nce.backend.auction.domain.valueObjects.CarDetails;
 import com.nce.backend.auction.infrastructure.redis.RedisTaskScheduler;
+import com.nce.backend.cars.application.CarApplicationService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class AuctionIntegrationTest {
     private RedisTaskScheduler redisTaskScheduler;
 
     @Test
-    void auction_isFinishedAfterEndTime() throws InterruptedException {
+    void auctionIsFinishedAfterEndTime() throws InterruptedException {
 
         Auction auction = Auction
                 .builder()

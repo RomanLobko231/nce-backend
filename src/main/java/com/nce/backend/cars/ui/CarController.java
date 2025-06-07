@@ -2,6 +2,7 @@ package com.nce.backend.cars.ui;
 
 import com.nce.backend.cars.application.CarApplicationService;
 import com.nce.backend.cars.domain.entities.Car;
+import com.nce.backend.cars.domain.valueObjects.PaginatedResult;
 import com.nce.backend.cars.domain.valueObjects.Status;
 import com.nce.backend.cars.ui.requests.*;
 import com.nce.backend.cars.ui.responses.CarResponse;
@@ -35,7 +36,6 @@ public class CarController {
                 carRequestMapper.toCarFromCustomerSimpleRequest(request),
                 images
         );
-        System.out.println("thread 1");
 
         return ResponseEntity.ok().build();
     }
@@ -76,28 +76,31 @@ public class CarController {
     }
 
     @GetMapping
-    ResponseEntity<List<CarResponse>> getAllCars(
-            @RequestParam(name = "status", required = false) String status
+    ResponseEntity<PaginatedResult<CarResponse>> getAllCars(
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "8") int size
     ) {
-        List<CarResponse> fetchedCars = carService
-                .getAllCarsByStatus(Status.fromString(status))
-                .stream()
-                .map(carResponseMapper::toCarResponse)
-                .toList();
+        PaginatedResult<Car> result = carService.getAllCarsByStatus(Status.fromString(status), page, size);
 
-        return ResponseEntity.ok(fetchedCars);
+        return ResponseEntity.ok(
+                carResponseMapper.toCarResponsePaginated(result)
+        );
     }
 
     @GetMapping(value = "/by-owner/{ownerId}")
     @PreAuthorize("#ownerId == authentication.principal.id or hasRole('ROLE_ADMIN')")
-    ResponseEntity<List<CarResponse>> getAllCarsByOwnerId(@PathVariable UUID ownerId) {
-        List<CarResponse> fetchedCars = carService
-                .getAllCarsByOwnerId(ownerId)
-                .stream()
-                .map(carResponseMapper::toCarResponse)
-                .toList();
+    ResponseEntity<PaginatedResult<CarResponse>> getAllCarsByOwnerId(
+            @PathVariable UUID ownerId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "8") int size
+    ) {
 
-        return ResponseEntity.ok(fetchedCars);
+        PaginatedResult<Car> result = carService.getAllCarsByOwnerId(ownerId, page, size);
+
+        return ResponseEntity.ok(
+                carResponseMapper.toCarResponsePaginated(result)
+        );
     }
 
     @GetMapping(value = "/{id}")

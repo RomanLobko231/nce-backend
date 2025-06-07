@@ -109,6 +109,15 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/by-number/{phoneNumber}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    ResponseEntity<UserResponse> getUserByPhoneNumber(@PathVariable(name = "phoneNumber") String number) {
+        User user = userService.findUserByPhoneNumber(number);
+        UserResponse response = responseMapper.toUserResponse(user);
+
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping()
     @PreAuthorize(
             "hasRole('ROLE_ADMIN') or " +
@@ -116,6 +125,17 @@ public class UserController {
                     "@userDomainService.companyHasRepresentativeById(authentication.principal.id, #request.id)")
     ResponseEntity<UserResponse> updateUser(@RequestBody @Valid UpdateUserRequest request) {
         User savedUser = userService.updateUser(
+                requestMapper.toDomainEntity(request)
+        );
+        UserResponse response = responseMapper.toUserResponse(savedUser);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/as-admin")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    ResponseEntity<UserResponse> updateUserAsAdmin(@RequestBody @Valid UpdateUserRequest request) {
+        User savedUser = userService.updateUserAsAdmin(
                 requestMapper.toDomainEntity(request)
         );
         UserResponse response = responseMapper.toUserResponse(savedUser);

@@ -101,6 +101,10 @@ public class UserDomainService {
         return userRepository.findByEmail(email);
     }
 
+    public Optional<User> findUserByNumber(String number) {
+        return userRepository.findByPhoneNumber(number);
+    }
+
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }

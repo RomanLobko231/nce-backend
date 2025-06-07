@@ -5,7 +5,9 @@ import com.nce.backend.auction.domain.valueObjects.AutoBid;
 import com.nce.backend.auction.domain.valueObjects.Bid;
 import com.nce.backend.auction.domain.repository.AuctionRepository;
 import com.nce.backend.auction.domain.valueObjects.AuctionStatus;
+import com.nce.backend.auction.domain.valueObjects.PaginatedResult;
 import com.nce.backend.auction.exceptions.AuctionDoesNotExist;
+import com.nce.backend.auction.exceptions.AuctionIllegalStateException;
 import com.nce.backend.common.events.auction.AuctionRestartedEvent;
 import com.nce.backend.common.events.auction.NewAuctionStartedEvent;
 import com.nce.backend.common.events.auction.NewBidPlacedEvent;
@@ -27,7 +29,7 @@ public class AuctionDomainService {
     @Transactional
     public void startAuction(Auction auction) {
         if (auctionRepository.existsByCarId(auction.getCarDetails().getCarId())) {
-            throw new IllegalStateException("Auction for car '%s' already exists".formatted(
+            throw new AuctionIllegalStateException("Auction for car '%s' already exists".formatted(
                     auction.getCarDetails().getCarId())
             );
         }
@@ -70,7 +72,6 @@ public class AuctionDomainService {
         auction.triggerAutoBids();
 
         if (isFirstTimeBid) {
-            System.out.println("event called");
             eventPublisher.publishEvent(
                     new NewBidPlacedEvent(bid.getBidderId(), auction.getCarDetails().getCarId())
             );
@@ -79,6 +80,7 @@ public class AuctionDomainService {
         return auctionRepository.save(auction);
     }
 
+    @Transactional
     public Auction placeAutoBidOnAuction(AutoBid autoBid) {
         Auction auction = auctionRepository
                 .findById(autoBid.getAuctionId())
@@ -86,8 +88,19 @@ public class AuctionDomainService {
                         () -> new AuctionDoesNotExist("Auction with id '%s' not found".formatted(autoBid.getAuctionId()))
                 );
 
+        final boolean isFirstTimeBid = auction
+                .getBids()
+                .stream()
+                .noneMatch(b -> b.getBidderId().equals(autoBid.getBidderId()));
+
         auction.placeNewAutoBid(autoBid);
         auction.triggerAutoBids();
+
+        if (isFirstTimeBid) {
+            eventPublisher.publishEvent(
+                    new NewBidPlacedEvent(autoBid.getBidderId(), auction.getCarDetails().getCarId())
+            );
+        }
 
         return auctionRepository.save(auction);
     }
@@ -125,12 +138,12 @@ public class AuctionDomainService {
         );
     }
 
-    public List<Auction> getAllByStatus(AuctionStatus status) {
-        return auctionRepository.findAllByStatus(status);
+    public PaginatedResult<Auction> getAllByStatus(AuctionStatus status, int page, int size) {
+        return auctionRepository.findAllByStatus(status, page, size);
     }
 
-    public List<Auction> getAllByCarIdsAndStatus(List<UUID> ids, AuctionStatus status) {
-        return auctionRepository.findAllByCarIdsAndStatus(ids, status);
+    public PaginatedResult<Auction> getAllByCarIdsAndStatus(List<UUID> ids, AuctionStatus status, int page, int size) {
+        return auctionRepository.findAllByCarIdsAndStatus(ids, status, page, size);
     }
 
     public Auction getAuctionById(UUID id) {
@@ -149,6 +162,7 @@ public class AuctionDomainService {
                 );
     }
 
+    @Transactional
     public void updateAuctionStatus(AuctionStatus status, UUID auctionId) {
         auctionRepository.updateAuctionStatusById(status, auctionId);
     }

@@ -5,7 +5,7 @@ import com.nce.backend.common.events.car.CarDeletedEvent;
 import com.nce.backend.common.events.car.CarSaveFailedRollbackUserEvent;
 import com.nce.backend.common.events.car.NewCarSavedEvent;
 import com.nce.backend.filestorage.FileStorageFacade;
-import com.nce.backend.security.SecurityFacade;
+import com.nce.backend.users.Authenticator;
 import com.nce.backend.users.domain.entities.*;
 import com.nce.backend.users.domain.services.UserDomainService;
 import com.nce.backend.users.domain.valueObjects.Role;
@@ -27,7 +27,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserApplicationService {
 
-    private final SecurityFacade securityFacade;
+    private final Authenticator authenticator;
     private final UserDomainService userDomainService;
     private final FileStorageFacade fileStorageFacade;
 
@@ -66,7 +66,7 @@ public class UserApplicationService {
 
     public User registerOneTimeSeller(OneTimeSellerUser oneTimeSeller) {
         String randomEmail = UUID.randomUUID().toString();
-        String randomPassword = securityFacade.generateHash(UUID.randomUUID().toString());
+        String randomPassword = authenticator.generateHash(UUID.randomUUID().toString());
 
         oneTimeSeller.setEmail(randomEmail);
         oneTimeSeller.setPassword(randomPassword);
@@ -81,11 +81,11 @@ public class UserApplicationService {
                         () -> new UserDoesNotExistException("User with email %s was not found".formatted(request.email()))
                 );
 
-        if (!securityFacade.matches(request.password(), user.getPassword())) {
+        if (!authenticator.matches(request.password(), user.getPassword())) {
             throw new BadCredentialsException("Invalid credentials. Please check email or password.");
         }
 
-        String token = securityFacade.generateToken(user.getEmail());
+        String token = authenticator.generateTokenFrom(user.getEmail());
 
         return AuthSuccessResponse
                 .builder()
@@ -107,6 +107,15 @@ public class UserApplicationService {
                 .findUserByEmail(email)
                 .orElseThrow(
                         () -> new UserDoesNotExistException("User with email %s was not found".formatted(email))
+                );
+    }
+
+
+    public User findUserByPhoneNumber(String number) {
+        return userDomainService
+                .findUserByNumber(number)
+                .orElseThrow(
+                        () -> new UserDoesNotExistException("User with number %s was not found".formatted(number))
                 );
     }
 
@@ -177,22 +186,27 @@ public class UserApplicationService {
                         () -> new UserDoesNotExistException("User with id %s was not found".formatted(userToUpdate.getId()))
                 );
 
-        //todo: make verify integrity polymorphic method
-//        userToUpdate.setPassword(user.getPassword());
-//        userToUpdate.setAccountLocked(user.isAccountLocked());
-//        if (user instanceof BuyerCompanyUser buyerCompanyUser) {
-//            ((BuyerCompanyUser) userToUpdate)
-//                    .setCompanyRepresentatives(buyerCompanyUser.getCompanyRepresentatives());
-//            ((BuyerCompanyUser) userToUpdate)
-//                    .setOrganisationLicenceURLs(buyerCompanyUser.getOrganisationLicenceURLs());
-//        }
         user.applyChangesFrom(userToUpdate);
 
         return userDomainService.updateUser(user);
     }
 
+
+    public User updateUserAsAdmin(User userToUpdate) {
+        User user = userDomainService
+                .findUserById(userToUpdate.getId())
+                .orElseThrow(
+                        () -> new UserDoesNotExistException("User with id %s was not found".formatted(userToUpdate.getId()))
+                );
+
+        user.applyChangesFrom(userToUpdate);
+        user.setEmail(userToUpdate.getEmail());
+
+        return userDomainService.updateUser(user);
+    }
+
     private void setEncodedPassword(User user) {
-        String encodedPassword = securityFacade.generateHash(user.getPassword());
+        String encodedPassword = authenticator.generateHash(user.getPassword());
         user.setPassword(encodedPassword);
     }
 
@@ -229,5 +243,4 @@ public class UserApplicationService {
     public void addSavedCarOn(NewBidPlacedEvent event) {
         userDomainService.addCarIdToSaved(event.bidderId(), event.carId());
     }
-
 }

@@ -39,6 +39,13 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByPhoneNumber(String number) {
+        return userJpaRepository
+                .findByPhoneNumber(number)
+                .map(entityMapper::toUserDomainEntity);
+    }
+
+    @Override
     public List<SellerUser> findAllSellerUsers() {
         return userJpaRepository
                 .findAllSellerUsers()
@@ -69,6 +76,7 @@ public class UserRepositoryImpl implements UserRepository {
     public List<String> findLicencesByBuyerId(UUID buyerId) {
         return userJpaRepository.findLicencesByBuyerId(buyerId);
     }
+
 
     @Override
     public Optional<BuyerCompanyUser> findBuyerCompanyUserById(UUID id) {

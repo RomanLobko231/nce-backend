@@ -1,9 +1,14 @@
 package com.nce.backend.auction.infrastructure.jpa;
 
+import ch.qos.logback.core.read.ListAppender;
 import com.nce.backend.auction.domain.entities.Auction;
 import com.nce.backend.auction.domain.repository.AuctionRepository;
 import com.nce.backend.auction.domain.valueObjects.AuctionStatus;
+import com.nce.backend.auction.domain.valueObjects.PaginatedResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,13 +30,22 @@ public class AuctionRepositoryImpl implements AuctionRepository {
     }
 
     @Override
-    public List<Auction> findAll() {
+    public PaginatedResult<Auction> findAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<AuctionJpaEntity> result = auctionRepository.findAll(pageable);
 
-        return auctionRepository
-                .findAll()
+        List<Auction> auctions = result
+                .getContent()
                 .stream()
                 .map(mapper::toDomainAuction)
                 .toList();
+
+        return new PaginatedResult<>(
+                auctions,
+                result.getTotalPages(),
+                result.getTotalElements(),
+                result.getNumber()
+        );
     }
 
     @Override
@@ -58,12 +72,22 @@ public class AuctionRepositoryImpl implements AuctionRepository {
     }
 
     @Override
-    public List<Auction> findAllByStatus(AuctionStatus status) {
-        return auctionRepository
-                .findAllByStatus(status.name())
+    public PaginatedResult<Auction> findAllByStatus(AuctionStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<AuctionJpaEntity> result = auctionRepository.findAllByStatus(status.name(), pageable);
+
+        List<Auction> auctions = result
+                .getContent()
                 .stream()
                 .map(mapper::toDomainAuction)
                 .toList();
+
+        return new PaginatedResult<>(
+                auctions,
+                result.getTotalPages(),
+                result.getTotalElements(),
+                result.getNumber()
+        );
     }
 
     @Override
@@ -79,11 +103,22 @@ public class AuctionRepositoryImpl implements AuctionRepository {
     }
 
     @Override
-    public List<Auction> findAllByCarIdsAndStatus(List<UUID> ids, AuctionStatus status) {
-        return auctionRepository
-                .findAllByCarIdsAndStatus(ids, status.name())
+    public PaginatedResult<Auction> findAllByCarIdsAndStatus(List<UUID> ids, AuctionStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<AuctionJpaEntity> result = auctionRepository.findAllByCarIdsAndStatus(ids, status.name(), pageable);
+
+        List<Auction> auctions = result
+                .getContent()
                 .stream()
                 .map(mapper::toDomainAuction)
                 .toList();
+
+        return new PaginatedResult<>(
+                auctions,
+                result.getTotalPages(),
+                result.getTotalElements(),
+                result.getNumber()
+        );
+
     }
 }

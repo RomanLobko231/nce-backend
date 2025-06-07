@@ -1,15 +1,14 @@
 package com.nce.backend.auction.application;
 
+import com.nce.backend.auction.AuctionSecurityService;
 import com.nce.backend.auction.domain.entities.Auction;
 import com.nce.backend.auction.domain.service.AuctionDomainService;
 import com.nce.backend.auction.domain.valueObjects.AuctionStatus;
 import com.nce.backend.auction.domain.valueObjects.AutoBid;
 import com.nce.backend.auction.domain.valueObjects.Bid;
-import com.nce.backend.security.SecurityFacade;
+import com.nce.backend.auction.domain.valueObjects.PaginatedResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public class AuctionApplicationService {
 
     private final AuctionDomainService auctionDomainService;
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final SecurityFacade securityFacade;
+    private final AuctionSecurityService auctionSecurityService;
 
     public void startAuction(Auction auction) {
         auctionDomainService.startAuction(auction);
@@ -31,12 +30,12 @@ public class AuctionApplicationService {
         auctionDomainService.updateRestartAuction(newAuction);
     }
 
-    public List<Auction> getAllByStatus(AuctionStatus status) {
-        return auctionDomainService.getAllByStatus(status);
+    public PaginatedResult<Auction> getAllByStatus(AuctionStatus status, int page, int size) {
+        return auctionDomainService.getAllByStatus(status, page, size);
     }
 
-    public List<Auction> getAllByCarIdsAndStatus(List<UUID> ids, AuctionStatus status) {
-        return auctionDomainService.getAllByCarIdsAndStatus(ids, status);
+    public PaginatedResult<Auction> getAllByCarIdsAndStatus(List<UUID> ids, AuctionStatus status, int page, int size) {
+        return auctionDomainService.getAllByCarIdsAndStatus(ids, status, page, size);
     }
 
     public Auction getAuctionById(UUID id) {
@@ -48,7 +47,7 @@ public class AuctionApplicationService {
     }
 
     public Auction placeBid(Bid bid) {
-        UUID bidderId = securityFacade.getCurrentUserId();
+        UUID bidderId = auctionSecurityService.getCurrentUserId();
         bid.setBidderId(bidderId);
 
         Auction updatedAuction = auctionDomainService.placeBidOnAuction(bid);
@@ -58,7 +57,7 @@ public class AuctionApplicationService {
     }
 
     public Auction placeAutoBid(AutoBid autoBid) {
-        UUID bidderId = securityFacade.getCurrentUserId();
+        UUID bidderId = auctionSecurityService.getCurrentUserId();
         autoBid.setBidderId(bidderId);
 
         Auction updatedAuction = auctionDomainService.placeAutoBidOnAuction(autoBid);

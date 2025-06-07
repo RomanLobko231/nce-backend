@@ -20,6 +20,8 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UUID> {
 
     Optional<UserJpaEntity> findByEmail(String email);
 
+    Optional<UserJpaEntity> findByPhoneNumber(String phoneNumber);
+
     boolean existsByEmail(String email);
 
     @Query(value = """

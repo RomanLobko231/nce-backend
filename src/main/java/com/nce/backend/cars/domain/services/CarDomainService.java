@@ -1,6 +1,7 @@
 package com.nce.backend.cars.domain.services;
 
 import com.nce.backend.cars.domain.entities.Car;
+import com.nce.backend.cars.domain.valueObjects.PaginatedResult;
 import com.nce.backend.cars.domain.valueObjects.Status;
 import com.nce.backend.cars.domain.repositories.CarRepository;
 import jakarta.transaction.Transactional;
@@ -48,12 +49,12 @@ public class CarDomainService {
         return carRepository.existsByRegNumber(regNumber);
     }
 
-    public List<Car> getAllCarsByOwnerId(UUID ownerId) {
-        return carRepository.findAllByOwnerId(ownerId);
+    public PaginatedResult<Car> getAllCarsByOwnerId(UUID ownerId, int page, int size) {
+        return carRepository.findAllByOwnerId(ownerId, page, size);
     }
 
-    public List<Car> getAllCarsByStatus(Status status) {
-        return carRepository.findAllByStatus(status);
+    public PaginatedResult<Car> getAllCarsByStatus(Status status,  int page, int size) {
+        return carRepository.findAllByStatus(status, page, size);
     }
 
     @Transactional

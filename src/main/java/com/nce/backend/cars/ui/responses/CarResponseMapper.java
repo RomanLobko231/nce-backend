@@ -1,7 +1,11 @@
 package com.nce.backend.cars.ui.responses;
 
 import com.nce.backend.cars.domain.entities.Car;
+import com.nce.backend.cars.domain.valueObjects.PaginatedResult;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CarResponseMapper {
@@ -30,5 +34,21 @@ public class CarResponseMapper {
                 .expectedPrice(car.getExpectedPrice())
                 .imagePaths(car.getImagePaths())
                 .build();
+    }
+
+    public PaginatedResult<CarResponse> toCarResponsePaginated(PaginatedResult<Car> result) {
+        List<CarResponse> response = result
+                .getItems()
+                .stream()
+                .map(this::toCarResponse)
+                .toList();
+
+        return new PaginatedResult<>(
+                response,
+                result.getTotalPages(),
+                result.getTotalElements(),
+                result.getCurrentPage()
+        );
+
     }
 }

@@ -3,6 +3,7 @@ package com.nce.backend.auction.ui.rest;
 import com.nce.backend.auction.application.AuctionApplicationService;
 import com.nce.backend.auction.domain.entities.Auction;
 import com.nce.backend.auction.domain.valueObjects.AuctionStatus;
+import com.nce.backend.auction.domain.valueObjects.PaginatedResult;
 import com.nce.backend.auction.ui.rest.requests.AuctionRequestMapper;
 import com.nce.backend.auction.ui.rest.requests.NewAuctionRequest;
 import com.nce.backend.auction.ui.rest.requests.UpdateAuctionRequest;
@@ -19,8 +20,10 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -62,21 +65,35 @@ public class AuctionController {
 
 
     @GetMapping()
-    ResponseEntity<List<AuctionResponse>> getAllByStatus(
-            @RequestParam(value = "status", required = true) String auctionStatus,
-            @RequestParam(value = "ids", required = false) List<UUID> carIds
+    ResponseEntity<PaginatedResult<AuctionResponse>> getAllByStatus(
+            @RequestParam(value = "status", defaultValue = "ACTIVE", required = true) String auctionStatus,
+            @RequestParam(value = "ids", required = false) List<UUID> carIds,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "8") int size
+
     ) {
-
-        List<Auction> auctions;
         AuctionStatus status = AuctionStatus.fromString(auctionStatus);
+        PaginatedResult<Auction> result;
 
-        if(carIds != null && !carIds.isEmpty()) {
-            auctions = applicationService.getAllByCarIdsAndStatus(carIds, status);
+        if (carIds != null && !carIds.isEmpty()) {
+            result = applicationService.getAllByCarIdsAndStatus(carIds, status, page, size);
         } else {
-            auctions = applicationService.getAllByStatus(status);
+            result = applicationService.getAllByStatus(status, page, size);
         }
 
-        return ResponseEntity.ok(responseMapper.toAuctionResponses(auctions));
+        List<AuctionResponse> response = result
+                .getItems()
+                .stream()
+                .map(responseMapper::toAuctionResponse)
+                .toList();
+
+        return ResponseEntity.ok(
+                new PaginatedResult<>(
+                response,
+                result.getTotalPages(),
+                result.getTotalElements(),
+                result.getCurrentPage()
+        ));
     }
 
     @GetMapping("/{id}")

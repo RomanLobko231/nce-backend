@@ -3,6 +3,8 @@ package com.nce.backend.cars.infrastructure.jpa;
 import com.nce.backend.cars.domain.entities.Car;
 import com.nce.backend.cars.domain.valueObjects.Status;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,10 +22,10 @@ public interface CarJpaRepository extends JpaRepository<CarJpaEntity, UUID> {
     boolean existsByRegistrationNumber(@Param("registrationNumber") String registrationNumber);
 
     @Query(value = "SELECT * FROM car WHERE owner_id = :ownerId", nativeQuery = true)
-    List<CarJpaEntity> findAllByOwnerId(@Param("ownerId") UUID ownerId);
+    Page<CarJpaEntity> findAllByOwnerId(@Param("ownerId") UUID ownerId, Pageable pageable);
 
     @Query(value = "SELECT * FROM car WHERE status = :status", nativeQuery = true)
-    List<CarJpaEntity> findAllByStatus(@Param("status") String status);
+    Page<CarJpaEntity> findAllByStatus(@Param("status") String status, Pageable pageable);
 
     @Modifying
     @Transactional
