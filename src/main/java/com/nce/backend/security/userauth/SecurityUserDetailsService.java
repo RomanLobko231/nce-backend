@@ -11,7 +11,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-class SecurityUserService implements UserDetailsService {
+class SecurityUserDetailsService implements UserDetailsService {
 
     private final UserFacade userFacade;
 

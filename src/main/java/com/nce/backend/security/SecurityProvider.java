@@ -1,7 +1,9 @@
 package com.nce.backend.security;
 
+import com.nce.backend.auction.AuctionSecurityService;
 import com.nce.backend.security.jwt.JWTService;
 import com.nce.backend.security.userauth.AuthenticatedUser;
+import com.nce.backend.users.Authenticator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,24 +13,28 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class SecurityFacade {
+public class SecurityProvider implements Authenticator, AuctionSecurityService {
 
     private final PasswordEncoder passwordEncoder;
 
     private final JWTService tokenService;
 
+    @Override
     public String generateHash(String rawPassword) {
         return passwordEncoder.encode(rawPassword);
     }
 
+    @Override
     public boolean matches(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
-    public String generateToken(String email) {
+    @Override
+    public String generateTokenFrom(String email) {
         return tokenService.generateJWT(email);
     }
 
+    @Override
     public UUID getCurrentUserId() {
         AuthenticatedUser user = (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 

@@ -13,7 +13,7 @@ import static io.micrometer.common.util.StringUtils.isBlank;
 public class AuthenticationService {
 
     private final JWTService jwtService;
-    private final SecurityUserService userService;
+    private final SecurityUserDetailsService userService;
 
     //only returns Authentication object - must be set manually by client code
     public UsernamePasswordAuthenticationToken authenticateWith(String token) {

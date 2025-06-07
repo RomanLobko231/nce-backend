@@ -51,7 +51,7 @@ public class SecurityConfig {
                         .requestMatchers(GET, "/ws-auction/**", "/ws-auction").permitAll()
                         .requestMatchers(GET, "/api/v1/cars").permitAll()
                         .requestMatchers(GET, "/api/v1/cars/exists").permitAll()
-                        .requestMatchers(POST, "/api/v1/cars/add_simplified").permitAll()
+                        .requestMatchers(POST, "/api/v1/cars/add-simplified").permitAll()
                         .requestMatchers(POST, "/api/v1/cars/add_complete").hasAnyRole("ADMIN", "SELLER")
                         .requestMatchers(GET, "/api/v1/cars/**").hasAnyRole("ADMIN", "SELLER", "BUYER_COMPANY", "BUYER_REPRESENTATIVE")
                         .requestMatchers(DELETE, "/api/v1/cars/**").hasAnyRole("ADMIN", "SELLER")
