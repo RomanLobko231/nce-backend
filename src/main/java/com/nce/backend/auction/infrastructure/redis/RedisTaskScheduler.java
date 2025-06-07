@@ -7,6 +7,7 @@ import com.nce.backend.common.events.auction.AuctionEndedEvent;
 import com.nce.backend.common.events.auction.AuctionRestartedEvent;
 import com.nce.backend.common.events.auction.NewAuctionStartedEvent;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -47,7 +48,7 @@ public class RedisTaskScheduler implements AuctionTaskScheduler {
         if (endDateTimeStr != null && !endDateTimeStr.isEmpty()) {
             Instant existingDeadline = Instant.parse(endDateTimeStr);
 
-            if(isDeadlineInFuture(existingDeadline) && existingDeadline.isBefore(event.newEndDateTime())){
+            if (isDeadlineInFuture(existingDeadline) && existingDeadline.isBefore(event.newEndDateTime())) {
                 return;
             }
         }
@@ -56,6 +57,7 @@ public class RedisTaskScheduler implements AuctionTaskScheduler {
     }
 
 
+    //gives the ability to recursively set new task for ending auction if deadline has been changed
     @Override
     public void scheduleAuctionFinish(UUID auctionId, Instant finishTime) {
         if (isDeadlinePassed(finishTime)) {
@@ -103,13 +105,21 @@ public class RedisTaskScheduler implements AuctionTaskScheduler {
             if (endDateTimeStr == null) continue;
 
             Instant endDateTime = Instant.parse(endDateTimeStr);
+            UUID auctionId = UUID.fromString(auctionIdStr);
 
             if (isDeadlinePassed(endDateTime)) {
+                auctionRepository
+                        .findById(auctionId)
+                        .ifPresent(auction -> {
+                            auctionRepository.updateAuctionStatusById(AuctionStatus.FINISHED, auctionId);
+                            eventPublisher.publishEvent(
+                                    new AuctionEndedEvent(auction.getId(), auction.getCarDetails().getCarId())
+                            );
+                        });
+
                 redisTemplate.delete(jobKey);
                 continue;
             }
-
-            UUID auctionId = UUID.fromString(auctionIdStr);
 
             this.scheduleAuctionFinish(auctionId, endDateTime);
         }
