@@ -1,6 +1,6 @@
 package com.nce.backend.cars.ui;
 
-import com.nce.backend.cars.application.CarApplicationService;
+import com.nce.backend.cars.application.service.CarApplicationService;
 import com.nce.backend.cars.domain.entities.Car;
 import com.nce.backend.cars.domain.valueObjects.PaginatedResult;
 import com.nce.backend.cars.domain.valueObjects.Status;
@@ -76,16 +76,26 @@ public class CarController {
     }
 
     @GetMapping
-    ResponseEntity<PaginatedResult<CarResponse>> getAllCars(
+    ResponseEntity<PaginatedResult<CarResponse>> getAllByOwnerAndStatus(
             @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "ownerId", required = false) UUID ownerId,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "8") int size
     ) {
-        PaginatedResult<Car> result = carService.getAllCarsByStatus(Status.fromString(status), page, size);
+        PaginatedResult<Car> result;
+        Status carStatus = Status.fromString(status);
 
-        return ResponseEntity.ok(
-                carResponseMapper.toCarResponsePaginated(result)
-        );
+        if (ownerId != null && status != null) {
+            result = carService.getAllCarsByOwnerAndStatus(carStatus, ownerId, page, size);
+        } else if (ownerId != null) {
+            result = carService.getAllCarsByOwnerId(ownerId, page, size);
+        } else if (status != null) {
+            result = carService.getAllCarsByStatus(carStatus, page, size);
+        } else {
+            result = carService.getAllCars(page, size);
+        }
+
+        return ResponseEntity.ok(carResponseMapper.toCarResponsePaginated(result));
     }
 
     @GetMapping(value = "/by-owner/{ownerId}")

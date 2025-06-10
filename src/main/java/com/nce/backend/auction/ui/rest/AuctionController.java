@@ -1,6 +1,6 @@
 package com.nce.backend.auction.ui.rest;
 
-import com.nce.backend.auction.application.AuctionApplicationService;
+import com.nce.backend.auction.application.service.AuctionApplicationService;
 import com.nce.backend.auction.domain.entities.Auction;
 import com.nce.backend.auction.domain.valueObjects.AuctionStatus;
 import com.nce.backend.auction.domain.valueObjects.PaginatedResult;
@@ -11,19 +11,14 @@ import com.nce.backend.auction.ui.rest.responses.AuctionResponse;
 import com.nce.backend.auction.ui.rest.responses.AuctionResponseMapper;
 import com.nce.backend.auction.ui.websocket.requests.AutoBidMessage;
 import com.nce.backend.auction.ui.websocket.requests.BidMessage;
-import com.nce.backend.auction.ui.websocket.responses.AuctionUpdatedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -65,8 +60,8 @@ public class AuctionController {
 
 
     @GetMapping()
-    ResponseEntity<PaginatedResult<AuctionResponse>> getAllByStatus(
-            @RequestParam(value = "status", defaultValue = "ACTIVE", required = true) String auctionStatus,
+    ResponseEntity<PaginatedResult<AuctionResponse>> getAllByStatusOrOwnerId(
+            @RequestParam(value = "status", defaultValue = "Aktivt", required = false) String auctionStatus,
             @RequestParam(value = "ids", required = false) List<UUID> carIds,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "8") int size

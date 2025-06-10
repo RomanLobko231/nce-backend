@@ -1,7 +1,5 @@
 package com.nce.backend.cars.domain.valueObjects;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter

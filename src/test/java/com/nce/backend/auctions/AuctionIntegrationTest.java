@@ -1,21 +1,15 @@
 package com.nce.backend.auctions;
 
-import com.nce.backend.auction.application.AuctionApplicationService;
 import com.nce.backend.auction.domain.entities.Auction;
-import com.nce.backend.auction.domain.repository.AuctionRepository;
 import com.nce.backend.auction.domain.service.AuctionDomainService;
 import com.nce.backend.auction.domain.valueObjects.AuctionStatus;
 import com.nce.backend.auction.domain.valueObjects.Bid;
 import com.nce.backend.auction.domain.valueObjects.CarDetails;
 import com.nce.backend.auction.infrastructure.redis.RedisTaskScheduler;
-import com.nce.backend.cars.application.CarApplicationService;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import java.math.BigDecimal;

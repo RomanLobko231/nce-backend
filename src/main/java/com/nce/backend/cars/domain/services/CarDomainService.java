@@ -28,8 +28,8 @@ public class CarDomainService {
         return carRepository.save(car);
     }
 
-    public List<Car> getAll() {
-        return carRepository.findAll();
+    public PaginatedResult<Car> getAll(int page, int size) {
+        return carRepository.findAll(page, size);
     }
 
     @Transactional
@@ -53,8 +53,12 @@ public class CarDomainService {
         return carRepository.findAllByOwnerId(ownerId, page, size);
     }
 
-    public PaginatedResult<Car> getAllCarsByStatus(Status status,  int page, int size) {
+    public PaginatedResult<Car> getAllCarsByStatus(Status status, int page, int size) {
         return carRepository.findAllByStatus(status, page, size);
+    }
+
+    public PaginatedResult<Car> getAllCarsByOwnerAndStatus(Status status, UUID ownerId, int page, int size) {
+        return carRepository.findAllByOwnerAndStatus(status, ownerId, page, size);
     }
 
     @Transactional
@@ -65,4 +69,5 @@ public class CarDomainService {
     public void deleteByOwnerId(UUID id) {
         carRepository.deleteByOwnerId(id);
     }
+
 }

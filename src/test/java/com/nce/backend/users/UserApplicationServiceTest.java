@@ -1,8 +1,7 @@
 package com.nce.backend.users;
 
-import com.nce.backend.users.application.UserApplicationService;
+import com.nce.backend.users.application.service.UserApplicationService;
 import com.nce.backend.users.domain.entities.SellerUser;
-import com.nce.backend.users.domain.valueObjects.Address;
 import com.nce.backend.users.domain.valueObjects.Role;
 import com.nce.backend.users.ui.requests.address.ValidatedAddress;
 import com.nce.backend.users.ui.requests.register.RegisterSellerRequest;

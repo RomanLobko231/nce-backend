@@ -1,6 +1,6 @@
 package com.nce.backend.users.domain.services;
 
-import com.nce.backend.common.events.user.UserDeletedEvent;
+import com.nce.backend.common.event.user.UserDeletedEvent;
 import com.nce.backend.users.domain.entities.*;
 import com.nce.backend.users.domain.repositories.UserRepository;
 import com.nce.backend.users.domain.valueObjects.Role;

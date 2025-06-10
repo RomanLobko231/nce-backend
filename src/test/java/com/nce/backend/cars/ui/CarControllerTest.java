@@ -1,8 +1,9 @@
 package com.nce.backend.cars.ui;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nce.backend.cars.application.CarApplicationService;
+import com.nce.backend.cars.application.service.CarApplicationService;
 import com.nce.backend.cars.domain.entities.Car;
+import com.nce.backend.cars.domain.valueObjects.PaginatedResult;
 import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
 import com.nce.backend.cars.ui.requests.AddCarSimplifiedRequest;
 import com.nce.backend.cars.ui.requests.CarRequestMapper;
@@ -224,7 +225,16 @@ public class CarControllerTest {
     public void testGetAllCars() throws Exception {
         List<CarResponse> carResponses = List.of(CarResponse.builder().build());
 
-        when(carService.getAllCars()).thenReturn(List.of(Car.builder().build()));
+        when(carService.getAllCars(0, 10))
+                .thenReturn(
+                        new PaginatedResult<>(
+                                List.of(Car.builder().build()),
+                                1,
+                                1,
+                                0
+                        )
+
+                );
         when(carResponseMapper.toCarResponse(any())).thenReturn(carResponses.get(0));
 
         mockMvc.perform(get("/api/v1/cars"))

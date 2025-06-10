@@ -1,10 +1,10 @@
 package com.nce.backend.auction.infrastructure.jpa;
 
-import ch.qos.logback.core.read.ListAppender;
 import com.nce.backend.auction.domain.entities.Auction;
 import com.nce.backend.auction.domain.repository.AuctionRepository;
 import com.nce.backend.auction.domain.valueObjects.AuctionStatus;
 import com.nce.backend.auction.domain.valueObjects.PaginatedResult;
+import com.nce.backend.auction.infrastructure.jpa.entity.AuctionJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

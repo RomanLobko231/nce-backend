@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -26,6 +27,9 @@ public interface CarJpaRepository extends JpaRepository<CarJpaEntity, UUID> {
 
     @Query(value = "SELECT * FROM car WHERE status = :status", nativeQuery = true)
     Page<CarJpaEntity> findAllByStatus(@Param("status") String status, Pageable pageable);
+
+    @Query(value = "SELECT * FROM car WHERE owner_id = :ownerId AND status = :status", nativeQuery = true)
+    Page<CarJpaEntity> findAllByOwnerAndStatus(@Param("status") String status, @Param("ownerId") UUID ownerId, Pageable pageable);
 
     @Modifying
     @Transactional

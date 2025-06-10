@@ -1,7 +1,11 @@
 package com.nce.backend.cars.infrastructure.jpa;
 
 import com.nce.backend.cars.domain.entities.Car;
+import com.nce.backend.cars.domain.valueObjects.PaginatedResult;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CarJpaEntityMapper {
@@ -56,5 +60,20 @@ public class CarJpaEntityMapper {
                 .imagePaths(carJpaEntity.getImagePaths())
                 .expectedPrice(carJpaEntity.getExpectedPrice())
                 .build();
+    }
+
+    public PaginatedResult<Car> toPaginatedResult(Page<CarJpaEntity> result) {
+        List<Car> cars = result
+                .getContent()
+                .stream()
+                .map(this::toDomainEntity)
+                .toList();
+
+        return new PaginatedResult<>(
+                cars,
+                result.getTotalPages(),
+                result.getTotalElements(),
+                result.getNumber()
+        );
     }
 }

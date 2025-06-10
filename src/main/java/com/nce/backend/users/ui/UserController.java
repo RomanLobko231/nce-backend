@@ -3,8 +3,9 @@ package com.nce.backend.users.ui;
 import com.nce.backend.users.domain.entities.BuyerCompanyUser;
 import com.nce.backend.users.domain.entities.BuyerRepresentativeUser;
 import com.nce.backend.users.ui.requests.register.RegisterRepresentativeRequest;
+import com.nce.backend.users.ui.requests.update.PasswordUpdateRequest;
 import com.nce.backend.users.ui.requests.update.UpdateUserRequest;
-import com.nce.backend.users.application.UserApplicationService;
+import com.nce.backend.users.application.service.UserApplicationService;
 import com.nce.backend.users.domain.entities.User;
 import com.nce.backend.users.ui.requests.*;
 import com.nce.backend.users.ui.requests.register.RegisterBuyerCompanyRequest;
@@ -13,11 +14,10 @@ import com.nce.backend.users.ui.requests.register.RegisterSellerRequest;
 import com.nce.backend.users.ui.responses.*;
 import com.nce.backend.users.ui.responses.userData.*;
 import com.nce.backend.users.ui.responses.userData.buyer.BuyerCompanyUserBasicInfo;
-import com.nce.backend.users.ui.responses.userData.buyer.BuyerCompanyUserResponse;
-import com.nce.backend.users.ui.responses.userData.representative.RepresentativeUserResponse;
 import com.nce.backend.users.ui.responses.userData.representative.RepresentativeWithCompanyResponse;
 import com.nce.backend.users.ui.responses.userData.seller.SellerUserResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -130,6 +130,20 @@ public class UserController {
         UserResponse response = responseMapper.toUserResponse(savedUser);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}/update-password")
+    @PreAuthorize(
+            "hasRole('ROLE_ADMIN') or " +
+                    "#id == authentication.principal.id or " +
+                    "@userDomainService.companyHasRepresentativeById(authentication.principal.id, #id)")
+    ResponseEntity<Void> updateUserPassword(
+            @PathVariable(name = "id") @NotNull UUID id,
+            @RequestBody @Valid PasswordUpdateRequest request
+    ) {
+        userService.updatePasswordById(id, request.password());
+
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/as-admin")

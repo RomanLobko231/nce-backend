@@ -48,7 +48,6 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(GET, "/ws-auction/**", "/ws-auction").permitAll()
                         .requestMatchers(GET, "/api/v1/cars").permitAll()
                         .requestMatchers(GET, "/api/v1/cars/exists").permitAll()
                         .requestMatchers(POST, "/api/v1/cars/add-simplified").permitAll()
@@ -56,11 +55,15 @@ public class SecurityConfig {
                         .requestMatchers(GET, "/api/v1/cars/**").hasAnyRole("ADMIN", "SELLER", "BUYER_COMPANY", "BUYER_REPRESENTATIVE")
                         .requestMatchers(DELETE, "/api/v1/cars/**").hasAnyRole("ADMIN", "SELLER")
                         .requestMatchers(POST, "/api/v1/cars/**").hasAnyRole("ADMIN", "SELLER")
+
                         .requestMatchers(POST, "/api/v1/users/**", "/api/v1/users/login").permitAll()
                         .requestMatchers(GET, "/api/v1/users/**").authenticated()
                         .requestMatchers(GET, "/api/v1/users").hasAnyRole("ADMIN", "SELLER", "BUYER_COMPANY")
                         .requestMatchers(PUT, "/api/v1/users").hasAnyRole("ADMIN", "SELLER", "BUYER_COMPANY")
+                        .requestMatchers(PUT, "/api/v1/users/**").hasAnyRole("ADMIN", "SELLER", "BUYER_COMPANY")
                         .requestMatchers(DELETE, "/api/v1/users/**").authenticated()
+
+                        .requestMatchers(GET, "/ws-auction/**", "/ws-auction").permitAll()
                         .requestMatchers(GET, "/api/v1/auctions").authenticated()
                         .requestMatchers(PUT, "/api/v1/auctions").hasRole("ADMIN")
                         .requestMatchers(DELETE, "/api/v1/auctions").hasRole("ADMIN")

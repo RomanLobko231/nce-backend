@@ -1,6 +1,5 @@
 package com.nce.backend.users.ui.requests.register;
 
-import com.nce.backend.users.domain.valueObjects.BuyerCompanyAddress;
 import com.nce.backend.users.ui.requests.address.ValidatedBuyerCompanyAddress;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

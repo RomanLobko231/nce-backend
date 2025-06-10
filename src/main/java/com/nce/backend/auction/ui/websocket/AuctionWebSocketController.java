@@ -1,6 +1,6 @@
 package com.nce.backend.auction.ui.websocket;
 
-import com.nce.backend.auction.application.AuctionApplicationService;
+import com.nce.backend.auction.application.service.AuctionApplicationService;
 import com.nce.backend.auction.domain.entities.Auction;
 import com.nce.backend.auction.ui.websocket.requests.AutoBidMessage;
 import com.nce.backend.auction.ui.websocket.requests.BidMessage;

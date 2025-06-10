@@ -4,6 +4,10 @@ import com.nce.backend.auction.domain.entities.Auction;
 import com.nce.backend.auction.domain.valueObjects.AutoBid;
 import com.nce.backend.auction.domain.valueObjects.Bid;
 import com.nce.backend.auction.domain.valueObjects.CarDetails;
+import com.nce.backend.auction.infrastructure.jpa.entity.AuctionJpaEntity;
+import com.nce.backend.auction.infrastructure.jpa.entity.AutoBidEmbeddable;
+import com.nce.backend.auction.infrastructure.jpa.entity.BidEmbeddable;
+import com.nce.backend.auction.infrastructure.jpa.entity.CarDetailsEmbeddable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

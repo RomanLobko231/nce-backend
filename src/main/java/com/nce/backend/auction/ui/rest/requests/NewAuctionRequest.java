@@ -1,6 +1,5 @@
 package com.nce.backend.auction.ui.rest.requests;
 
-import com.nce.backend.common.validation.InstantInFuture;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

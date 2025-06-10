@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface CarRepository {
     Optional<Car> findById(UUID id);
-    List<Car> findAll();
+    PaginatedResult<Car> findAll(int page, int size);
     PaginatedResult<Car> findAllByOwnerId(UUID id, int page, int size);
     Car save(Car car);
     void deleteById(UUID id);
@@ -19,4 +19,5 @@ public interface CarRepository {
     PaginatedResult<Car> findAllByStatus(Status status, int page, int size);
     void updateCarStatusById(Status status, UUID carId);
     void deleteByOwnerId(UUID id);
+    PaginatedResult<Car> findAllByOwnerAndStatus(Status status, UUID ownerId, int page, int size);
 }

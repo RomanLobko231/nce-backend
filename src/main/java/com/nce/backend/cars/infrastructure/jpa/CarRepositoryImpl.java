@@ -31,12 +31,11 @@ public class CarRepositoryImpl implements CarRepository {
     }
 
     @Override
-    public List<Car> findAll() {
-        return carJpaRepository
-                .findAll()
-                .stream()
-                .map(mapper::toDomainEntity)
-                .toList();
+    public PaginatedResult<Car> findAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CarJpaEntity> result = carJpaRepository.findAll(pageable);
+
+        return mapper.toPaginatedResult(result);
     }
 
     @Override
@@ -44,18 +43,7 @@ public class CarRepositoryImpl implements CarRepository {
         Pageable pageable = PageRequest.of(page, size);
         Page<CarJpaEntity> result = carJpaRepository.findAllByOwnerId(ownerId, pageable);
 
-        List<Car> cars = result
-                .getContent()
-                .stream()
-                .map(mapper::toDomainEntity)
-                .toList();
-
-        return new PaginatedResult<>(
-                cars,
-                result.getTotalPages(),
-                result.getTotalElements(),
-                result.getNumber()
-        );
+        return mapper.toPaginatedResult(result);
     }
 
     @Override
@@ -85,18 +73,7 @@ public class CarRepositoryImpl implements CarRepository {
         Pageable pageable = PageRequest.of(page, size);
         Page<CarJpaEntity> result = carJpaRepository.findAllByStatus(status.name(), pageable);
 
-        List<Car> cars = result
-                .getContent()
-                .stream()
-                .map(mapper::toDomainEntity)
-                .toList();
-
-        return new PaginatedResult<>(
-                cars,
-                result.getTotalPages(),
-                result.getTotalElements(),
-                result.getNumber()
-        );
+        return mapper.toPaginatedResult(result);
     }
 
     @Override
@@ -107,5 +84,13 @@ public class CarRepositoryImpl implements CarRepository {
     @Override
     public void deleteByOwnerId(UUID id) {
         carJpaRepository.deleteByOwnerId(id);
+    }
+
+    @Override
+    public PaginatedResult<Car> findAllByOwnerAndStatus(Status status, UUID ownerId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CarJpaEntity> result = carJpaRepository.findAllByOwnerAndStatus(status.name(), ownerId, pageable);
+
+        return mapper.toPaginatedResult(result);
     }
 }

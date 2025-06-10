@@ -1,5 +1,6 @@
 package com.nce.backend.cars.application;
 
+import com.nce.backend.cars.application.service.CarApplicationService;
 import com.nce.backend.cars.domain.entities.Car;
 import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
 import com.nce.backend.cars.ui.requests.AddCarSimplifiedRequest;
