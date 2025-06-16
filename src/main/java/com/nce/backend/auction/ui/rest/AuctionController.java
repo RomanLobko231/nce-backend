@@ -58,9 +58,34 @@ public class AuctionController {
         return ResponseEntity.ok(responseMapper.toAuctionResponse(auction));
     }
 
+    @GetMapping("/by-status")
+    ResponseEntity<PaginatedResult<AuctionResponse>> getAllByStatus(
+            @RequestParam(value = "status", defaultValue = "Aktivt", required = false) String auctionStatus,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "8") int size
+
+    ) {
+        AuctionStatus status = AuctionStatus.fromString(auctionStatus);
+        PaginatedResult<Auction> result = applicationService.getAllByStatus(status, page, size);
+
+        List<AuctionResponse> response = result
+                .getItems()
+                .stream()
+                .map(responseMapper::toAuctionResponse)
+                .toList();
+
+        return ResponseEntity.ok(
+                new PaginatedResult<>(
+                        response,
+                        result.getTotalPages(),
+                        result.getTotalElements(),
+                        result.getCurrentPage()
+                ));
+    }
+
 
     @GetMapping()
-    ResponseEntity<PaginatedResult<AuctionResponse>> getAllByStatusOrOwnerId(
+    ResponseEntity<PaginatedResult<AuctionResponse>> getAllByStatusOrIds(
             @RequestParam(value = "status", defaultValue = "Aktivt", required = false) String auctionStatus,
             @RequestParam(value = "ids", required = false) List<UUID> carIds,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -91,6 +116,8 @@ public class AuctionController {
         ));
     }
 
+
+
     @GetMapping("/{id}")
     ResponseEntity<AuctionResponse> getAuctionById(@PathVariable UUID id) {
         Auction auction = applicationService.getAuctionById(id);
@@ -99,6 +126,7 @@ public class AuctionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     ResponseEntity<Void> deleteAuctionById(@PathVariable UUID id) {
         applicationService.deleteAuctionById(id);
 
@@ -113,6 +141,7 @@ public class AuctionController {
     }
 
     @PutMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     ResponseEntity<Void> updateAuction(@Valid @RequestBody UpdateAuctionRequest request) {
         applicationService.updateAuction(
                 requestMapper.toDomainFromUpdate(request)
@@ -124,6 +153,7 @@ public class AuctionController {
     }
 
     @PutMapping("/update-restart")
+    @PreAuthorize("hasRole('ADMIN')")
     ResponseEntity<Void> restartUpdateAuction(@Valid @RequestBody UpdateAuctionRequest request) {
         applicationService.updateRestartAuction(
                 requestMapper.toDomainFromUpdate(request)
@@ -133,6 +163,7 @@ public class AuctionController {
     }
 
     @PutMapping("/{auctionId}")
+    @PreAuthorize("hasRole('ADMIN')")
     ResponseEntity<Void> updateAuctionStatus(
             @RequestParam(name = "status", required = true) String status,
             @PathVariable UUID auctionId
