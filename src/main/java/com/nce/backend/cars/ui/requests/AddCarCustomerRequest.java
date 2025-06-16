@@ -32,7 +32,7 @@ public record AddCarCustomerRequest(
 
         @PositiveOrZero(message = "Engine volume cannot be less then 0")
         @NotNull
-        Integer engineVolume,
+        Double engineVolume,
 
         @NotBlank(message = "Bodywork cannot be null or blank")
         String bodywork,

@@ -55,7 +55,7 @@ public class VegvesenApiJsonMapper {
                 .engineVolume(
                         technicalDetailsNode
                                 .at("/motorOgDrivverk/motor/0/slagvolum")
-                                .asInt(INT_DEFAULT_VALUE)
+                                .asDouble(INT_DEFAULT_VALUE)
                 )
                 .engineType(
                         technicalDetailsNode

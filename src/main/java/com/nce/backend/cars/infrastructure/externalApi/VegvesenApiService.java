@@ -66,7 +66,7 @@ public class VegvesenApiService implements ExternalApiService {
                 .bodywork("N/A")
                 .engineType("N/A")
                 .weight(0)
-                .engineVolume(0)
+                .engineVolume(0d)
                 .numberOfDoors(0)
                 .numberOfSeats(0)
                 .operatingMode(OperatingMode.OTHER)
