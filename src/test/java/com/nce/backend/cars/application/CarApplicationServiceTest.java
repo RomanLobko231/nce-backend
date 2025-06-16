@@ -57,7 +57,7 @@ public class CarApplicationServiceTest {
                 "Model",
                 LocalDate.now().minusMonths(6),
                 "Diesel",
-                0,
+                0d,
                 "Kupe",
                 5,
                 4,
