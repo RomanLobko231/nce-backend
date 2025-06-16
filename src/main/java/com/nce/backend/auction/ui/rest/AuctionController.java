@@ -30,6 +30,7 @@ public class AuctionController {
     private final AuctionResponseMapper responseMapper;
 
     @PostMapping("/start")
+    @PreAuthorize("hasRole('ADMIN')")
     ResponseEntity<Void> startAuction(@Valid @RequestBody NewAuctionRequest request) {
         applicationService.startAuction(
                 requestMapper.toDomainFromNew(request)
@@ -39,7 +40,7 @@ public class AuctionController {
     }
 
     @PostMapping("/place-bid")
-    @PreAuthorize("authentication.principal.isAccountLocked == false")
+    @PreAuthorize("authentication.principal.isAccountLocked == false and hasRole('BUYER_REPRESENTATIVE')")
     public ResponseEntity<AuctionResponse> placeBid(@RequestBody @Valid BidMessage bid) {
         Auction auction = applicationService.placeBid(
                 bid.toDomain()
@@ -49,7 +50,7 @@ public class AuctionController {
     }
 
     @PostMapping("/place-auto-bid")
-    @PreAuthorize("authentication.principal.isAccountLocked == false")
+    @PreAuthorize("authentication.principal.isAccountLocked == false and hasRole('BUYER_REPRESENTATIVE')")
     public ResponseEntity<AuctionResponse> placeAutoBid(@RequestBody @Valid AutoBidMessage bid) {
         Auction auction = applicationService.placeAutoBid(
                 bid.toDomain()
