@@ -1,0 +1,1 @@
+ALTER TABLE car ADD COLUMN expected_price INTEGER;

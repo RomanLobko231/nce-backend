@@ -1,0 +1,4 @@
+ALTER TABLE auction
+ADD COLUMN thumbnail_image_url TEXT NOT NULL,
+ADD COLUMN make_model VARCHAR(255) NOT NULL,
+ADD COLUMN model_year VARCHAR(50) NOT NULL;

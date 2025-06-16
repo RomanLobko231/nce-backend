@@ -34,7 +34,7 @@ public record UpdateCarRequest(
 
         @PositiveOrZero(message = "Engine volume cannot be less then 0")
         @NotNull
-        Integer engineVolume,
+        Double engineVolume,
 
         @NotBlank(message = "Bodywork cannot be null or blank")
         String bodywork,
@@ -66,8 +66,9 @@ public record UpdateCarRequest(
         @NotNull
         UUID ownerId,
 
-        @NotBlank(message = "Status cannot be null or blank")
-        String status,
+        @Min(value = 0, message = "Price must be no less than 0")
+        @NotNull(message = "Price cannot be null")
+        Integer expectedPrice,
 
         String additionalInformation,
 

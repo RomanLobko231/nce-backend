@@ -19,9 +19,7 @@ public class VegvesenApiJsonMapper {
 
 
     public ApiCarData mapFromJson(JsonNode jsonNode) {
-
         JsonNode technicalDetailsNode = jsonNode.at("/kjoretoydataListe/0/godkjenning/tekniskGodkjenning/tekniskeData");
-
 
         return ApiCarData.builder()
                 .make(
@@ -57,7 +55,7 @@ public class VegvesenApiJsonMapper {
                 .engineVolume(
                         technicalDetailsNode
                                 .at("/motorOgDrivverk/motor/0/slagvolum")
-                                .asInt(INT_DEFAULT_VALUE)
+                                .asDouble(INT_DEFAULT_VALUE)
                 )
                 .engineType(
                         technicalDetailsNode

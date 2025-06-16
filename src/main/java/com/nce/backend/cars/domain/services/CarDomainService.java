@@ -1,12 +1,11 @@
 package com.nce.backend.cars.domain.services;
 
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.common.events.NewCarSavedEvent;
+import com.nce.backend.cars.domain.valueObjects.PaginatedResult;
+import com.nce.backend.cars.domain.valueObjects.Status;
 import com.nce.backend.cars.domain.repositories.CarRepository;
-import com.nce.backend.cars.exceptions.CarAlreadyExistsException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,15 +18,18 @@ public class CarDomainService {
 
     private final CarRepository carRepository;
 
-    private final ApplicationEventPublisher eventPublisher;
-
     @Transactional
     public Car save(Car car) {
         return carRepository.save(car);
     }
 
-    public List<Car> getAll() {
-        return carRepository.findAll();
+    @Transactional
+    public Car update(Car car) {
+        return carRepository.save(car);
+    }
+
+    public PaginatedResult<Car> getAll(int page, int size) {
+        return carRepository.findAll(page, size);
     }
 
     @Transactional
@@ -43,19 +45,29 @@ public class CarDomainService {
         return carRepository.existsById(id);
     }
 
-    @Transactional
-    public Car saveNewCarRequest(Car car) {
-        if (carRepository.existsByRegNumber(car.getRegistrationNumber())) {
-            throw new CarAlreadyExistsException(
-                    "Car with the registration number '%s' already exists".formatted(car.getRegistrationNumber())
-            );
-        }
-
-        Car savedCar = carRepository.save(car);
-        eventPublisher.publishEvent(
-                new NewCarSavedEvent(savedCar.getId(), savedCar.getOwnerID(), savedCar.getRegistrationNumber())
-        );
-
-        return savedCar;
+    public boolean existsByRegNumber(String regNumber) {
+        return carRepository.existsByRegNumber(regNumber);
     }
+
+    public PaginatedResult<Car> getAllCarsByOwnerId(UUID ownerId, int page, int size) {
+        return carRepository.findAllByOwnerId(ownerId, page, size);
+    }
+
+    public PaginatedResult<Car> getAllCarsByStatus(Status status, int page, int size) {
+        return carRepository.findAllByStatus(status, page, size);
+    }
+
+    public PaginatedResult<Car> getAllCarsByOwnerAndStatus(Status status, UUID ownerId, int page, int size) {
+        return carRepository.findAllByOwnerAndStatus(status, ownerId, page, size);
+    }
+
+    @Transactional
+    public void updateCarStatus(Status status, UUID carId) {
+        carRepository.updateCarStatusById(status, carId);
+    }
+
+    public void deleteByOwnerId(UUID id) {
+        carRepository.deleteByOwnerId(id);
+    }
+
 }

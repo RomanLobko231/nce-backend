@@ -1,6 +1,7 @@
 package com.nce.backend.cars.ui.responses;
 
 import lombok.Builder;
+import org.hibernate.Internal;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,7 +24,7 @@ public record CarResponse(
 
         String engineType,
 
-        Integer engineVolume,
+        Double engineVolume,
 
         String bodywork,
 
@@ -46,6 +47,8 @@ public record CarResponse(
         String status,
 
         String additionalInformation,
+
+        Integer expectedPrice,
 
         List<String> imagePaths
 ) {

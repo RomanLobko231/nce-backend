@@ -2,8 +2,13 @@ package com.nce.backend.cars.infrastructure.jpa;
 
 import com.nce.backend.cars.domain.entities.Car;
 import com.nce.backend.cars.domain.repositories.CarRepository;
+import com.nce.backend.cars.domain.valueObjects.PaginatedResult;
+import com.nce.backend.cars.domain.valueObjects.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -26,12 +31,19 @@ public class CarRepositoryImpl implements CarRepository {
     }
 
     @Override
-    public List<Car> findAll() {
-        return carJpaRepository
-                .findAll()
-                .stream()
-                .map(mapper::toDomainEntity)
-                .toList();
+    public PaginatedResult<Car> findAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CarJpaEntity> result = carJpaRepository.findAll(pageable);
+
+        return mapper.toPaginatedResult(result);
+    }
+
+    @Override
+    public PaginatedResult<Car> findAllByOwnerId(UUID ownerId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CarJpaEntity> result = carJpaRepository.findAllByOwnerId(ownerId, pageable);
+
+        return mapper.toPaginatedResult(result);
     }
 
     @Override
@@ -54,5 +66,31 @@ public class CarRepositoryImpl implements CarRepository {
     @Override
     public boolean existsById(UUID id) {
         return carJpaRepository.existsById(id);
+    }
+
+    @Override
+    public PaginatedResult<Car> findAllByStatus(Status status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CarJpaEntity> result = carJpaRepository.findAllByStatus(status.name(), pageable);
+
+        return mapper.toPaginatedResult(result);
+    }
+
+    @Override
+    public void updateCarStatusById(Status status, UUID carId) {
+        carJpaRepository.updateCarStatusById(status.name(), carId);
+    }
+
+    @Override
+    public void deleteByOwnerId(UUID id) {
+        carJpaRepository.deleteByOwnerId(id);
+    }
+
+    @Override
+    public PaginatedResult<Car> findAllByOwnerAndStatus(Status status, UUID ownerId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CarJpaEntity> result = carJpaRepository.findAllByOwnerAndStatus(status.name(), ownerId, pageable);
+
+        return mapper.toPaginatedResult(result);
     }
 }

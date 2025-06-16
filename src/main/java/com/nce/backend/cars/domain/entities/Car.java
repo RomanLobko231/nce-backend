@@ -30,7 +30,7 @@ public class Car {
 
     private String engineType;
 
-    private Integer engineVolume;
+    private Double engineVolume;
 
     private String bodywork;
 
@@ -54,11 +54,15 @@ public class Car {
 
     private String additionalInformation;
 
+    private Integer expectedPrice;
+
     @Builder.Default
     private List<String> imagePaths = new ArrayList<>();
 
     public void addNewImagePaths(List<String> newImagePaths) {
-        imagePaths.addAll(newImagePaths);
+        if (newImagePaths != null && !imagePaths.contains(null)) {
+            this.imagePaths.addAll(newImagePaths);
+        }
     }
 
     public void updateDataFromApi(ApiCarData apiData){

@@ -1,8 +1,9 @@
 package com.nce.backend.cars.application;
 
+import com.nce.backend.cars.application.service.CarApplicationService;
 import com.nce.backend.cars.domain.entities.Car;
 import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
-import com.nce.backend.cars.ui.requests.AddCarCustomerRequest;
+import com.nce.backend.cars.ui.requests.AddCarSimplifiedRequest;
 import com.nce.backend.cars.ui.requests.CarRequestMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -29,14 +30,15 @@ public class CarApplicationServiceTest {
     @Test
     @Transactional
     void testAddCarAsCustomer_savesCarSuccessfully() {
-        AddCarCustomerRequest request = new AddCarCustomerRequest(
+        AddCarSimplifiedRequest request = new AddCarSimplifiedRequest(
                UUID.randomUUID(),
                 "ABC123",
-                10
+                10,
+                10000
         );
 
-        Car mappedCar = carRequestMapper.toCarFromCustomerRequest(request);
-        Car savedCar = carApplicationService.addCarAsCustomer(mappedCar, Collections.emptyList());
+        Car mappedCar = carRequestMapper.toCarFromCustomerSimpleRequest(request);
+        Car savedCar = carApplicationService.addCarSimplified(mappedCar, Collections.emptyList());
 
         assertNotNull(savedCar);
         assertEquals("ABC123", savedCar.getRegistrationNumber());
@@ -65,12 +67,12 @@ public class CarApplicationServiceTest {
                 1000,
                 LocalDate.now().plusMonths(6),
                 UUID.randomUUID(),
-                "Vurdering",
+                10000,
                 null,
                 Collections.emptyList()
         );
         Car mappedCar = carRequestMapper.toCarFromAdminRequest(request);
-        Car savedCar = carApplicationService.addCarAsAdmin(mappedCar, Collections.emptyList());
+        Car savedCar = carApplicationService.addCarComplete(mappedCar, Collections.emptyList());
 
         assertNotNull(savedCar);
         assertNotNull(savedCar.getId());

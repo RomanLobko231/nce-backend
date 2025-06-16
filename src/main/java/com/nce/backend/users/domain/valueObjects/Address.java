@@ -1,8 +1,16 @@
 package com.nce.backend.users.domain.valueObjects;
 
-import lombok.Builder;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-@Builder
-public record Address(String streetAddress, String postalLocation, String postalCode) {
 
+@SuperBuilder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Address {
+    private String streetAddress;
+    private String postalLocation;
+    private String postalCode;
 }

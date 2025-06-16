@@ -1,5 +1,6 @@
 package com.nce.backend.users.infrastructure.jpa.entities;
 
+import com.nce.backend.users.domain.entities.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import lombok.AllArgsConstructor;
@@ -18,4 +19,5 @@ import lombok.experimental.SuperBuilder;
 public class AdminJpaEntity extends UserJpaEntity {
 
     private String fallbackEmail;
+
 }

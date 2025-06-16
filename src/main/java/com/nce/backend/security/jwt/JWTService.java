@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -15,11 +16,14 @@ import java.util.function.Function;
 @Service
 public class JWTService {
 
-    private final String SECRET_KEY = "N0ZCcWNFY3E3OTZxRGNxNzVjcUI4MzE2RkVxd0Y1OHF3cUQ0ODdxdzY3QzVxdzE=";
+    @Value("${security.jwt.secret-key}")
+    private String SECRET_KEY;
 
-    private final long EXPIRATION_TIME = 86400000;
+    @Value("${security.jwt.expiration}")
+    private long EXPIRATION_TIME;
 
-    private final String ISSUER = "NCE_BACKEND";
+    @Value("${security.jwt.issuer}")
+    private String ISSUER;
 
     public String generateJWT(String email) {
         return Jwts

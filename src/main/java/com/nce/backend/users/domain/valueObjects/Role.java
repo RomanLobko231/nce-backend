@@ -2,6 +2,8 @@ package com.nce.backend.users.domain.valueObjects;
 
 public enum Role {
     SELLER,
-    BUYER,
+    ONE_TIME_SELLER,
+    BUYER_COMPANY,
+    BUYER_REPRESENTATIVE,
     ADMIN
 }

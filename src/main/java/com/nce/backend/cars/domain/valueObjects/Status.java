@@ -1,7 +1,5 @@
 package com.nce.backend.cars.domain.valueObjects;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -21,9 +19,9 @@ public enum Status {
         this.value = value;
     }
 
-    public static Status fromString(String apiValue) {
+    public static Status fromString(String value) {
         for (Status type : values()) {
-            if (type.value.equalsIgnoreCase(apiValue)) {
+            if (type.value.equalsIgnoreCase(value)) {
                 return type;
             }
         }
