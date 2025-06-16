@@ -1,10 +1,11 @@
 package com.nce.backend.cars.ui;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nce.backend.cars.application.CarApplicationService;
+import com.nce.backend.cars.application.service.CarApplicationService;
 import com.nce.backend.cars.domain.entities.Car;
+import com.nce.backend.cars.domain.valueObjects.PaginatedResult;
 import com.nce.backend.cars.ui.requests.AddCarAdminRequest;
-import com.nce.backend.cars.ui.requests.AddCarCustomerRequest;
+import com.nce.backend.cars.ui.requests.AddCarSimplifiedRequest;
 import com.nce.backend.cars.ui.requests.CarRequestMapper;
 import com.nce.backend.cars.ui.requests.UpdateCarRequest;
 import com.nce.backend.cars.ui.responses.CarResponse;
@@ -50,10 +51,11 @@ public class CarControllerTest {
 
     @Test
     public void testAddCarAsCustomer() throws Exception {
-        AddCarCustomerRequest request = new AddCarCustomerRequest(
+        AddCarSimplifiedRequest request = new AddCarSimplifiedRequest(
                 UUID.randomUUID(),
                 "ABC123",
-                10
+                10,
+                10000
         );
 
         MockMultipartFile carDataPart = new MockMultipartFile(
@@ -83,8 +85,8 @@ public class CarControllerTest {
                 .kilometers(request.kilometers())
                 .build();
 
-        when(carRequestMapper.toCarFromCustomerRequest(any(AddCarCustomerRequest.class))).thenReturn(mockCar);
-        when(carService.addCarAsCustomer(any(Car.class), anyList())).thenReturn(mockCar);
+        when(carRequestMapper.toCarFromCustomerSimpleRequest(any(AddCarSimplifiedRequest.class))).thenReturn(mockCar);
+        when(carService.addCarSimplified(any(Car.class), anyList())).thenReturn(mockCar);
 
         mockMvc.perform(multipart("/api/v1/cars/customer")
                         .file(carDataPart)
@@ -94,7 +96,7 @@ public class CarControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(carService).addCarAsCustomer(mockCar, List.of(image1, image2));
+        verify(carService).addCarSimplified(mockCar, List.of(image1, image2));
     }
 
     @Test
@@ -106,7 +108,7 @@ public class CarControllerTest {
                 "Model",
                 LocalDate.now().minusMonths(6),
                 "Diesel",
-                0,
+                0d,
                 "Kupe",
                 5,
                 4,
@@ -116,7 +118,7 @@ public class CarControllerTest {
                 10,
                 LocalDate.now().plusMonths(6),
                 UUID.randomUUID(),
-                "Vurdering",
+                10000,
                 null,
                 Collections.emptyList()
         );
@@ -144,7 +146,7 @@ public class CarControllerTest {
         Car mockCar = Car.builder().build();
 
         when(carRequestMapper.toCarFromAdminRequest(any(AddCarAdminRequest.class))).thenReturn(mockCar);
-        when(carService.addCarAsAdmin(any(Car.class), anyList())).thenReturn(mockCar);
+        when(carService.addCarComplete(any(Car.class), anyList())).thenReturn(mockCar);
 
         mockMvc.perform(multipart("/api/v1/cars/admin")
                         .file(carDataPart)
@@ -154,7 +156,7 @@ public class CarControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(carService).addCarAsAdmin(mockCar, List.of(image1, image2));
+        verify(carService).addCarComplete(mockCar, List.of(image1, image2));
     }
 
     @Test
@@ -167,7 +169,7 @@ public class CarControllerTest {
                 "Model",
                 LocalDate.now().minusMonths(6),
                 "Diesel",
-                0,
+                0d,
                 "Kupe",
                 5,
                 4,
@@ -177,7 +179,7 @@ public class CarControllerTest {
                 1000,
                 LocalDate.now().plusMonths(6),
                 UUID.randomUUID(),
-                "Vurdering",
+                1000,
                 null,
                 Collections.emptyList()
         );
@@ -223,7 +225,16 @@ public class CarControllerTest {
     public void testGetAllCars() throws Exception {
         List<CarResponse> carResponses = List.of(CarResponse.builder().build());
 
-        when(carService.getAllCars()).thenReturn(List.of(Car.builder().build()));
+        when(carService.getAllCars(0, 10))
+                .thenReturn(
+                        new PaginatedResult<>(
+                                List.of(Car.builder().build()),
+                                1,
+                                1,
+                                0
+                        )
+
+                );
         when(carResponseMapper.toCarResponse(any())).thenReturn(carResponses.get(0));
 
         mockMvc.perform(get("/api/v1/cars"))

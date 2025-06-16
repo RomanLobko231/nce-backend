@@ -28,6 +28,7 @@ public class CarJpaEntity {
 
     @NotNull(message = "Registration number can't be null")
     @NotBlank(message = "Registration number can't be null")
+    @Column(unique = true, nullable = false)
     private String registrationNumber;
 
     private Integer kilometers;
@@ -40,7 +41,7 @@ public class CarJpaEntity {
 
     private String engineType;
 
-    private Integer engineVolume;
+    private Double engineVolume;
 
     private String bodywork;
 
@@ -69,7 +70,9 @@ public class CarJpaEntity {
 
     private String additionalInformation;
 
-    @ElementCollection
+    private Integer expectedPrice;
+
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "car_image_paths",
             joinColumns = @JoinColumn(name = "car_id")

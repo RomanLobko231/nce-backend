@@ -8,6 +8,5 @@ import java.util.UUID;
 public record AuthSuccessResponse(
         String token,
 
-        UUID userId
-) {
+        UUID userId) {
 }

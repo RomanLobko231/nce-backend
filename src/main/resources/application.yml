@@ -21,9 +21,27 @@ spring:
     baseline-version: 0
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 20MB
+      max-request-size: 20MB
+  data:
+    redis:
+      port: ${REDISPORT}
+      host: ${REDISHOST}
+      password: ${REDISPASSWORD}
 
-authorization:
-  token: ${AUTH_TOKEN}
+vegvesen:
+  api-key: ${VEGVESEN_API_KEY}
 
+security:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    expiration: ${JWT_EXPIRATION}
+    issuer: ${JWT_ISSUER}
+  allowed-origins: ${ALLOWED_ORIGINS}
+
+aws:
+  s3:
+    private-bucket-name: ${S3_PRIVATE_BUCKET_NAME}
+    public-bucket-name: ${S3_PUBLIC_BUCKET_NAME}
+    secret-access-key: ${AWS_SECRET_ACCESS_KEY}
+    access-key-id: ${AWS_ACCESS_KEY_ID}

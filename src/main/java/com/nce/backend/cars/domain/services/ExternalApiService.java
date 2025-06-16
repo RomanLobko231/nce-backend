@@ -2,6 +2,8 @@ package com.nce.backend.cars.domain.services;
 
 import com.nce.backend.cars.domain.valueObjects.ApiCarData;
 
+import java.util.concurrent.CompletableFuture;
+
 public interface ExternalApiService {
-    ApiCarData fetchCarData(String registrationNumber);
+    CompletableFuture<ApiCarData> fetchCarData(String registrationNumber);
 }

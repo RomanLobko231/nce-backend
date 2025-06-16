@@ -27,10 +27,10 @@ public class CarRequestMapper {
                 .nextEUControl(request.nextEUControl())
                 .numberOfSeats(request.numberOfSeats())
                 .numberOfDoors(request.numberOfDoors())
-                .status(Status.fromString(request.status()))
                 .ownerID(request.ownerId())
                 .additionalInformation(request.additionalInformation())
                 .imagePaths(request.imagePaths())
+                .expectedPrice(request.expectedPrice())
                 .build();
     }
 
@@ -51,18 +51,42 @@ public class CarRequestMapper {
                 .nextEUControl(request.nextEUControl())
                 .numberOfSeats(request.numberOfSeats())
                 .numberOfDoors(request.numberOfDoors())
-                .status(Status.fromString(request.status()))
                 .ownerID(request.ownerId())
                 .additionalInformation(request.additionalInformation())
+                .expectedPrice(request.expectedPrice())
                 .imagePaths(request.imagePaths())
                 .build();
     }
-    
+
     public Car toCarFromCustomerRequest(AddCarCustomerRequest request) {
+        return Car.builder()
+                .make(request.make())
+                .model(request.model())
+                .engineType(request.engineType())
+                .engineVolume(request.engineVolume())
+                .bodywork(request.bodywork())
+                .kilometers(request.kilometers())
+                .registrationNumber(request.registrationNumber())
+                .color(request.color())
+                .weight(request.weight())
+                .gearboxType(GearboxType.fromString(request.gearboxType()))
+                .operatingMode(OperatingMode.fromString(request.operatingMode()))
+                .firstTimeRegisteredInNorway(request.firstTimeRegisteredInNorway())
+                .nextEUControl(request.nextEUControl())
+                .numberOfSeats(request.numberOfSeats())
+                .numberOfDoors(request.numberOfDoors())
+                .ownerID(request.ownerId())
+                .additionalInformation(request.additionalInformation())
+                .expectedPrice(request.expectedPrice())
+                .build();
+    }
+    
+    public Car toCarFromCustomerSimpleRequest(AddCarSimplifiedRequest request) {
         return Car.builder()
                 .registrationNumber(request.registrationNumber())
                 .ownerID(request.ownerId())
                 .kilometers(request.kilometers())
+                .expectedPrice(request.expectedPrice())
                 .status(Status.IN_REVIEW)
                 .build();
     }

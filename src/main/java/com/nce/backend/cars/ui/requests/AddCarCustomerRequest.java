@@ -3,21 +3,71 @@ package com.nce.backend.cars.ui.requests;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.lang.Nullable;
+import jakarta.validation.constraints.PositiveOrZero;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 public record AddCarCustomerRequest(
 
-        @NotNull(message = "Owner ID cannot be null")
-        UUID ownerId,
-
-        @NotBlank(message = "Registration number should not be blank")
-        @NotNull(message = "Registration number cannot be null")
+        @NotBlank(message = "Registration number cannot be null or blank")
         String registrationNumber,
 
-        @NotNull(message = "KMs cannot be null")
-        @Min(value = 0, message = "Kilometers value cannot be less than 0")
-        Integer kilometers
+        @PositiveOrZero(message = "Kilometers cannot be less then 0")
+        @NotNull
+        Integer kilometers,
+
+        @NotBlank(message = "Make cannot be null or blank")
+        String make,
+
+        @NotBlank(message = "Model cannot be null or blank")
+        String model,
+
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        LocalDate firstTimeRegisteredInNorway,
+
+        @NotBlank(message = "Engine type cannot be null or blank")
+        String engineType,
+
+        @PositiveOrZero(message = "Engine volume cannot be less then 0")
+        @NotNull
+        Double engineVolume,
+
+        @NotBlank(message = "Bodywork cannot be null or blank")
+        String bodywork,
+
+        @PositiveOrZero(message = "Seats cannot be less then 0")
+        @NotNull
+        Integer numberOfSeats,
+
+        @PositiveOrZero(message = "Doors cannot be less then 0")
+        @NotNull
+        Integer numberOfDoors,
+
+        @NotBlank(message = "Color cannot be null or blank")
+        String color,
+
+        @NotBlank(message = "Gearbox type cannot be null or blank")
+        String gearboxType,
+
+        @NotBlank(message = "Operating mode cannot be null or blank")
+        String operatingMode,
+
+        @PositiveOrZero(message = "Weight cannot be less then 0")
+        @NotNull
+        Integer weight,
+
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        LocalDate nextEUControl,
+
+        @NotNull
+        UUID ownerId,
+
+        @Min(value = 0, message = "Price must be no less than 0")
+        @NotNull(message = "Price cannot be null")
+        Integer expectedPrice,
+
+        String additionalInformation
 ) {
 }
