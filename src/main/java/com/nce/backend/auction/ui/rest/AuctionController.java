@@ -30,7 +30,7 @@ public class AuctionController {
     private final AuctionResponseMapper responseMapper;
 
     @PostMapping("/start")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<Void> startAuction(@Valid @RequestBody NewAuctionRequest request) {
         applicationService.startAuction(
                 requestMapper.toDomainFromNew(request)
@@ -40,7 +40,7 @@ public class AuctionController {
     }
 
     @PostMapping("/place-bid")
-    @PreAuthorize("authentication.principal.isAccountLocked == false and hasRole('BUYER_REPRESENTATIVE')")
+    @PreAuthorize("authentication.principal.isAccountLocked == false and hasRole('ROLE_BUYER_REPRESENTATIVE')")
     public ResponseEntity<AuctionResponse> placeBid(@RequestBody @Valid BidMessage bid) {
         Auction auction = applicationService.placeBid(
                 bid.toDomain()
@@ -50,7 +50,7 @@ public class AuctionController {
     }
 
     @PostMapping("/place-auto-bid")
-    @PreAuthorize("authentication.principal.isAccountLocked == false and hasRole('BUYER_REPRESENTATIVE')")
+    @PreAuthorize("authentication.principal.isAccountLocked == false and hasRole('ROLE_BUYER_REPRESENTATIVE')")
     public ResponseEntity<AuctionResponse> placeAutoBid(@RequestBody @Valid AutoBidMessage bid) {
         Auction auction = applicationService.placeAutoBid(
                 bid.toDomain()
@@ -127,7 +127,7 @@ public class AuctionController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<Void> deleteAuctionById(@PathVariable UUID id) {
         applicationService.deleteAuctionById(id);
 
@@ -142,7 +142,7 @@ public class AuctionController {
     }
 
     @PutMapping()
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<Void> updateAuction(@Valid @RequestBody UpdateAuctionRequest request) {
         applicationService.updateAuction(
                 requestMapper.toDomainFromUpdate(request)
@@ -154,7 +154,7 @@ public class AuctionController {
     }
 
     @PutMapping("/update-restart")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<Void> restartUpdateAuction(@Valid @RequestBody UpdateAuctionRequest request) {
         applicationService.updateRestartAuction(
                 requestMapper.toDomainFromUpdate(request)
@@ -164,7 +164,7 @@ public class AuctionController {
     }
 
     @PutMapping("/{auctionId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<Void> updateAuctionStatus(
             @RequestParam(name = "status", required = true) String status,
             @PathVariable UUID auctionId

@@ -67,6 +67,17 @@ public class UserApplicationService {
         return userDomainService.registerRepresentative(representative);
     }
 
+
+    public User registerAdmin(AdminUser admin) {
+        if (userDomainService.existsByEmail(admin.getEmail())) {
+            throw new UserAlreadyExistsException("User with this email already exists");
+        }
+        this.setEncodedPassword(admin);
+
+
+        return userDomainService.registerAdmin(admin);
+    }
+
     @LoggableAction(action = "REGISTER_USER")
     public User registerOneTimeSeller(OneTimeSellerUser oneTimeSeller) {
         String randomEmail = UUID.randomUUID().toString();
@@ -94,6 +105,7 @@ public class UserApplicationService {
 
         return AuthSuccessResponse
                 .builder()
+                .role(user.getRole().name())
                 .token(token)
                 .userId(user.getId())
                 .build();
@@ -148,6 +160,10 @@ public class UserApplicationService {
     @LoggableAction(action = "GET_USER_INFO")
     public List<SellerUser> findAllSellers() {
         return userDomainService.findAllSellers();
+    }
+
+    public List<AdminUser> findAllAdmins() {
+        return userDomainService.findAllAdmins();
     }
 
     @LoggableAction(action = "GET_USER_INFO")

@@ -1,9 +1,6 @@
 package com.nce.backend.users.infrastructure.jpa.repositories;
 
-import com.nce.backend.users.domain.entities.BuyerCompanyUser;
-import com.nce.backend.users.domain.entities.BuyerRepresentativeUser;
-import com.nce.backend.users.domain.entities.SellerUser;
-import com.nce.backend.users.domain.entities.User;
+import com.nce.backend.users.domain.entities.*;
 import com.nce.backend.users.domain.repositories.UserRepository;
 import com.nce.backend.users.infrastructure.jpa.UserJpaEntityMapper;
 import com.nce.backend.users.infrastructure.jpa.entities.UserJpaEntity;
@@ -36,6 +33,15 @@ public class UserRepositoryImpl implements UserRepository {
         return userJpaRepository
                 .findByEmail(email)
                 .map(entityMapper::toUserDomainEntity);
+    }
+
+    @Override
+    public List<AdminUser> findAllAdminUsers() {
+        return userJpaRepository
+                .findAllAdminUsers()
+                .stream()
+                .map(entityMapper::toAdminDomainEntity)
+                .toList();
     }
 
     @Override

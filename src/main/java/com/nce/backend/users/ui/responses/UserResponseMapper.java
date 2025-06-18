@@ -2,6 +2,7 @@ package com.nce.backend.users.ui.responses;
 
 import com.nce.backend.users.domain.entities.*;
 import com.nce.backend.users.ui.responses.userData.*;
+import com.nce.backend.users.ui.responses.userData.admin.AdminUserResponse;
 import com.nce.backend.users.ui.responses.userData.buyer.BuyerCompanyUserBasicInfo;
 import com.nce.backend.users.ui.responses.userData.buyer.BuyerCompanyUserResponse;
 import com.nce.backend.users.ui.responses.userData.representative.RepresentativeUserResponse;
@@ -30,7 +31,9 @@ public class UserResponseMapper {
             return toOneTimeSellerResponse(oneTimeSellerUser);
         } else if (user instanceof BuyerRepresentativeUser representativeUser) {
             return toRepresentativeUserResponse(representativeUser);
-        } else {
+        } else if (user instanceof AdminUser adminUser) {
+            return toAdminUserResponse(adminUser);
+        }else {
             throw new IllegalStateException("Unknown user type");
         }
     }
@@ -73,6 +76,19 @@ public class UserResponseMapper {
                 .phoneNumber(user.getPhoneNumber())
                 .email(user.getEmail())
                 .isAccountLocked(user.isAccountLocked())
+                .build();
+    }
+
+    public AdminUserResponse toAdminUserResponse(AdminUser user){
+        return AdminUserResponse
+                .builder()
+                .id(user.getId())
+                .name(user.getName())
+                .role(user.getRole().name())
+                .phoneNumber(user.getPhoneNumber())
+                .email(user.getEmail())
+                .isAccountLocked(user.isAccountLocked())
+                .fallbackEmail(user.getFallbackEmail())
                 .build();
     }
 

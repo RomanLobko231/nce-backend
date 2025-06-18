@@ -6,17 +6,14 @@ import com.nce.backend.users.domain.valueObjects.BuyerCompanyAddress;
 import com.nce.backend.users.domain.valueObjects.Role;
 import com.nce.backend.users.ui.requests.address.ValidatedAddress;
 import com.nce.backend.users.ui.requests.address.ValidatedBuyerCompanyAddress;
-import com.nce.backend.users.ui.requests.register.RegisterBuyerCompanyRequest;
-import com.nce.backend.users.ui.requests.register.RegisterOneTimeSellerRequest;
-import com.nce.backend.users.ui.requests.register.RegisterRepresentativeRequest;
-import com.nce.backend.users.ui.requests.register.RegisterSellerRequest;
+import com.nce.backend.users.ui.requests.register.*;
 import com.nce.backend.users.ui.requests.update.*;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserRequestMapper {
 
-    public User toDomainEntity(UpdateUserRequest updateUserRequest) {
+    public User toDomainEntityFromUpdate(UpdateUserRequest updateUserRequest) {
         if (updateUserRequest instanceof UpdateSellerRequest request) {
             return toSellerUserFromUpdate(request);
         } else if (updateUserRequest instanceof UpdateBuyerCompanyRequest request) {
@@ -25,7 +22,10 @@ public class UserRequestMapper {
             return toOneTimeSellerFromUpdate(request);
         } else if (updateUserRequest instanceof UpdateBuyerRepresentativeRequest request) {
             return toRepresentativeFromUpdate(request);
-        } else {
+        } else if (updateUserRequest instanceof UpdateAdminRequest request) {
+            return toAdminFromUpdate(request);
+        }
+        else {
             throw new IllegalArgumentException("Unknown update request type");
         }
     }
@@ -39,6 +39,19 @@ public class UserRequestMapper {
                 .id(request.getId())
                 .name(request.getName())
                 .savedCarIds(request.getSavedCarIds())
+                .isAccountLocked(request.isAccountLocked())
+                .role(Role.valueOf(request.getRole()))
+                .build();
+    }
+
+    private AdminUser toAdminFromUpdate(UpdateAdminRequest request) {
+        return AdminUser
+                .builder()
+                .phoneNumber(request.getPhoneNumber())
+                .email(request.getEmail())
+                .id(request.getId())
+                .name(request.getName())
+                .fallbackEmail(request.getFallbackEmail())
                 .isAccountLocked(request.isAccountLocked())
                 .role(Role.valueOf(request.getRole()))
                 .build();
@@ -127,6 +140,17 @@ public class UserRequestMapper {
                 )
                 .organisationName(request.organisationName())
                 .organisationNumber(request.organisationNumber())
+                .build();
+    }
+
+    public AdminUser toAdminFromRegister(RegisterAdminRequest request){
+        return AdminUser
+                .builder()
+                .email(request.email())
+                .password(request.password())
+                .name(request.name())
+                .phoneNumber(request.phoneNumber())
+                .fallbackEmail(request.fallbackEmail())
                 .build();
     }
 

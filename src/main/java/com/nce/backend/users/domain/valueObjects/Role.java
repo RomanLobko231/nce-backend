@@ -5,5 +5,6 @@ public enum Role {
     ONE_TIME_SELLER,
     BUYER_COMPANY,
     BUYER_REPRESENTATIVE,
-    ADMIN
+    ADMIN,
+    SUPER_ADMIN,
 }

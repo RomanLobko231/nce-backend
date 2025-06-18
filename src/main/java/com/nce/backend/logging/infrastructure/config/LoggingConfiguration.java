@@ -14,7 +14,7 @@ public class LoggingConfiguration {
         delegate.setCorePoolSize(2);
         delegate.setMaxPoolSize(4);
         delegate.setQueueCapacity(50);
-        delegate.setThreadNamePrefix("logging-executor-");
+        delegate.setThreadNamePrefix("logs-executor-");
         delegate.initialize();
 
         return new DelegatingSecurityContextAsyncTaskExecutor(delegate);

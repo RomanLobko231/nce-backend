@@ -99,7 +99,7 @@ public class CarController {
     }
 
     @GetMapping(value = "/by-owner/{ownerId}")
-    @PreAuthorize("#ownerId == authentication.principal.id or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("#ownerId == authentication.principal.id or hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<PaginatedResult<CarResponse>> getAllCarsByOwnerId(
             @PathVariable UUID ownerId,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -121,7 +121,7 @@ public class CarController {
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("#carData.ownerId() == authentication.principal.id or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("#carData.ownerId() == authentication.principal.id or hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<Void> updateCar(@RequestPart(name = "carData") @Valid UpdateCarRequest carData,
                                    @RequestPart(name = "images", required = false) List<MultipartFile> images) {
 
