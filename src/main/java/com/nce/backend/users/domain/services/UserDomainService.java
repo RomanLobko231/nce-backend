@@ -44,6 +44,13 @@ public class UserDomainService {
     }
 
     @Transactional
+    public User registerAdmin(AdminUser admin) {
+        admin.setRole(Role.ADMIN);
+
+        return userRepository.save(admin);
+    }
+
+    @Transactional
     public User saveUser(User userToSave) {
         return userRepository.save(userToSave);
     }
@@ -59,6 +66,10 @@ public class UserDomainService {
 
     public List<SellerUser> findAllSellers() {
         return userRepository.findAllSellerUsers();
+    }
+
+    public List<AdminUser> findAllAdmins() {
+        return userRepository.findAllAdminUsers();
     }
 
     public List<BuyerCompanyUser> findAllBuyerCompanies() {

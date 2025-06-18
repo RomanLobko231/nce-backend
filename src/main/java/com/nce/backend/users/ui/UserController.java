@@ -2,17 +2,15 @@ package com.nce.backend.users.ui;
 
 import com.nce.backend.users.domain.entities.BuyerCompanyUser;
 import com.nce.backend.users.domain.entities.BuyerRepresentativeUser;
-import com.nce.backend.users.ui.requests.register.RegisterRepresentativeRequest;
+import com.nce.backend.users.ui.requests.register.*;
 import com.nce.backend.users.ui.requests.update.PasswordUpdateRequest;
 import com.nce.backend.users.ui.requests.update.UpdateUserRequest;
 import com.nce.backend.users.application.service.UserApplicationService;
 import com.nce.backend.users.domain.entities.User;
 import com.nce.backend.users.ui.requests.*;
-import com.nce.backend.users.ui.requests.register.RegisterBuyerCompanyRequest;
-import com.nce.backend.users.ui.requests.register.RegisterOneTimeSellerRequest;
-import com.nce.backend.users.ui.requests.register.RegisterSellerRequest;
 import com.nce.backend.users.ui.responses.*;
 import com.nce.backend.users.ui.responses.userData.*;
+import com.nce.backend.users.ui.responses.userData.admin.AdminUserResponse;
 import com.nce.backend.users.ui.responses.userData.buyer.BuyerCompanyUserBasicInfo;
 import com.nce.backend.users.ui.responses.userData.representative.RepresentativeWithCompanyResponse;
 import com.nce.backend.users.ui.responses.userData.seller.SellerUserResponse;
@@ -84,6 +82,18 @@ public class UserController {
         return ResponseEntity.ok(responseMapper.toUserResponse(registeredUser));
     }
 
+    @PostMapping(value = "/register-admin")
+    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    ResponseEntity<UserResponse> registerAdmin(
+            @RequestBody @Valid RegisterAdminRequest request
+    ) {
+        User newAdmin = userService.registerAdmin(
+                requestMapper.toAdminFromRegister(request)
+        );
+
+        return ResponseEntity.ok(responseMapper.toUserResponse(newAdmin));
+    }
+
     @PostMapping("/login")
     ResponseEntity<AuthSuccessResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
         AuthSuccessResponse authResponse = userService.authenticateUser(loginRequest);
@@ -92,7 +102,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("#id == authentication.principal.id or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("#id == authentication.principal.id or hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<UserResponse> getUserById(@PathVariable(name = "id") UUID id) {
         User user = userService.findUserById(id);
         UserResponse response = responseMapper.toUserResponse(user);
@@ -101,7 +111,7 @@ public class UserController {
     }
 
     @GetMapping("/by-email/{email}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<UserResponse> getUserByEmail(@PathVariable(name = "email") String email) {
         User user = userService.findUserByEmail(email);
         UserResponse response = responseMapper.toUserResponse(user);
@@ -110,7 +120,7 @@ public class UserController {
     }
 
     @GetMapping("/by-number/{phoneNumber}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<UserResponse> getUserByPhoneNumber(@PathVariable(name = "phoneNumber") String number) {
         User user = userService.findUserByPhoneNumber(number);
         UserResponse response = responseMapper.toUserResponse(user);
@@ -120,12 +130,12 @@ public class UserController {
 
     @PutMapping()
     @PreAuthorize(
-            "hasRole('ROLE_ADMIN') or " +
+            "hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN') or " +
                     "#request.id == authentication.principal.id or " +
                     "@userDomainService.companyHasRepresentativeById(authentication.principal.id, #request.id)")
     ResponseEntity<UserResponse> updateUser(@RequestBody @Valid UpdateUserRequest request) {
         User savedUser = userService.updateUser(
-                requestMapper.toDomainEntity(request)
+                requestMapper.toDomainEntityFromUpdate(request)
         );
         UserResponse response = responseMapper.toUserResponse(savedUser);
 
@@ -134,7 +144,7 @@ public class UserController {
 
     @PutMapping("/{id}/update-password")
     @PreAuthorize(
-            "hasRole('ROLE_ADMIN') or " +
+            "hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN') or " +
                     "#id == authentication.principal.id or " +
                     "@userDomainService.companyHasRepresentativeById(authentication.principal.id, #id)")
     ResponseEntity<Void> updateUserPassword(
@@ -147,10 +157,10 @@ public class UserController {
     }
 
     @PutMapping("/as-admin")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<UserResponse> updateUserAsAdmin(@RequestBody @Valid UpdateUserRequest request) {
         User savedUser = userService.updateUserAsAdmin(
-                requestMapper.toDomainEntity(request)
+                requestMapper.toDomainEntityFromUpdate(request)
         );
         UserResponse response = responseMapper.toUserResponse(savedUser);
 
@@ -179,6 +189,18 @@ public class UserController {
         );
     }
 
+    @GetMapping("/admins")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
+    ResponseEntity<List<AdminUserResponse>> getAllAdmins() {
+        return ResponseEntity.ok(
+                userService
+                        .findAllAdmins()
+                        .stream()
+                        .map(responseMapper::toAdminUserResponse)
+                        .toList()
+        );
+    }
+
     @GetMapping("/buyers")
     ResponseEntity<List<BuyerCompanyUserBasicInfo>> getAllBuyers(
             @RequestParam(name = "isLocked", required = false) Boolean isLocked) {
@@ -196,7 +218,7 @@ public class UserController {
     }
 
     @GetMapping("/buyers/{id}/licences")
-    @PreAuthorize("#id == authentication.principal.id or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("#id == authentication.principal.id or hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<List<String>> getLicenceUrlsByBuyerId(@PathVariable UUID id) {
         List<String> urls = userService.getLicenceUrlsByBuyerId(id);
 
@@ -204,7 +226,7 @@ public class UserController {
     }
 
     @GetMapping("/representatives/{id}")
-    @PreAuthorize("#id == authentication.principal.id or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("#id == authentication.principal.id or hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<UserResponse> getRepresentativeById(@PathVariable UUID id) {
         BuyerRepresentativeUser representative = userService.getRepresentativeById(id);
         UserResponse response = responseMapper.toUserResponse(representative);
@@ -213,7 +235,7 @@ public class UserController {
     }
 
     @GetMapping("/representatives/{id}/with-company")
-    @PreAuthorize("#id == authentication.principal.id or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("#id == authentication.principal.id or hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<RepresentativeWithCompanyResponse> getRepresentativeWithCompanyById(@PathVariable UUID id) {
         BuyerRepresentativeUser representative = userService.getRepresentativeById(id);
         BuyerCompanyUser company = userService.getCompanyById(representative.getBuyerCompanyId());
@@ -226,7 +248,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize(
-            "hasRole('ROLE_ADMIN') or " +
+            "hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN') or " +
                     "#id == authentication.principal.id or " +
                     "@userDomainService.companyHasRepresentativeById(authentication.principal.id, #id)"
     )
@@ -237,7 +259,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/set-lock")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     ResponseEntity<Void> setLockOnUserAccount(
             @PathVariable UUID id,
             @RequestParam(name = "isLocked") boolean isLocked
