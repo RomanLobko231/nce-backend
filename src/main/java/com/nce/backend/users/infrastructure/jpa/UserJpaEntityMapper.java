@@ -22,9 +22,9 @@ public class UserJpaEntityMapper {
             return toBuyerCompanyUserDomainEntity(buyerEntity);
         } else if (jpaEntity instanceof OneTimeSellerJpaEntity oneTimeSellerEntity) {
             return toOneTimeSellerDomainEntity(oneTimeSellerEntity);
-        } else if (jpaEntity instanceof  AdminJpaEntity adminEntity) {
+        } else if (jpaEntity instanceof AdminJpaEntity adminEntity) {
             return toAdminDomainEntity(adminEntity);
-        } else if (jpaEntity instanceof  BuyerRepresentativeJpaEntity repEntity) {
+        } else if (jpaEntity instanceof BuyerRepresentativeJpaEntity repEntity) {
             return toBuyerRepresentativeDomain(repEntity);
         } else {
             throw new IllegalArgumentException("Unsupported entity type: " + jpaEntity.getClass().getSimpleName());
@@ -38,16 +38,16 @@ public class UserJpaEntityMapper {
             return toBuyerCompanyJpaEntity(buyerCompanyUser);
         } else if (domainEntity instanceof OneTimeSellerUser oneTimeSellerUser) {
             return toOneTimeSellerJpaEntity(oneTimeSellerUser);
-        } else if (domainEntity instanceof  AdminUser adminUser) {
+        } else if (domainEntity instanceof AdminUser adminUser) {
             return toAdminJpaEntity(adminUser);
-        } else if (domainEntity instanceof  BuyerRepresentativeUser repUser) {
+        } else if (domainEntity instanceof BuyerRepresentativeUser repUser) {
             return toBuyerRepresentativeJpaEntity(repUser);
         } else {
             throw new IllegalArgumentException("Unsupported entity type: " + domainEntity.getClass().getSimpleName());
         }
     }
 
-    private AdminUser toAdminDomainEntity(AdminJpaEntity jpaEntity) {
+    public AdminUser toAdminDomainEntity(AdminJpaEntity jpaEntity) {
         return AdminUser
                 .builder()
                 .phoneNumber(jpaEntity.getPhoneNumber())
@@ -57,12 +57,12 @@ public class UserJpaEntityMapper {
                 .id(jpaEntity.getId())
                 .role(jpaEntity.getRole())
                 .isAccountLocked(jpaEntity.isAccountLocked())
-                .fallbackEmail(jpaEntity.getFallbackEmail())
+                .fallbackEmail("-")
                 .build();
     }
 
     private AdminJpaEntity toAdminJpaEntity(AdminUser domainEntity) {
-       return AdminJpaEntity
+        return AdminJpaEntity
                 .builder()
                 .phoneNumber(domainEntity.getPhoneNumber())
                 .name(domainEntity.getName())
@@ -71,7 +71,7 @@ public class UserJpaEntityMapper {
                 .id(domainEntity.getId())
                 .role(domainEntity.getRole())
                 .isAccountLocked(domainEntity.isAccountLocked())
-                .fallbackEmail(domainEntity.getFallbackEmail())
+                .fallbackEmail("-")
                 .build();
     }
 
@@ -216,7 +216,7 @@ public class UserJpaEntityMapper {
                 .build();
     }
 
-    private BuyerRepresentativeJpaEntity toBuyerRepresentativeJpaEntity(BuyerRepresentativeUser domainEntity){
+    private BuyerRepresentativeJpaEntity toBuyerRepresentativeJpaEntity(BuyerRepresentativeUser domainEntity) {
         return BuyerRepresentativeJpaEntity
                 .builder()
                 .buyerCompanyId(domainEntity.getBuyerCompanyId())
@@ -231,7 +231,7 @@ public class UserJpaEntityMapper {
                 .build();
     }
 
-    public BuyerRepresentativeUser toBuyerRepresentativeDomain(BuyerRepresentativeJpaEntity jpaEntity){
+    public BuyerRepresentativeUser toBuyerRepresentativeDomain(BuyerRepresentativeJpaEntity jpaEntity) {
         return BuyerRepresentativeUser
                 .builder()
                 .buyerCompanyId(jpaEntity.getBuyerCompanyId())

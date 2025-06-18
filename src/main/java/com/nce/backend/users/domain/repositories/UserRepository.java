@@ -1,10 +1,7 @@
 package com.nce.backend.users.domain.repositories;
 
 import com.nce.backend.cars.domain.entities.Car;
-import com.nce.backend.users.domain.entities.BuyerCompanyUser;
-import com.nce.backend.users.domain.entities.BuyerRepresentativeUser;
-import com.nce.backend.users.domain.entities.SellerUser;
-import com.nce.backend.users.domain.entities.User;
+import com.nce.backend.users.domain.entities.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +10,7 @@ import java.util.UUID;
 public interface UserRepository {
     Optional<User> findById(UUID id);
     Optional<User> findByEmail(String email);
+    List<AdminUser> findAllAdminUsers();
     List<SellerUser> findAllSellerUsers();
     List<BuyerCompanyUser> findAllBuyerCompanyUsers();
     Optional<BuyerCompanyUser> findBuyerCompanyUserById(UUID id);

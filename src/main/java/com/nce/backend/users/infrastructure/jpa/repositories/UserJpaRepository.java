@@ -1,5 +1,6 @@
 package com.nce.backend.users.infrastructure.jpa.repositories;
 
+import com.nce.backend.users.infrastructure.jpa.entities.AdminJpaEntity;
 import com.nce.backend.users.infrastructure.jpa.entities.buyer.BuyerCompanyJpaEntity;
 import com.nce.backend.users.infrastructure.jpa.entities.buyer.BuyerRepresentativeJpaEntity;
 import com.nce.backend.users.infrastructure.jpa.entities.seller.SellerJpaEntity;
@@ -30,6 +31,13 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UUID> {
             JOIN base_user u ON su.seller_id = u.id
             """, nativeQuery = true)
     List<SellerJpaEntity> findAllSellerUsers();
+
+    @Query(value = """
+            SELECT au.*, u.*
+            FROM app_admin au
+            JOIN base_user u ON au.admin_id = u.id
+            """, nativeQuery = true)
+    List<AdminJpaEntity> findAllAdminUsers();
 
     @Query(value = """
             SELECT bu.*, u.*
@@ -91,4 +99,5 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UUID> {
 
     @Query(value = "SELECT url FROM org_licence_urls WHERE buyer_company_id = :buyerId", nativeQuery = true)
     List<String> findLicencesByBuyerId(@Param("buyerId") UUID buyerId);
+
 }

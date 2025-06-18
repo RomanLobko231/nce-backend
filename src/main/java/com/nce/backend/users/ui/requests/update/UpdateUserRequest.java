@@ -23,6 +23,8 @@ import java.util.UUID;
         @JsonSubTypes.Type(value = UpdateOneTimeSellerRequest.class, name = "ONE_TIME_SELLER"),
         @JsonSubTypes.Type(value = UpdateBuyerCompanyRequest.class, name = "BUYER_COMPANY"),
         @JsonSubTypes.Type(value = UpdateBuyerRepresentativeRequest.class, name = "BUYER_REPRESENTATIVE"),
+        @JsonSubTypes.Type(value = UpdateAdminRequest.class, name = "SUPER_ADMIN"),
+        @JsonSubTypes.Type(value = UpdateAdminRequest.class, name = "ADMIN"),
 })
 @Getter
 @AllArgsConstructor
