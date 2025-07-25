@@ -1,0 +1,1 @@
+ALTER TABLE car ALTER COLUMN engine_volume TYPE VARCHAR(50);

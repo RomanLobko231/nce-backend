@@ -14,7 +14,7 @@ public record ApiCarData(
 
          String engineType,
 
-         Double engineVolume,
+         String engineVolume,
 
          String bodywork,
 

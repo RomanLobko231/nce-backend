@@ -24,7 +24,7 @@ public record CarResponse(
 
         String engineType,
 
-        Double engineVolume,
+        String engineVolume,
 
         String bodywork,
 
