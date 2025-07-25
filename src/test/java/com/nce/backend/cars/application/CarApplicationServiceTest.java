@@ -57,7 +57,7 @@ public class CarApplicationServiceTest {
                 "Model",
                 LocalDate.now().minusMonths(6),
                 "Diesel",
-                0d,
+                "2.3",
                 "Kupe",
                 5,
                 4,
@@ -81,7 +81,7 @@ public class CarApplicationServiceTest {
         assertEquals("Make", savedCar.getMake());
         assertEquals("Model", savedCar.getModel());
         assertEquals("Diesel", savedCar.getEngineType());
-        assertEquals(0, savedCar.getEngineVolume());
+        assertEquals("2.3", savedCar.getEngineVolume());
         assertEquals("Kupe", savedCar.getBodywork());
         assertEquals("Black", savedCar.getColor());
         assertEquals("Manuell", savedCar.getGearboxType().getValue());
