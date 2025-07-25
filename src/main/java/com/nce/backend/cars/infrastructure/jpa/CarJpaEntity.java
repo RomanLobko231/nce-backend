@@ -41,7 +41,7 @@ public class CarJpaEntity {
 
     private String engineType;
 
-    private Double engineVolume;
+    private String engineVolume;
 
     private String bodywork;
 
